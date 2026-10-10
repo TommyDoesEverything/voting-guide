@@ -546,6 +546,9 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
 .cc.party-edge { border-left: 4px solid var(--pc); }
 .pf.party-edge { border-top: 5px solid var(--pc); }
 .party-top-edge { border-top: 5px solid var(--pc); }
+.party-top-edge .party-counts div { background: color-mix(in srgb, var(--pc) 9%, var(--surface-2)); }
+.party-top-edge .party-counts b { color: var(--pc-ink); }
+.party-top-edge .party-counts .none b { color: var(--muted); }
 .bar-row.party-bar .bar-fill { background: var(--pc); }
 .compare thead th { border-bottom: 3px solid var(--pc, transparent); }
 .compare thead th:first-child { border-bottom-color: var(--line); }
@@ -555,7 +558,7 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
   .compare td { border-left: 4px solid var(--pc); }
   .compare td::before { color: var(--pc-ink); }
 }
-/* Coloured names are always links (to a party or a candidate). */
+/* Party-coloured names that link to the party or the candidate. */
 .party-link { color: var(--pc-ink); font-weight: 700; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--pc) 45%, transparent); text-underline-offset: 3px; }
 .party-link:hover { text-decoration-color: var(--pc); }
 .positions a.who { display: flex; align-items: center; width: fit-content; }
