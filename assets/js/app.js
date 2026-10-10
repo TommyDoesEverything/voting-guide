@@ -81,6 +81,11 @@
   }
   function orgName(c) { return c.org ? G.orgs[c.org].name : "Independent / no organization listed"; }
   function orgShort(c) { return c.org ? G.orgs[c.org].short : "Independent"; }
+  // Party badge that links to the party (or the Independents card) on the Parties page.
+  function orgBadge(c) {
+    var target = c.org || "independent";
+    return '<a class="badge badge-link" href="#parties/' + target + '" title="About ' + esc(c.org ? G.orgs[c.org].name : "independent candidates") + '">' + esc(orgShort(c)) + "</a>";
+  }
   function plainName(c) {
     // "Mike HURLEY" -> "Mike Hurley" for running text.
     return c.name.replace(/\b([A-Z])([A-Z]+)\b/g, function (_, a, b) { return a + b.toLowerCase(); });
@@ -400,7 +405,7 @@
     var debate = debateCount(c.ops);
     return '<article class="cc' + (isPicked(c.id) ? " is-picked" : "") + '" id="card-' + esc(c.id) + '">' +
       "<div>" +
-        '<div class="cc-top"><span class="badge' + (c.office === "mayor" ? " solid" : "") + '">' + esc(OFFICES[c.office].label) + '</span><span class="badge">' + esc(orgShort(c)) + "</span></div>" +
+        '<div class="cc-top"><span class="badge' + (c.office === "mayor" ? " solid" : "") + '">' + esc(OFFICES[c.office].label) + '</span>' + orgBadge(c) + "</div>" +
         '<h3 class="cc-name">' + esc(c.name) + "</h3>" +
         (tags ? '<div class="cc-tags">' + tags + "</div>" : "") +
         '<div class="cc-focus-wrap"><p class="cc-focus-label">Focus</p>' +
@@ -468,7 +473,7 @@
     var c = BY_ID[id];
     if (!c) return;
     var o = OFFICES[c.office];
-    var badges = '<span class="badge' + (c.office === "mayor" ? " solid" : "") + '">' + esc(o.label) + '</span><span class="badge">' + esc(orgShort(c)) + "</span>" +
+    var badges = '<span class="badge' + (c.office === "mayor" ? " solid" : "") + '">' + esc(o.label) + '</span>' + orgBadge(c) +
       c.flags.map(function (f) { return '<span class="badge' + (FLAGS[f].cls === "warn" ? " warn" : "") + '">' + esc(FLAGS[f].text) + "</span>"; }).join("");
 
     function noteList(list) { return list.map(function (n) { return "<li>" + esc(n.text) + srcChips(n.src) + "</li>"; }).join(""); }
@@ -617,7 +622,7 @@
     $("#view-parties").innerHTML =
       intro("Parties", "Candidates can run with a civic party (officially an \"elector organization\") or on their own. These are local groups, separate from provincial and federal parties. Listed alphabetically. Promises are quoted or closely paraphrased from each party's platform. A political lean is shown only where an independent source states one.") +
       '<div class="grid-3">' + cards +
-      '<article class="card party"><div><span class="badge">No party</span></div><h2>Independents</h2>' +
+      '<article class="card party" id="org-independent"><div><span class="badge">No party</span></div><h2>Independents</h2>' +
         '<p class="small">' + indep.length + " candidates have no party listed on their City profile. Each one's priorities are on their candidate card.</p>" +
         Object.keys(OFFICES).map(function (off) {
           var people = indep.filter(function (c) { return c.office === off; });

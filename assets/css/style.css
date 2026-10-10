@@ -238,6 +238,9 @@ section[data-view] > * + * { margin-top: 20px; }
   font-size: .72rem; font-weight: 700; line-height: 1.6; white-space: nowrap;
   background: var(--surface-2); color: var(--text-2); border: 1px solid var(--line);
 }
+a.badge-link { text-decoration: none; cursor: pointer; }
+a.badge-link::after { content: " ›"; opacity: .55; }
+a.badge-link:hover { border-color: var(--text); color: var(--text); }
 .badge.solid { background: var(--btn); color: var(--btn-text); border-color: var(--btn); }
 .badge.warn { background: var(--warn-soft); color: var(--warn-text); border-color: var(--warn-line); }
 .badge.opinion { background: var(--opinion-soft); color: var(--opinion-text); border-color: var(--opinion-line); }
