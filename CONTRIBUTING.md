@@ -27,6 +27,7 @@ This guide is only useful if people of every political view can trust it. These 
 ## 3. Neutral language
 
 - No em dashes; use a plain hyphen.
+- No emoji. Use the line icons in `index.html` (`icon("name")` in app.js). Icons label what something is (a topic, a time, an action), never how to feel about it, and never sit next to a candidate or party as a judgement.
 - Describe what people say and do, not whether it's good. No adjectives like "radical", "common-sense", "extreme", "boondoggle" or "populist", except inside a direct quote.
 - No ratings, pros and cons, predictions, "front-runner" labels or endorsements.
 - Context notes must be factual and verifiable, for example "Currently in office", "Says they are no longer running" or "Also on the provincial ballot". They must apply the same way to anyone they'd fit.

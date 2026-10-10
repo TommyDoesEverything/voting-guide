@@ -503,6 +503,7 @@ window.GUIDE = {
   issues: [
     {
       id: "housing",
+      icon: "home",
       title: "Housing & multiplexes (Bill 44)",
       summary: "Provincial law now requires cities to allow 3-6 homes on most single-family lots. Candidates disagree about that and about how much new housing the city should build itself.",
       facts: [
@@ -519,6 +520,7 @@ window.GUIDE = {
     },
     {
       id: "taxes",
+      icon: "receipt",
       title: "Property taxes & city finances",
       summary: "Burnaby raised property taxes 2.9% for 2026. Its plan pencils in larger increases after that. Candidates range from tax freezes to keeping increases near the regional average.",
       facts: [
@@ -535,6 +537,7 @@ window.GUIDE = {
     },
     {
       id: "hospital",
+      icon: "hospital",
       title: "Burnaby Hospital Phase 2",
       summary: "The province cancelled the construction contract for the hospital's next phase in April 2026. Hospitals are a provincial responsibility, but many local candidates say they'll press for it.",
       facts: [
@@ -551,6 +554,7 @@ window.GUIDE = {
     },
     {
       id: "safety",
+      icon: "shield",
       title: "Shelters, supportive housing & drug use",
       summary: "Shelter and supportive-housing locations have drawn large protests. Some parties want to pause or restrict these projects. Others focus on health-based responses.",
       facts: [
@@ -568,6 +572,7 @@ window.GUIDE = {
     },
     {
       id: "schools",
+      icon: "school",
       title: "Schools (trustee race)",
       summary: "Trustee candidates talk about crowding, cuts to programs like Grade 7 band, mental-health supports, and sexual orientation and gender identity (SOGI) education.",
       facts: [

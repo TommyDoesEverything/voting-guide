@@ -9,9 +9,9 @@
   var POLLS = window.POLLS || [];
 
   var OFFICES = {
-    mayor: { label: "Mayor", plural: "Mayor", seats: G.election.seats.mayor, src: "city-profiles-mayor" },
-    council: { label: "Council", plural: "City Council", seats: G.election.seats.council, src: "city-profiles-council" },
-    trustee: { label: "Trustee", plural: "School Trustees", seats: G.election.seats.trustee, src: "city-profiles-trustee" },
+    mayor: { icon: "user", label: "Mayor", plural: "Mayor", seats: G.election.seats.mayor, src: "city-profiles-mayor" },
+    council: { icon: "users", label: "Council", plural: "City Council", seats: G.election.seats.council, src: "city-profiles-council" },
+    trustee: { icon: "school", label: "Trustee", plural: "School Trustees", seats: G.election.seats.trustee, src: "city-profiles-trustee" },
   };
   var FLAGS = {
     incumbent: { text: "Incumbent", cls: "strong" },
@@ -53,6 +53,8 @@
   var state = { office: "mayor", org: "all", query: "" };
 
   // ---------------------------------------------------------------- helpers
+  // Inline line icon from the sprite in index.html (decorative).
+  function icon(name, cls) { return '<svg class="i' + (cls ? " " + cls : "") + '" aria-hidden="true"><use href="#i-' + name + '"/></svg>'; }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (ch) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
@@ -76,8 +78,10 @@
   }
   function shortPublisher(p) { return p.replace(/\s*\(.*\)$/, "").replace(/, in partnership with .*/, "").replace("The Canadian Press via ", ""); }
   function ext(url, label) { return '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(label) + "</a>"; }
-  function more(summary, body, open) {
-    return '<details class="more"' + (open ? " open" : "") + "><summary>" + esc(summary) + '</summary><div class="more-body">' + body + "</div></details>";
+  var MORE_ICONS = { "Links & official documents": "link", "More of their platform": "file", "Further reading": "news", "Who can vote, accepted ID and accessibility": "id", "What do they actually decide?": "landmark" };
+  function more(summary, body, open, ico) {
+    ico = ico || MORE_ICONS[summary] || (/^All \d+ candidates/.test(summary) ? "users" : /^Candidates who/.test(summary) ? "users" : /^Arguments for/.test(summary) ? "scale" : null);
+    return '<details class="more"' + (open ? " open" : "") + "><summary>" + (ico ? icon(ico) : "") + esc(summary) + '</summary><div class="more-body">' + body + "</div></details>";
   }
   function orgName(c) { return c.org ? G.orgs[c.org].name : "Independent / no organization listed"; }
   function orgShort(c) { return c.org ? G.orgs[c.org].short : "Independent"; }
@@ -166,7 +170,7 @@
     var on = isPicked(id);
     $all('.pick-btn[data-id="' + id + '"]').forEach(function (b) {
       b.setAttribute("aria-pressed", on);
-      b.textContent = on ? "Picked" : "Pick";
+      b.innerHTML = icon(on ? "check" : "star") + (on ? "Picked" : "Pick");
     });
     var card = document.getElementById("card-" + id);
     if (card) card.classList.toggle("is-picked", on);
@@ -180,16 +184,18 @@
   }
   function pickButton(c) {
     var on = isPicked(c.id);
-    return '<button type="button" class="btn sm ghost pick-btn" data-id="' + esc(c.id) + '" aria-pressed="' + on + '" aria-label="Pick ' + esc(plainName(c)) + '">' + (on ? "Picked" : "Pick") + "</button>";
+    return '<button type="button" class="btn sm ghost pick-btn" data-id="' + esc(c.id) + '" aria-pressed="' + on + '" aria-label="Pick ' + esc(plainName(c)) + '">' + icon(on ? "check" : "star") + (on ? "Picked" : "Pick") + "</button>";
   }
 
   // -------------------------------------------------------------------- theme
   function initTheme() {
     var btn = $("#theme-btn");
     var META = { auto: "System", light: "Light", dark: "Dark" };
+    var ICONS = { auto: "monitor", light: "sun", dark: "moon" };
     function label() {
       var t = document.documentElement.dataset.theme || "auto";
-      $("#theme-label").textContent = "Theme: " + META[t];
+      $("#theme-label").textContent = META[t];
+      $("#theme-icon").setAttribute("href", "#i-" + ICONS[t]);
       btn.setAttribute("aria-label", "Colour theme: " + META[t] + ". Tap to change.");
     }
     btn.addEventListener("click", function () {
@@ -227,15 +233,15 @@
   }
   function opinionsBox(list, subject) {
     var groups = [
-      { key: "for", label: "Arguments for", tag: "For" },
-      { key: "against", label: "Criticisms & arguments against", tag: "Against" },
-      { key: "reported", label: "Reported in news coverage", tag: "Reported" },
+      { key: "for", label: "Arguments for", tag: "For", icon: "check" },
+      { key: "against", label: "Criticisms & arguments against", tag: "Against", icon: "x" },
+      { key: "reported", label: "Reported in news coverage", tag: "Reported", icon: "news" },
     ];
     var body = groups.map(function (g) {
       var items = list.filter(function (o) { return o.stance === g.key; });
       if (!items.length) return "";
       return '<div class="op-group"><p class="label">' + esc(g.label) + '</p><ul class="ops">' + items.map(function (o) {
-        return '<li class="op"><span class="op-tag">' + g.tag + '</span><div><div class="say">' + esc(o.text) + srcChips(o.src) + "</div>" + voiceLine(o.voice) + "</div></li>";
+        return '<li class="op"><span class="op-tag">' + icon(g.icon) + g.tag + '</span><div><div class="say">' + esc(o.text) + srcChips(o.src) + "</div>" + voiceLine(o.voice) + "</div></li>";
       }).join("") + "</ul></div>";
     }).join("");
     if (!body) body = '<p class="none-found">We haven\'t found published arguments for or against ' + esc(subject) + " beyond their own statement. No criticism listed isn't an endorsement.</p>";
@@ -281,7 +287,7 @@
     var snap = p.snapshot.map(function (s) {
       return "<div><b>" + esc(s.value) + "</b><span>" + esc(s.label) + "</span><small>" + esc(s.detail) + (s.src ? srcChips(s.src) : "") + "</small></div>";
     }).join("");
-    return '<div><h2>What Burnaby residents told pollsters</h2><p class="small muted">' + esc(p.pollster) + " · fieldwork " + esc(p.fieldDates) + " · " + p.burnabyN + " Burnaby respondents" + srcChips(p.src) + "</p></div>" +
+    return '<div><h2 class="h-ico">' + icon("chart") + 'What Burnaby residents told pollsters</h2><p class="small muted">' + esc(p.pollster) + " · fieldwork " + esc(p.fieldDates) + " · " + p.burnabyN + " Burnaby respondents" + srcChips(p.src) + "</p></div>" +
       '<div class="grid-2">' +
         '<div class="card"><p class="label">Mayoral vote intention</p><p class="small muted">"' + esc(p.mayor.question) + '"</p><div class="bars">' + barRows(p.mayor.results, "mayor") + '</div><p class="small muted">' + esc(p.mayor.note) + "</p></div>" +
         '<div class="card"><p class="label">Burnaby mood</p><div class="snap">' + snap + '</div><p class="label" style="margin-top:16px">Top local issues</p><div class="bars">' + barRows(p.issues) + '</div><p class="small muted">' + esc(p.issuesNote) + "</p></div>" +
@@ -293,9 +299,9 @@
     var e = G.election;
     var tiles = Object.keys(OFFICES).map(function (o) {
       var n = CANDS.filter(function (c) { return c.office === o; }).length;
-      return '<a class="tile" href="#candidates/' + o + '"><span><span class="label">' + esc(OFFICES[o].plural) + "</span>" +
+      return '<a class="tile" href="#candidates/' + o + '"><span class="tile-ico">' + icon(OFFICES[o].icon) + '</span><span class="tile-text"><span class="label">' + esc(OFFICES[o].plural) + "</span>" +
         "<strong>Vote for " + (OFFICES[o].seats === 1 ? "1" : "up to " + OFFICES[o].seats) + "</strong>" +
-        '<span class="small muted">' + n + ' candidates</span></span><span class="arrow" aria-hidden="true">→</span></a>';
+        '<span class="small muted">' + n + ' candidates</span></span><span class="arrow">' + icon("arrow") + '</span></a>';
     }).join("");
 
     var flagged = CANDS.filter(function (c) { return c.flags.indexOf("withdrawn") > -1 || c.flags.indexOf("provincial") > -1; });
@@ -319,16 +325,16 @@
         "</div>" +
       "</div>" +
 
-      (notices ? '<div class="notice"><h2>Good to know</h2><ul>' +
+      (notices ? '<div class="notice"><h2 class="h-ico">' + icon("alert") + 'Good to know</h2><ul>' +
         "<li>The <strong>provincial election on October 24</strong> is a separate vote, one week later. Some local candidates are on both ballots." + srcChips(["ebc-candidates"]) + "</li>" +
         notices + "</ul></div>" : "") +
 
       '<div class="grid-2">' +
-        '<div class="card"><h2>Before you go</h2><ul class="facts">' +
-          '<li><span><strong>' + esc(e.hours) + "</strong>, " + esc(e.day) + ". Advance voting: " + esc(e.advance) + "." + srcChips(["city-elections"]) + "</span></li>" +
-          '<li><span><strong>Vote at any location.</strong> There are no assigned voting places. ' + ext(G.sources["city-map"].url, "Locations and wait times") + srcChips(["city-voters"]) + "</span></li>" +
-          '<li><span><strong>Bring ID.</strong> Not registered? Bring two pieces showing who you are and where you live (one with your signature). You can register on the spot.' + srcChips(["city-voters"]) + "</span></li>" +
-          '<li><span><strong>Need help?</strong> Curbside voting at every location; translation and interpreters available.' + srcChips(["city-voters"]) + "</span></li>" +
+        '<div class="card"><h2 class="h-ico">' + icon("pin") + 'Before you go</h2><ul class="facts">' +
+          '<li>' + icon("clock") + '<span><strong>' + esc(e.hours) + "</strong>, " + esc(e.day) + ". Advance voting: " + esc(e.advance) + "." + srcChips(["city-elections"]) + "</span></li>" +
+          '<li>' + icon("pin") + '<span><strong>Vote at any location.</strong> There are no assigned voting places. ' + ext(G.sources["city-map"].url, "Locations and wait times") + srcChips(["city-voters"]) + "</span></li>" +
+          '<li>' + icon("id") + '<span><strong>Bring ID.</strong> Not registered? Bring two pieces showing who you are and where you live (one with your signature). You can register on the spot.' + srcChips(["city-voters"]) + "</span></li>" +
+          '<li>' + icon("access") + '<span><strong>Need help?</strong> Curbside voting at every location; translation and interpreters available.' + srcChips(["city-voters"]) + "</span></li>" +
         "</ul>" +
         more("Who can vote, accepted ID and accessibility",
           "<p><strong>Residents:</strong> Canadian citizen, 18+ by voting day, living in BC for at least 6 months and in Burnaby when you register.</p>" +
@@ -337,7 +343,7 @@
           "<p><strong>Accessibility:</strong> an assisted ballot-marking device is at Edmonds Community Centre on all voting days.</p>" +
           '<p class="small muted">Mail-ballot applications closed October 5.' + srcChips(["city-voters", "city-elections"]) + "</p>") +
         "</div>" +
-        '<div class="card"><h2>How your ballot works</h2>' +
+        '<div class="card"><h2 class="h-ico">' + icon("ballot") + 'How your ballot works</h2>' +
           "<p>You vote for <strong>individual people</strong>, not a party list. People in the same party run as a team, but you can mix and match.</p>" +
           "<ul><li>Mayor: pick 1. Council: up to 8. School trustees: up to 7." + srcChips(["city-voters"]) + "</li>" +
           "<li>Picking <strong>fewer</strong> is fine. Marking <strong>more</strong> than the limit cancels your votes in that race only." + srcChips(["bc-lga"]) + "</li>" +
@@ -349,7 +355,7 @@
         "</div>" +
       "</div>" +
 
-      "<div><h2>What's on your ballot</h2></div>" +
+      "<div><h2 class=\"h-ico\">" + icon("ballot") + "What's on your ballot</h2></div>" +
       '<div class="tiles">' + tiles + "</div>" +
 
       keyIssues() +
@@ -359,12 +365,12 @@
 
   // Compact preview of the Issues tab; each card links to the full, sourced issue.
   function keyIssues() {
-    return '<div><h2>Key issues in this election</h2><p class="small muted">The debates candidates and parties return to most. Each links to sourced background and what each side has said.</p></div>' +
+    return '<div><h2 class="h-ico">' + icon("message") + 'Key issues in this election</h2><p class="small muted">The debates candidates and parties return to most. Each links to sourced background and what each side has said.</p></div>' +
       '<div class="grid-3 issue-previews">' + G.issues.map(function (iss, i) {
         return '<a class="card issue-preview" href="#issues/' + iss.id + '">' +
-          '<div class="issue-head"><span class="issue-num">' + (i + 1) + "</span><h3>" + esc(iss.title) + "</h3></div>" +
+          '<div class="issue-head"><span class="issue-num">' + icon(iss.icon) + "</span><h3>" + esc(iss.title) + "</h3></div>" +
           '<p class="sum">' + esc(iss.summary) + "</p>" +
-          '<span class="more-link">Facts and positions →</span></a>';
+          '<span class="more-link">Facts and positions' + icon("arrow") + '</span></a>';
       }).join("") + "</div>";
   }
 
@@ -379,7 +385,7 @@
       '<div class="card filters-card">' +
         '<div class="seg" role="group" aria-label="Choose a race">' + seg + "</div>" +
         '<div class="filter-row">' +
-          '<label class="input"><span class="visually-hidden">Search</span><input type="search" id="cand-q" placeholder="Search names or topics, e.g. transit" autocomplete="off"></label>' +
+          '<label class="input">' + icon("search") + '<span class="visually-hidden">Search</span><input type="search" id="cand-q" placeholder="Search names or topics, e.g. transit" autocomplete="off"></label>' +
           '<label><span class="visually-hidden">Party</span><select id="cand-org"></select></label>' +
         "</div>" +
         '<div class="race-bar"><strong id="race-title"></strong><span id="race-count"></span></div>' +
@@ -449,7 +455,7 @@
       "</div>" +
       '<div class="cc-foot">' + pickButton(c) +
         (debate ? '<span class="cc-debate" title="Arguments for, against, and news reports in the full profile">' + debate + "</span>" : "") +
-        '<button type="button" class="btn sm" data-open="' + esc(c.id) + '">View full profile →</button>' +
+        '<button type="button" class="btn sm" data-open="' + esc(c.id) + '">View full profile' + icon("arrow") + '</button>' +
       "</div></article>";
   }
 
@@ -514,8 +520,8 @@
     function noteList(list) { return list.map(function (n) { return "<li>" + esc(n.text) + srcChips(n.src) + "</li>"; }).join(""); }
     var facts = c.notes.filter(function (n) { return n.kind !== "jurisdiction"; });
     var juris = c.notes.filter(function (n) { return n.kind === "jurisdiction"; });
-    var notes = (facts.length ? '<div class="pf-sec"><p class="label">Good to know</p><div class="pf-box"><ul>' + noteList(facts) + "</ul></div></div>" : "") +
-      (juris.length ? '<div class="pf-sec"><p class="label">Who decides this?</p><div class="pf-box juris"><p class="juris-intro">Some of these promises depend on another level of government. These notes say who controls them; a mayor or council can still advocate.</p><ul>' +
+    var notes = (facts.length ? '<div class="pf-sec"><p class="label">' + icon("info") + 'Good to know</p><div class="pf-box"><ul>' + noteList(facts) + "</ul></div></div>" : "") +
+      (juris.length ? '<div class="pf-sec"><p class="label">' + icon("landmark") + 'Who decides this?</p><div class="pf-box juris"><p class="juris-intro">Some of these promises depend on another level of government. These notes say who controls them; a mayor or council can still advocate.</p><ul>' +
         noteList(juris) + "</ul></div></div>" : "");
 
     var links = [];
@@ -535,11 +541,11 @@
         c.topics.map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div></div>" +
         '<button type="button" class="x-btn" data-close aria-label="Close profile">✕</button></div>' +
       '<div class="pf-body">' +
-        '<div class="pf-sec"><p class="label">Campaign focus <span class="muted">(from their statement)</span></p><ul class="pf-focus">' +
+        '<div class="pf-sec"><p class="label">' + icon("target") + 'Campaign focus <span class="muted">(from their statement)</span></p><ul class="pf-focus">' +
           c.points.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ul></div>" +
         notes +
-        '<div class="pf-sec"><p class="label">Arguments for & against</p>' + opinionsBox(c.ops, plainName(c)) + "</div>" +
-        '<div class="pf-sec">' + more("Read their full statement", statement) +
+        '<div class="pf-sec"><p class="label">' + icon("scale") + 'Arguments for & against</p>' + opinionsBox(c.ops, plainName(c)) + "</div>" +
+        '<div class="pf-sec">' + more("Read their full statement", statement, false, "file") +
           more("Links & official documents", (links.length ? '<ul class="linkrow">' + links.map(function (l) { return "<li>" + l + "</li>"; }).join("") + "</ul>" : '<p class="small muted">No website or phone listed.</p>') +
             '<ul class="linkrow">' + docs.map(function (l) { return "<li>" + l + "</li>"; }).join("") + "</ul>" +
             (c.org ? '<p class="small"><a href="#parties/' + c.org + '">About ' + esc(G.orgs[c.org].name) + " →</a></p>" : "")) +
@@ -649,7 +655,7 @@
           "<div>" + (st ? esc(st.text) + srcChips(st.src) : '<span class="na">Not in their platform</span>') + "</div></td>";
       }).join("") + "</tr>";
     }).join("");
-    return '<div class="card compare-card"><h2>Compare their platforms</h2>' +
+    return '<div class="card compare-card"><h2 class="h-ico">' + icon("scale") + 'Compare their platforms</h2>' +
       '<p class="small muted">What each party\'s published platform says on the same five topics, quoted or closely paraphrased. "Not in their platform" means we didn\'t find it there, not that they oppose it. Tap a topic for background facts.</p>' +
       '<div class="compare-scroll"><table class="compare"><thead>' + head + "</thead><tbody>" + rows + "</tbody></table></div></div>";
   }
@@ -662,7 +668,7 @@
       var notable = mine.filter(function (c) { return c.office === "mayor" || c.flags.indexOf("incumbent") > -1; });
       return '<article class="card party party-top-edge' + pc(k) + '" id="org-' + k + '">' +
         '<div class="party-top"><span class="badge' + (o.role === "Governing party" ? " solid" : "") + '">' + esc(o.role) + "</span>" +
-          ext(o.website, "Website") + "</div>" +
+          '<a class="site-link" href="' + esc(o.website) + '" target="_blank" rel="noopener">' + icon("globe") + "Website</a></div>" +
         '<h2><span class="party-dot"></span>' + esc(o.name) + "</h2>" +
         (o.tagline ? '<p class="tagline">“' + esc(o.tagline.text) + "”" + srcChips(o.tagline.src) + "</p>" : "") +
         countTiles(mine) +
@@ -675,7 +681,7 @@
         '<p class="label">Key promises, in their words</p>' +
         '<ul class="says">' + o.says.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" +
         '<p class="small">' + srcChips(o.moreSrc || [o.platform]) + "</p>" +
-        '<p class="label">Arguments for & against</p>' + opinionsBox(OPS[k] || [], o.name) +
+        '<p class="label">' + icon("scale") + 'Arguments for & against</p>' + opinionsBox(OPS[k] || [], o.name) +
         more("More of their platform", '<ul class="says">' + o.more.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" +
           "<p>" + ext(G.sources[o.platform].url, "Read the full platform") + "</p>") +
         more("All " + mine.length + " candidates", rosterBlock(mine)) +
@@ -701,7 +707,7 @@
   // ------------------------------------------------------------------ ISSUES
   function renderIssues() {
     var jump = '<nav class="issue-jump" aria-label="Jump to issue">' + G.issues.map(function (iss, i) {
-      return '<a href="#issues/' + iss.id + '"><span>' + (i + 1) + "</span>" + esc(iss.title) + "</a>";
+      return '<a href="#issues/' + iss.id + '"><span>' + icon(iss.icon) + "</span>" + esc(iss.title) + "</a>";
     }).join("") + "</nav>";
 
     $("#view-issues").innerHTML =
@@ -722,11 +728,11 @@
             "<p>" + esc(v.text) + srcChips(v.src) + "</p></li>";
         }).join("");
         return '<article class="card issue" id="issue-' + iss.id + '">' +
-          '<div class="issue-head"><span class="issue-num">' + (i + 1) + "</span><h2>" + esc(iss.title) + "</h2></div>" +
+          '<div class="issue-head"><span class="issue-num">' + icon(iss.icon) + "</span><h2>" + esc(iss.title) + "</h2></div>" +
           '<p class="sum">' + esc(iss.summary) + "</p>" +
           '<div class="issue-body">' +
-            '<div class="issue-facts"><p class="label">The facts</p><ul>' + iss.facts.map(function (f) { return "<li>" + esc(f.text) + srcChips(f.src) + "</li>"; }).join("") + "</ul></div>" +
-            '<div class="issue-parties"><p class="label">Where the parties stand <span class="muted">(from their platforms)</span></p><div class="stances">' + parties + "</div></div>" +
+            '<div class="issue-facts"><p class="label">' + icon("file") + 'The facts</p><ul>' + iss.facts.map(function (f) { return "<li>" + esc(f.text) + srcChips(f.src) + "</li>"; }).join("") + "</ul></div>" +
+            '<div class="issue-parties"><p class="label">' + icon("landmark") + 'Where the parties stand <span class="muted">(from their platforms)</span></p><div class="stances">' + parties + "</div></div>" +
           "</div>" +
           (voices ? more("Candidates who've spoken to this (" + iss.candidates.length + ")", '<p class="small muted">Examples from candidates\' own statements and news coverage, not a complete list.</p><ul class="voices">' + voices + "</ul>") : "") +
           (iss.further ? more("Further reading", "<ul>" + iss.further.map(function (id) {
@@ -769,11 +775,11 @@
 
     $("#view-picks").innerHTML =
       intro("My ballot", "A personal checklist for voting day. Tap <strong>Pick</strong> on any candidate to add them. Your list is saved only in this browser on this device. Nothing is sent anywhere.") +
-      '<div class="ballot"><h2>Your ballot</h2><div class="total">' + total + ' <span class="muted" style="font-size:1rem;font-weight:600">/ 16 votes</span></div>' +
+      '<div class="ballot"><h2 class="h-ico">' + icon("ballot") + 'Your ballot</h2><div class="total">' + total + ' <span class="muted" style="font-size:1rem;font-weight:600">/ 16 votes</span></div>' +
         '<p class="muted small">You don\'t have to use every vote.</p>' + races + "</div>" +
-      (total ? '<div class="btn-row no-print"><button class="btn" type="button" id="copy-picks">Copy list</button>' +
-        '<button class="btn ghost" type="button" id="print-picks">Print</button>' +
-        '<button class="btn ghost" type="button" id="clear-picks">Clear all</button></div>' : "");
+      (total ? '<div class="btn-row no-print"><button class="btn" type="button" id="copy-picks">' + icon("copy") + 'Copy list</button>' +
+        '<button class="btn ghost" type="button" id="print-picks">' + icon("print") + 'Print</button>' +
+        '<button class="btn ghost" type="button" id="clear-picks">' + icon("trash") + 'Clear all</button></div>' : "");
 
     $all("[data-remove]", $("#view-picks")).forEach(function (b) {
       b.addEventListener("click", function () { togglePick(b.dataset.remove); renderPicks(); });
