@@ -138,7 +138,7 @@
     var on = isPicked(id);
     $all('.pick-btn[data-id="' + id + '"]').forEach(function (b) {
       b.setAttribute("aria-pressed", on);
-      b.textContent = on ? "✓ Picked" : "☆ Pick";
+      b.textContent = on ? "Picked" : "Pick";
     });
     var card = document.getElementById("card-" + id);
     if (card) card.classList.toggle("is-picked", on);
@@ -152,18 +152,17 @@
   }
   function pickButton(c) {
     var on = isPicked(c.id);
-    return '<button type="button" class="btn sm ghost pick-btn" data-id="' + esc(c.id) + '" aria-pressed="' + on + '" aria-label="Pick ' + esc(plainName(c)) + '">' + (on ? "✓ Picked" : "☆ Pick") + "</button>";
+    return '<button type="button" class="btn sm ghost pick-btn" data-id="' + esc(c.id) + '" aria-pressed="' + on + '" aria-label="Pick ' + esc(plainName(c)) + '">' + (on ? "Picked" : "Pick") + "</button>";
   }
 
   // -------------------------------------------------------------------- theme
   function initTheme() {
     var btn = $("#theme-btn");
-    var META = { auto: ["💻", "System"], light: ["☀️", "Light"], dark: ["🌙", "Dark"] };
+    var META = { auto: "System", light: "Light", dark: "Dark" };
     function label() {
       var t = document.documentElement.dataset.theme || "auto";
-      $("#theme-icon").textContent = META[t][0];
-      $("#theme-label").textContent = META[t][1];
-      btn.setAttribute("aria-label", "Colour theme: " + META[t][1] + ". Tap to change.");
+      $("#theme-label").textContent = "Theme: " + META[t];
+      btn.setAttribute("aria-label", "Colour theme: " + META[t] + ". Tap to change.");
     }
     btn.addEventListener("click", function () {
       var order = ["auto", "light", "dark"];
@@ -184,19 +183,19 @@
     if (org && org.name !== v.name) parts.push(esc(org.short));
     if (v.role) parts.push(esc(v.role));
     var lean = org && org.lean ? org.lean.map(function (l) { return '<span class="tag">' + esc(l.label) + "</span>" + srcChips(l.src); }).join(" ") : "";
-    return '<div class="voice"><span aria-hidden="true">🗣</span>' + parts.join(" · ") + (lean ? " " + lean : "") + "</div>";
+    return '<div class="voice">Said by ' + parts.join(" · ") + (lean ? " " + lean : "") + "</div>";
   }
   function opinionsBox(list, subject) {
     var groups = [
-      { key: "for", label: "Arguments for", icon: "✅" },
-      { key: "against", label: "Criticisms & arguments against", icon: "⚠️" },
-      { key: "reported", label: "Reported in news coverage", icon: "📰" },
+      { key: "for", label: "Arguments for", tag: "For" },
+      { key: "against", label: "Criticisms & arguments against", tag: "Against" },
+      { key: "reported", label: "Reported in news coverage", tag: "Reported" },
     ];
     var body = groups.map(function (g) {
       var items = list.filter(function (o) { return o.stance === g.key; });
       if (!items.length) return "";
       return '<div class="op-group"><p class="label">' + esc(g.label) + '</p><ul class="ops">' + items.map(function (o) {
-        return '<li class="op"><span class="ic" aria-hidden="true">' + g.icon + '</span><div><div class="say">' + esc(o.text) + srcChips(o.src) + "</div>" + voiceLine(o.voice) + "</div></li>";
+        return '<li class="op"><span class="op-tag">' + g.tag + '</span><div><div class="say">' + esc(o.text) + srcChips(o.src) + "</div>" + voiceLine(o.voice) + "</div></li>";
       }).join("") + "</ul></div>";
     }).join("");
     if (!body) body = '<p class="none-found">We haven\'t found published arguments for or against ' + esc(subject) + " beyond their own statement. No criticism listed isn't an endorsement.</p>";
@@ -207,10 +206,10 @@
     var a = list.filter(function (o) { return o.stance === "against"; }).length;
     var r = list.filter(function (o) { return o.stance === "reported"; }).length;
     var bits = [];
-    if (f) bits.push("✅ " + f);
-    if (a) bits.push("⚠️ " + a);
-    if (r) bits.push("📰 " + r);
-    return bits.join("  ");
+    if (f) bits.push(f + " for");
+    if (a) bits.push(a + " against");
+    if (r) bits.push(r + " reported");
+    return bits.join(" · ");
   }
 
   // ---------------------------------------------------------------- OVERVIEW
@@ -241,7 +240,7 @@
     var snap = p.snapshot.map(function (s) {
       return "<div><b>" + esc(s.value) + "</b><span>" + esc(s.label) + "</span><small>" + esc(s.detail) + (s.src ? srcChips(s.src) : "") + "</small></div>";
     }).join("");
-    return '<div><h2>📊 What Burnaby residents told pollsters</h2><p class="small muted">' + esc(p.pollster) + " · fieldwork " + esc(p.fieldDates) + " · " + p.burnabyN + " Burnaby respondents" + srcChips(p.src) + "</p></div>" +
+    return '<div><h2>What Burnaby residents told pollsters</h2><p class="small muted">' + esc(p.pollster) + " · fieldwork " + esc(p.fieldDates) + " · " + p.burnabyN + " Burnaby respondents" + srcChips(p.src) + "</p></div>" +
       '<div class="grid-2">' +
         '<div class="card"><p class="label">Mayoral vote intention</p><p class="small muted">"' + esc(p.mayor.question) + '"</p><div class="bars">' + barRows(p.mayor.results, "mayor") + '</div><p class="small muted">' + esc(p.mayor.note) + "</p></div>" +
         '<div class="card"><p class="label">Burnaby mood</p><div class="snap">' + snap + '</div><p class="label" style="margin-top:16px">Top local issues</p><div class="bars">' + barRows(p.issues) + '</div><p class="small muted">' + esc(p.issuesNote) + "</p></div>" +
@@ -277,16 +276,16 @@
         "</div>" +
       "</div>" +
 
-      (notices ? '<div class="notice"><h2>⚠️ Good to know</h2><ul>' +
+      (notices ? '<div class="notice"><h2>Good to know</h2><ul>' +
         "<li>The <strong>provincial election on October 24</strong> is a separate vote, one week later. Some local candidates are on both ballots." + srcChips(["ebc-candidates"]) + "</li>" +
         notices + "</ul></div>" : "") +
 
       '<div class="grid-2">' +
         '<div class="card"><h2>Before you go</h2><ul class="facts">' +
-          '<li><span class="ico" aria-hidden="true">🕗</span><span><strong>' + esc(e.hours) + "</strong>, " + esc(e.day) + ". Advance voting: " + esc(e.advance) + "." + srcChips(["city-elections"]) + "</span></li>" +
-          '<li><span class="ico" aria-hidden="true">📍</span><span><strong>Vote at any location.</strong> There are no assigned voting places. ' + ext(G.sources["city-map"].url, "Locations and wait times") + srcChips(["city-voters"]) + "</span></li>" +
-          '<li><span class="ico" aria-hidden="true">🪪</span><span><strong>Bring ID.</strong> Not registered? Bring two pieces showing who you are and where you live (one with your signature). You can register on the spot.' + srcChips(["city-voters"]) + "</span></li>" +
-          '<li><span class="ico" aria-hidden="true">♿</span><span><strong>Need help?</strong> Curbside voting at every location; translation and interpreters available.' + srcChips(["city-voters"]) + "</span></li>" +
+          '<li><span><strong>' + esc(e.hours) + "</strong>, " + esc(e.day) + ". Advance voting: " + esc(e.advance) + "." + srcChips(["city-elections"]) + "</span></li>" +
+          '<li><span><strong>Vote at any location.</strong> There are no assigned voting places. ' + ext(G.sources["city-map"].url, "Locations and wait times") + srcChips(["city-voters"]) + "</span></li>" +
+          '<li><span><strong>Bring ID.</strong> Not registered? Bring two pieces showing who you are and where you live (one with your signature). You can register on the spot.' + srcChips(["city-voters"]) + "</span></li>" +
+          '<li><span><strong>Need help?</strong> Curbside voting at every location; translation and interpreters available.' + srcChips(["city-voters"]) + "</span></li>" +
         "</ul>" +
         more("Who can vote, accepted ID and accessibility",
           "<p><strong>Residents:</strong> Canadian citizen, 18+ by voting day, living in BC for at least 6 months and in Burnaby when you register.</p>" +
@@ -307,7 +306,7 @@
         "</div>" +
       "</div>" +
 
-      "<div><h2>🗳️ What's on your ballot</h2></div>" +
+      "<div><h2>What's on your ballot</h2></div>" +
       '<div class="tiles">' + tiles + "</div>" +
 
       pollSection();
@@ -324,7 +323,7 @@
       '<div class="card filters-card">' +
         '<div class="seg" role="group" aria-label="Choose a race">' + seg + "</div>" +
         '<div class="filter-row">' +
-          '<label class="input"><span class="ico" aria-hidden="true">🔍</span><span class="visually-hidden">Search</span><input type="search" id="cand-q" placeholder="Search names or topics, e.g. transit" autocomplete="off"></label>' +
+          '<label class="input"><span class="visually-hidden">Search</span><input type="search" id="cand-q" placeholder="Search names or topics, e.g. transit" autocomplete="off"></label>' +
           '<label><span class="visually-hidden">Party</span><select id="cand-org"></select></label>' +
         "</div>" +
         '<div class="race-bar"><strong id="race-title"></strong><span id="race-count"></span></div>' +
@@ -393,7 +392,7 @@
   function renderCandidateList() {
     var list = CANDS.filter(matches);
     $("#cand-list").innerHTML = list.length ? list.map(candidateCard).join("") :
-      '<div class="card empty"><div style="font-size:2rem" aria-hidden="true">🔍</div><p>No candidates match that search.</p><button class="btn" type="button" id="clear-filters">Reset filters</button></div>';
+      '<div class="card empty"><p>No candidates match that search.</p><button class="btn" type="button" id="clear-filters">Reset filters</button></div>';
     var clr = $("#clear-filters");
     if (clr) clr.addEventListener("click", function () { state.query = ""; state.org = "all"; $("#cand-q").value = ""; $("#cand-org").value = "all"; renderCandidateList(); });
   }
@@ -420,7 +419,7 @@
     var badges = '<span class="badge' + (c.office === "mayor" ? " solid" : "") + '">' + esc(o.label) + '</span><span class="badge">' + esc(orgShort(c)) + "</span>" +
       c.flags.map(function (f) { return '<span class="badge' + (FLAGS[f].cls === "warn" ? " warn" : "") + '">' + esc(FLAGS[f].text) + "</span>"; }).join("");
 
-    var notes = c.notes.length ? '<div class="pf-sec"><p class="label">📌 Good to know</p><div class="pf-box"><ul>' +
+    var notes = c.notes.length ? '<div class="pf-sec"><p class="label">Good to know</p><div class="pf-box"><ul>' +
       c.notes.map(function (n) { return "<li>" + esc(n.text) + srcChips(n.src) + "</li>"; }).join("") + "</ul></div></div>" : "";
 
     var links = [];
@@ -438,12 +437,12 @@
       '<div class="pf-head"><div><div class="badges">' + badges + '</div><h2 class="pf-name" id="pf-name">' + esc(c.name) + '</h2><div class="pf-aff">' + esc(orgName(c)) + "</div></div>" +
         '<button type="button" class="x-btn" data-close aria-label="Close profile">✕</button></div>' +
       '<div class="pf-body">' +
-        '<div class="pf-sec"><p class="label">🎯 Campaign focus <span class="muted">(from their statement)</span></p><ul class="pf-focus">' +
+        '<div class="pf-sec"><p class="label">Campaign focus <span class="muted">(from their statement)</span></p><ul class="pf-focus">' +
           c.points.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ul></div>" +
         notes +
-        '<div class="pf-sec"><p class="label">⚖️ Arguments for & against</p>' + opinionsBox(c.ops, plainName(c)) + "</div>" +
-        '<div class="pf-sec">' + more("📄 Read their full statement", statement) +
-          more("🔗 Links & official documents", (links.length ? '<ul class="linkrow">' + links.map(function (l) { return "<li>" + l + "</li>"; }).join("") + "</ul>" : '<p class="small muted">No website or phone listed.</p>') +
+        '<div class="pf-sec"><p class="label">Arguments for & against</p>' + opinionsBox(c.ops, plainName(c)) + "</div>" +
+        '<div class="pf-sec">' + more("Read their full statement", statement) +
+          more("Links & official documents", (links.length ? '<ul class="linkrow">' + links.map(function (l) { return "<li>" + l + "</li>"; }).join("") + "</ul>" : '<p class="small muted">No website or phone listed.</p>') +
             '<ul class="linkrow">' + docs.map(function (l) { return "<li>" + l + "</li>"; }).join("") + "</ul>" +
             (c.org ? '<p class="small"><a href="#parties/' + c.org + '">About ' + esc(G.orgs[c.org].name) + " →</a></p>" : "")) +
         "</div>" +
@@ -514,7 +513,7 @@
         '<p class="small">' + srcChips(o.moreSrc || [o.platform]) + "</p>" +
         more("More of their platform", '<ul class="says">' + o.more.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" +
           "<p>" + ext(G.sources[o.platform].url, "Read the full platform") + " · " + ext(o.website, "Website") + "</p>") +
-        more("⚖️ Arguments for & against" + (debate ? "   " + debate : ""), opinionsBox(OPS[k] || [], o.name)) +
+        more("Arguments for & against" + (debate ? " (" + debate + ")" : ""), opinionsBox(OPS[k] || [], o.name)) +
         more("Their candidates", roster) +
         "</article>";
     }).join("");
@@ -543,11 +542,11 @@
         return '<article class="card issue" id="issue-' + iss.id + '">' +
           '<div class="issue-head"><span class="issue-num">' + (i + 1) + "</span><h2>" + esc(iss.title) + "</h2></div>" +
           '<p class="sum">' + esc(iss.summary) + "</p>" +
-          more("📋 The facts", "<ul>" + iss.facts.map(function (f) { return "<li>" + esc(f.text) + srcChips(f.src) + "</li>"; }).join("") + "</ul>") +
-          more("🗣 What they say", '<ul class="positions">' + iss.positions.map(function (p) {
+          more("The facts", "<ul>" + iss.facts.map(function (f) { return "<li>" + esc(f.text) + srcChips(f.src) + "</li>"; }).join("") + "</ul>") +
+          more("What they say", '<ul class="positions">' + iss.positions.map(function (p) {
             return '<li><span class="who">' + esc(p.who) + "</span>" + esc(p.text) + srcChips(p.src) + "</li>";
           }).join("") + "</ul>") +
-          (iss.further ? more("📚 Further reading", "<ul>" + iss.further.map(function (id) {
+          (iss.further ? more("Further reading", "<ul>" + iss.further.map(function (id) {
             var s = G.sources[id];
             return "<li>" + ext(s.url, s.title) + ' <span class="muted small">(' + esc(s.publisher) + ". Note the publisher's interest in the topic.)</span></li>";
           }).join("") + "</ul>") : "") +
@@ -585,8 +584,8 @@
     }).join("");
 
     $("#view-picks").innerHTML =
-      intro("My ballot", "A personal checklist for voting day. Tap <strong>☆ Pick</strong> on any candidate to add them. Your list is saved only in this browser on this device. Nothing is sent anywhere.") +
-      '<div class="ballot"><h2>📋 Your ballot</h2><div class="total">' + total + ' <span class="muted" style="font-size:1rem;font-weight:600">/ 16 votes</span></div>' +
+      intro("My ballot", "A personal checklist for voting day. Tap <strong>Pick</strong> on any candidate to add them. Your list is saved only in this browser on this device. Nothing is sent anywhere.") +
+      '<div class="ballot"><h2>Your ballot</h2><div class="total">' + total + ' <span class="muted" style="font-size:1rem;font-weight:600">/ 16 votes</span></div>' +
         '<p class="muted small">You don\'t have to use every vote.</p>' + races + "</div>" +
       (total ? '<div class="btn-row no-print"><button class="btn" type="button" id="copy-picks">Copy list</button>' +
         '<button class="btn ghost" type="button" id="print-picks">Print</button>' +
