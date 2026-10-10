@@ -457,3 +457,37 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
   .ballot-race { background: none; border: 1px solid #999; }
 }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+/* ---------- Scroll cues: edge fade + arrow while more content is hidden ---------- */
+.scroll-cue {
+  position: absolute; z-index: 2; width: 30px; height: 30px; padding: 0; border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center; font-size: 1.15rem; font-weight: 800; line-height: 1;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.more > .scroll-cue { opacity: 1; pointer-events: auto; }
+
+/* Tab bar (scrolls sideways on phones) */
+.tabs-wrap { position: relative; max-width: 1120px; margin: 0 auto; }
+.tabs-wrap::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 10px; width: 64px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--bar) 70%); opacity: 0; transition: opacity .2s;
+}
+.tabs-wrap.more::after { opacity: 1; }
+.cue-right { right: 8px; top: calc(50% - 5px); transform: translateY(-50%); background: var(--bar-raised); color: var(--bar-text); border: 1px solid var(--bar-line); }
+
+/* Profile popup body (scrolls vertically) */
+.cue-anchor { position: relative; height: 0; flex: 0 0 auto; }
+.cue-anchor::before {
+  content: ""; position: absolute; left: 0; right: 10px; bottom: 0; height: 56px; pointer-events: none;
+  background: linear-gradient(180deg, transparent, var(--surface)); opacity: 0; transition: opacity .2s;
+}
+.cue-anchor.more::before { opacity: 1; }
+.cue-down {
+  left: 50%; bottom: 8px; transform: translateX(-50%) rotate(90deg);
+  background: var(--surface); color: var(--text); border: 1px solid var(--line-strong); box-shadow: 0 2px 8px rgba(15, 23, 42, .15);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cue-anchor.more .cue-down { animation: cue-bob 1.6s ease-in-out 2; }
+}
+@keyframes cue-bob { 50% { transform: translate(-50%, 3px) rotate(90deg); } }
+@media print { .scroll-cue, .cue-anchor, .tabs-wrap::after { display: none !important; } }

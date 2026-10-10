@@ -31,14 +31,17 @@
         </button>
       </div>
     </div>
-    <nav class="tabs" aria-label="Sections">
-      <a href="#start" data-tab="start">Overview</a>
-      <a href="#candidates" data-tab="candidates">Candidates</a>
-      <a href="#parties" data-tab="parties">Parties</a>
-      <a href="#issues" data-tab="issues">Issues</a>
-      <a href="#picks" data-tab="picks">My ballot <span class="pill" id="picks-count" hidden>0</span></a>
-      <a href="#about" data-tab="about">About</a>
-    </nav>
+    <div class="tabs-wrap">
+      <nav class="tabs" aria-label="Sections">
+        <a href="#start" data-tab="start">Overview</a>
+        <a href="#candidates" data-tab="candidates">Candidates</a>
+        <a href="#parties" data-tab="parties">Parties</a>
+        <a href="#issues" data-tab="issues">Issues</a>
+        <a href="#picks" data-tab="picks">My ballot <span class="pill" id="picks-count" hidden>0</span></a>
+        <a href="#about" data-tab="about">About</a>
+      </nav>
+      <button type="button" class="scroll-cue cue-right" tabindex="-1" aria-hidden="true">›</button>
+    </div>
   </header>
 
   <main id="main" tabindex="-1">

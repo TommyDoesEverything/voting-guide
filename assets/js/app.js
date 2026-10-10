@@ -505,11 +505,42 @@
             (c.org ? '<p class="small"><a href="#parties/' + c.org + '">About ' + esc(G.orgs[c.org].name) + " →</a></p>" : "")) +
         "</div>" +
       "</div>" +
+      '<div class="cue-anchor"><button type="button" class="scroll-cue cue-down" tabindex="-1" aria-hidden="true">›</button></div>' +
       '<div class="pf-foot"><span class="meta">' + esc(orgShort(c)) + " · " + esc(o.plural) + '</span><span class="btns">' + pickButton(c) +
         '<button type="button" class="btn sm" data-close>Close</button></span></div>' +
       "</div>";
     if (!dlg.open) dlg.showModal();
-    $(".pf-body", dlg).scrollTop = 0;
+    var body = $(".pf-body", dlg);
+    body.scrollTop = 0;
+    watchScroll(body, $(".cue-anchor", dlg), "y");
+  }
+
+  // Fade + arrow on an edge while there is more to scroll in that direction.
+  // `holder` gets the "more" class; its .scroll-cue button scrolls one step.
+  function watchScroll(el, holder, axis) {
+    function update() {
+      var more = axis === "y"
+        ? el.scrollTop + el.clientHeight < el.scrollHeight - 8
+        : el.scrollLeft + el.clientWidth < el.scrollWidth - 8;
+      holder.classList.toggle("more", more);
+    }
+    if (!el._cueBound) {
+      el.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", update);
+      el._cueBound = true;
+    }
+    var cue = $(".scroll-cue", holder);
+    if (cue && !cue._cueBound) {
+      cue.addEventListener("click", function () {
+        if (axis === "y") el.scrollBy({ top: el.clientHeight * 0.7, behavior: "smooth" });
+        else el.scrollBy({ left: el.clientWidth * 0.6, behavior: "smooth" });
+      });
+      cue._cueBound = true;
+    }
+    // Re-check after layout settles (details opening, fonts, images).
+    update();
+    requestAnimationFrame(update);
+    if (axis === "y") $all("details", el).forEach(function (d) { d.addEventListener("toggle", update); });
   }
 
   function initDialog() {
@@ -775,4 +806,5 @@
   updatePickCount();
   window.addEventListener("hashchange", route);
   route();
+  watchScroll($(".tabs"), $(".tabs-wrap"), "x");
 })();
