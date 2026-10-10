@@ -182,8 +182,9 @@
     var org = v.org && G.orgs[v.org];
     if (org && org.name !== v.name) parts.push(esc(org.short));
     if (v.role) parts.push(esc(v.role));
-    var lean = org && org.lean ? org.lean.map(function (l) { return '<span class="tag">' + esc(l.label) + "</span>" + srcChips(l.src); }).join(" ") : "";
-    return '<div class="voice">Said by ' + parts.join(" · ") + (lean ? " " + lean : "") + "</div>";
+    var lean = org && org.lean ? '<span class="lean-tags">' + leanTags(org) + "</span>" : "";
+    return '<div class="voice"><span>Said by ' + parts.join(" · ") + "</span></div>" +
+      (lean ? '<div class="voice voice-lean"><span>Lean:</span>' + lean + "</div>" : "");
   }
   function opinionsBox(list, subject) {
     var groups = [
@@ -479,9 +480,15 @@
   }
 
   // ----------------------------------------------------------------- PARTIES
+  // Each lean label followed by its source tags.
+  function leanTags(o) {
+    return o.lean.map(function (l) {
+      return '<span class="lean-item"><span class="lean-label">' + esc(l.label) + "</span>" + srcChips(l.src) + "</span>";
+    }).join("");
+  }
   function leanText(o) {
     if (!o.lean) return '<span class="muted">Not labelled by any source we found</span>';
-    return o.lean.map(function (l) { return esc(l.label) + srcChips(l.src); }).join("<br>");
+    return '<span class="lean-tags">' + leanTags(o) + "</span>";
   }
 
   function renderParties() {

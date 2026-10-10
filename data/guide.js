@@ -130,7 +130,7 @@ window.GUIDE = {
     },
     "green": {
       name: "Burnaby Green Party",
-      lean: [{ label: "Centre-left", src: ["wiki-green"] }, { label: "Independent of provincial/federal Greens (self-described)", src: ["party-green-home"] }],
+      lean: [{ label: "Centre-left", src: ["wiki-green"] }],
       role: "Challenger",
       short: "Burnaby Greens",
       website: "https://burnabygreenparty.com/",
