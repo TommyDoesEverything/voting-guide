@@ -357,6 +357,8 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
 .pf-box ul { list-style: none; padding: 0; margin: 0; }
 .pf-box li { margin: 0 0 6px; }
 .pf-box li:last-child { margin: 0; }
+.pf-box.juris { background: var(--surface); border-style: dashed; border-color: var(--line-strong); }
+.juris-intro { font-size: .74rem; color: var(--muted); margin: 0 0 8px; }
 .pf-foot { padding: 12px 18px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--surface-2); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .pf-foot .meta { font-size: .72rem; color: var(--muted); }
 .pf-foot .btns { display: flex; gap: 8px; }

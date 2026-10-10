@@ -34,6 +34,9 @@ window.GUIDE = {
     "bc-municipal-powers": { title: "Municipal powers & services", publisher: "Province of British Columbia", url: "https://www2.gov.bc.ca/gov/content/governments/local-governments/governance-powers/powers-services/municipal-powers-services", type: "official" },
     "bc-lga": { title: "Local Government Act, Part 3 (ballot marking and rejection rules)", publisher: "BC Laws", url: "https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/r15001_03", type: "official" },
     "bc-voting": { title: "Voting in local elections", publisher: "Province of British Columbia", url: "https://www2.gov.bc.ca/gov/content/governments/local-governments/governance-powers/general-local-elections/voting-local-elections", type: "official" },
+    "bc-tuition": { title: "Tuition Limit Policy", publisher: "Province of British Columbia", url: "https://www2.gov.bc.ca/gov/content/education-training/post-secondary-education/institution-resources-administration/tuition-limit-policy", type: "official" },
+    "bc-health-plan": { title: "Ministry of Health 2025/26 Service Plan", publisher: "Province of British Columbia", url: "https://www.bcbudget.gov.bc.ca/2025/sp/pdf/ministry/hlth.pdf", type: "official" },
+    "bc-hog-seniors": { title: "Home owner grant for seniors", publisher: "Province of British Columbia", url: "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/annual-property-tax/home-owner-grant/senior", type: "official" },
     "bc-ssmuh": { title: "Small-scale, multi-unit housing (Bill 44)", publisher: "Province of British Columbia", url: "https://www2.gov.bc.ca/gov/content/housing-tenancy/local-governments-and-housing/housing-initiatives/smale-scale-multi-unit-housing", type: "official" },
     "ebc-candidates": { title: "2026 Provincial General Election - candidate list", publisher: "Elections BC", url: "https://www.elections.bc.ca/docs/fin/GE-2026-10-24-Candidate-Website-Report.PDF", type: "official" },
     "ebc-yamagata": { title: "2026 Provincial General Election candidates update", publisher: "Elections BC", url: "https://elections.bc.ca/news/2026-provincial-general-election-candidates-update/", type: "official" },
@@ -220,11 +223,19 @@ window.GUIDE = {
   candidates: {
     // ----- Mayor -----
     "mayor-michaelangelo-abcrobinhood": {
-      points: ["Donate 100% of the mayor's salary to school lunches, single parents and people in need", "10% property-tax discount for seniors, and for homeowners who grow fruit and vegetables", "Cut tuition and student-housing costs by 50%", "Oppose injection sites; build recovery centres outside urban centres"],
+      points: ["Nearly 40-year resident; runs painting and renovation businesses; does free small repairs for seniors and people with disabilities", "Donate 100% of the mayor's salary to school lunches, single parents and people in need", "10% property-tax discount for seniors, and for homeowners who grow fruit and vegetables", "Cut tuition and student-housing costs by 50%", "Oppose injection sites; build recovery centres outside urban centres; expand senior-care homes"],
+      notes: [
+        { kind: "jurisdiction", text: "Tuition at public colleges and universities is set by each institution's board, within a provincial cap of 2% a year, not by the City.", src: ["bc-tuition"] },
+        { kind: "jurisdiction", text: "Health services, including addiction treatment and recovery beds and publicly funded care homes, are mainly delivered by the Province's health authorities (here, Fraser Health).", src: ["bc-health-plan", "city-homelessness"] },
+        { kind: "jurisdiction", text: "Property tax relief for seniors currently comes from the Province's additional Home Owner Grant for owners 65 and older.", src: ["bc-hog-seniors"] },
+      ],
     },
     "mayor-sabina-hsu": {
       points: ["Committee oversight aimed at lowering property taxes", "Expand remote AI diagnostics", "Strict smoking bylaws to protect green spaces and reduce wildfire risk", "Sign language and AI/science courses in local schools"],
-      notes: [{ text: "Her City profile opens with the words “Action One”.", src: ["city-profiles-mayor"] }],
+      notes: [
+        { text: "Her City profile opens with the words “Action One”.", src: ["city-profiles-mayor"] },
+        { kind: "jurisdiction", text: "Health services such as diagnostics are mainly delivered by the Province's health authorities (here, Fraser Health), not the City.", src: ["bc-health-plan"] },
+      ],
     },
     "mayor-mike-hurley": {
       flags: ["incumbent"],

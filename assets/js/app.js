@@ -441,8 +441,12 @@
     var badges = '<span class="badge' + (c.office === "mayor" ? " solid" : "") + '">' + esc(o.label) + '</span><span class="badge">' + esc(orgShort(c)) + "</span>" +
       c.flags.map(function (f) { return '<span class="badge' + (FLAGS[f].cls === "warn" ? " warn" : "") + '">' + esc(FLAGS[f].text) + "</span>"; }).join("");
 
-    var notes = c.notes.length ? '<div class="pf-sec"><p class="label">Good to know</p><div class="pf-box"><ul>' +
-      c.notes.map(function (n) { return "<li>" + esc(n.text) + srcChips(n.src) + "</li>"; }).join("") + "</ul></div></div>" : "";
+    function noteList(list) { return list.map(function (n) { return "<li>" + esc(n.text) + srcChips(n.src) + "</li>"; }).join(""); }
+    var facts = c.notes.filter(function (n) { return n.kind !== "jurisdiction"; });
+    var juris = c.notes.filter(function (n) { return n.kind === "jurisdiction"; });
+    var notes = (facts.length ? '<div class="pf-sec"><p class="label">Good to know</p><div class="pf-box"><ul>' + noteList(facts) + "</ul></div></div>" : "") +
+      (juris.length ? '<div class="pf-sec"><p class="label">Who decides this?</p><div class="pf-box juris"><p class="juris-intro">Some of these promises depend on another level of government. These notes say who controls them; a mayor or council can still advocate.</p><ul>' +
+        noteList(juris) + "</ul></div></div>" : "");
 
     var links = [];
     c.website.forEach(function (u) { links.push(ext(u, "Website")); });
@@ -668,6 +672,7 @@
         "<li><strong>Candidates speak for themselves.</strong> Full statements are reproduced from the City's official profiles (punctuation lightly normalized). Card focus points come only from those statements.</li>" +
         "<li><strong>Same treatment for everyone.</strong> Same card layout, the City's alphabetical order, and topic tags assigned by the same keyword rules for every candidate.</li>" +
         '<li><strong>Opinions are labelled.</strong> Arguments for and against sit in a box marked <span class="badge opinion">Opinion</span>, and each one names who is speaking. A party\'s political lean is shown only when an independent source states it.</li>' +
+        "<li><strong>Who decides this?</strong> When a candidate promises to directly do something another government controls (like setting tuition), a sourced note says who controls it. Promises to advocate don't get one. The same test applies to everyone.</li>" +
         "<li><strong>Facts carry a source.</strong> Tap the small ↗ tags to see where anything came from.</li>" +
         "<li><strong>No party colours</strong> and no predictions.</li>" +
       "</ul></div>" +

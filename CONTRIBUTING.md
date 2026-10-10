@@ -6,7 +6,7 @@ This guide is only useful if people of every political view can trust it. These 
 
 - `data/profiles.*` holds candidates' official statements, verbatim from the City of Burnaby. Never hand-edit it. Re-run `scripts/fetch_profiles.py` instead.
 - A candidate's `points` (2-4 short items) must come **only** from their own statement. Paraphrase faithfully, and quote distinctive phrases. Don't add priorities they didn't state, and don't drop the ones they lead with.
-- Keep `points` roughly the same length and number for everyone.
+- Keep `points` roughly the same length and number for everyone (2-5 each).
 - Every candidate has exactly two `signature` tags: short phrases naming a specific promise or background fact from their own statement (for example "4-year tax freeze", "Doctor of Medicine"). Use quote marks only for their exact words. No adjectives or labels like "populist" or "anti-density".
 
 ## 2. Every added fact needs a source
@@ -16,6 +16,13 @@ This guide is only useful if people of every political view can trust it. These 
 - A third-party source with a stake in an issue (for example, a real-estate marketplace writing about housing rules) can go in **Further reading**, labelled as such. It can't be the only source for a fact.
 - Attribute claims a source makes but doesn't establish. Write "the party says…", not "…is true".
 - If you can't link to it, leave it out.
+
+### "Who decides this?" notes
+
+- Add a note with `kind: "jurisdiction"` when a candidate promises to **directly do** something another level of government controls (for example, setting tuition or running treatment centres). Cite an official source for who controls it.
+- Don't add one when the candidate promises to **advocate** or **press** another government; that is within their role.
+- State who controls it, nothing more. No "unrealistic", "impossible" or similar.
+- Apply the same test to every candidate.
 
 ## 3. Neutral language
 
