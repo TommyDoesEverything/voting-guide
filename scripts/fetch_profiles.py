@@ -52,6 +52,8 @@ def clean(fragment):
     text = re.sub(r"<br\s*/?>", "\n", fragment)
     text = re.sub(r"<[^>]+>", "", text)
     text = html.unescape(text).replace("\xa0", " ").replace(" ", " ")
+    # House style: plain hyphens instead of em/en dashes.
+    text = re.sub(r"\s* - \s*", " - ", text).replace("-", "-")
     return re.sub(r"[ \t]+", " ", text).strip()
 
 

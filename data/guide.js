@@ -20,13 +20,13 @@ window.GUIDE = {
   // ---------------------------------------------------------------------------
   sources: {
     "city-elections": { title: "General Local Election", publisher: "City of Burnaby", url: "https://www.burnaby.ca/elections", type: "official" },
-    "city-voters": { title: "Your City – Your Choice: information for voters", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council/elections/voters", type: "official" },
+    "city-voters": { title: "Your City - Your Choice: information for voters", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council/elections/voters", type: "official" },
     "city-mail": { title: "Mail ballot voting", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council/elections/mail-ballot-voting", type: "official" },
     "city-map": { title: "Voting locations map (wait times, accessibility)", publisher: "City of Burnaby", url: "https://gis.burnaby.ca/electionvotinglocations/", type: "official" },
     "city-declaration": { title: "Declaration of Candidates for 2026 City of Burnaby General Local Election", publisher: "City of Burnaby", date: "2026-09-11", url: "https://www.burnaby.ca/our-city/news/2026-09-11/declaration-candidates-2026-city-burnaby-general-local-election", type: "official" },
-    "city-profiles-mayor": { title: "Office of Mayor – candidate profiles", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates/office-of-mayor-candidate-profiles", type: "candidate" },
-    "city-profiles-council": { title: "Office of Councillor – candidate profiles", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates/office-of-councillor-candidate-profiles", type: "candidate" },
-    "city-profiles-trustee": { title: "Office of School Trustee – candidate profiles", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates/office-of-school-trustees-candidate-profiles", type: "candidate" },
+    "city-profiles-mayor": { title: "Office of Mayor - candidate profiles", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates/office-of-mayor-candidate-profiles", type: "candidate" },
+    "city-profiles-council": { title: "Office of Councillor - candidate profiles", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates/office-of-councillor-candidate-profiles", type: "candidate" },
+    "city-profiles-trustee": { title: "Office of School Trustee - candidate profiles", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates/office-of-school-trustees-candidate-profiles", type: "candidate" },
     "city-council-members": { title: "Mayor and Council", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council", type: "official" },
     "city-budget-2026": { title: "Burnaby keeps tax rates affordable with latest financial plan", publisher: "City of Burnaby", date: "2026-01-28", url: "https://www.burnaby.ca/our-city/news/2026-01-28/burnaby-keeps-tax-rates-affordable-latest-financial-plan", type: "official" },
     "city-homelessness": { title: "Four realities every Burnaby resident should understand about homelessness", publisher: "City of Burnaby", date: "2026-07-16", url: "https://www.burnaby.ca/our-city/news/2026-07-16/four-realities-every-burnaby-resident-should-understand-about-homelessness", type: "official" },
@@ -35,7 +35,7 @@ window.GUIDE = {
     "bc-lga": { title: "Local Government Act, Part 3 (ballot marking and rejection rules)", publisher: "BC Laws", url: "https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/r15001_03", type: "official" },
     "bc-voting": { title: "Voting in local elections", publisher: "Province of British Columbia", url: "https://www2.gov.bc.ca/gov/content/governments/local-governments/governance-powers/general-local-elections/voting-local-elections", type: "official" },
     "bc-ssmuh": { title: "Small-scale, multi-unit housing (Bill 44)", publisher: "Province of British Columbia", url: "https://www2.gov.bc.ca/gov/content/housing-tenancy/local-governments-and-housing/housing-initiatives/smale-scale-multi-unit-housing", type: "official" },
-    "ebc-candidates": { title: "2026 Provincial General Election – candidate list", publisher: "Elections BC", url: "https://www.elections.bc.ca/docs/fin/GE-2026-10-24-Candidate-Website-Report.PDF", type: "official" },
+    "ebc-candidates": { title: "2026 Provincial General Election - candidate list", publisher: "Elections BC", url: "https://www.elections.bc.ca/docs/fin/GE-2026-10-24-Candidate-Website-Report.PDF", type: "official" },
     "ebc-yamagata": { title: "2026 Provincial General Election candidates update", publisher: "Elections BC", url: "https://elections.bc.ca/news/2026-provincial-general-election-candidates-update/", type: "official" },
 
     "party-bca": { title: "BCA platform", publisher: "Burnaby Citizens Association", url: "https://www.burnaby-citizens.ca/platform", type: "party" },
@@ -54,9 +54,20 @@ window.GUIDE = {
     "ctv-hospital": { title: "Eby says Burnaby, B.C., hospital expansion will go ahead, despite cancelled contract", publisher: "The Canadian Press via CTV News", date: "2026-05-01", url: "https://www.ctvnews.ca/vancouver/politics/article/eby-says-burnaby-bc-hospital-expansion-will-go-ahead-despite-cancelled-contract/", type: "news" },
     "freshet-imperial": { title: "Controversial BC Housing project cancelled in Burnaby", publisher: "Freshet News", date: "2026-02-28", url: "https://www.freshetnews.ca/?p=6793", type: "news" },
 
+    "sun-giant": { title: "'Up against a giant': Burnaby's political status quo faces biggest test in years this election", publisher: "Vancouver Sun (Sarah Grochowski)", date: "2026-09-23", url: "https://ca.news.yahoo.com/against-giant-burnaby-political-status-130026974.html", type: "news" },
+    "sun-poll": { title: "'Room for movement': Leger poll shows B.C.'s municipal voters are searching for someone to get behind", publisher: "Vancouver Sun (Glenda Luymes)", date: "2026-10-08", url: "https://ca.news.yahoo.com/room-movement-leger-poll-shows-130012760.html", type: "news" },
+    "freshet-council-race": { title: "Burnaby mayor's seat challenged, 42 vying for eight council spots", publisher: "Freshet News", date: "2026-09-11", url: "https://www.freshetnews.ca/burnaby-mayors-seat-challenged-42-vying-for-eight-council-spots/", type: "news" },
+    "freshet-trustee-race": { title: "16 candidates vying for seven seats on Burnaby board of education", publisher: "Freshet News", date: "2026-09-13", url: "https://www.freshetnews.ca/16-candidates-vying-for-seven-seats-on-burnaby-board-of-education/", type: "news" },
+    "leger-poll": { title: "Vancouver CMA Municipal Election Polling, October 2026 (report)", publisher: "Leger, in partnership with Postmedia", date: "2026-10-07", url: "https://documents.leger360.com/hubfs/%C3%89tudes%20M%C3%A9diatiques/%C3%89tudes%20M%C3%A9diatiques%20-%202026/10.%20October%202026/Media%20Release%20-%20BC%20Municipal%20Election%20Polling%20-%20October%207%2c%202026%20(1).pdf", type: "poll" },
+    "leger-page": { title: "Metro Vancouver Municipal Election 2026: Voters Want Change", publisher: "Leger", date: "2026-10-09", url: "https://leger360.com/metro-vancouver-municipal-election-2026-poll/", type: "poll" },
+    "wiki-bca": { title: "Burnaby Citizens Association", publisher: "Wikipedia", url: "https://en.wikipedia.org/wiki/Burnaby_Citizens_Association", type: "reference" },
+    "wiki-green": { title: "Burnaby Green Party", publisher: "Wikipedia", url: "https://en.wikipedia.org/wiki/Burnaby_Green_Party", type: "reference" },
+    "party-bca-home": { title: "BCA home page", publisher: "Burnaby Citizens Association", url: "https://www.burnaby-citizens.ca/", type: "party" },
+    "party-first-home": { title: "Burnaby First home page", publisher: "Burnaby First", url: "https://burnabyfirst.ca/", type: "party" },
+
     "multiliving": { title: "Burnaby Mayor Candidates 2026: Where All 6 Stand on Multiplex Homes", publisher: "MultiLiving (a multiplex real-estate marketplace)", date: "2026-10-09", url: "https://multiliving.ca/pulse/burnaby-mayor-council-candidates-2026-multiplex-homes-buyers", type: "third-party" },
     "bbot": { title: "2026 Burnaby Election Candidates", publisher: "Burnaby Board of Trade", url: "https://www.bbot.ca/2026/09/15/election-candidates/", type: "third-party" },
-    "votemate": { title: "VoteMate BC 2026 – Burnaby", publisher: "VoteMate", url: "https://en.votemate.org/bc2026/candidates/?riding=796&race=176", type: "third-party" },
+    "votemate": { title: "VoteMate BC 2026 - Burnaby", publisher: "VoteMate", url: "https://en.votemate.org/bc2026/candidates/?riding=796&race=176", type: "third-party" },
   },
 
   // ---------------------------------------------------------------------------
@@ -66,11 +77,14 @@ window.GUIDE = {
   orgs: {
     "bca": {
       name: "Burnaby Citizens Association",
+      lean: [{ label: "Centre-left", src: ["wiki-bca"] }, { label: "NDP-affiliated", src: ["sun-giant", "wiki-bca"] }],
+      role: "Governing party",
       short: "BCA",
       website: "https://www.burnaby-citizens.ca/",
       platform: "party-bca",
       context: [
-        { text: "Holds 7 of the 8 current council seats.", src: ["freshet-bca-slate"] },
+        { text: "Holds 7 of the 8 current council seats and every current school board seat.", src: ["freshet-bca-slate", "freshet-trustee-race"] },
+        { text: "The only group running a full council slate (8).", src: ["freshet-council-race"] },
         { text: "Is not running a candidate for mayor in 2026.", src: ["freshet-bca-slate"] },
       ],
       says: [
@@ -90,6 +104,8 @@ window.GUIDE = {
     },
     "burnaby-first": {
       name: "Burnaby First",
+      lean: null,
+      role: "Challenger",
       short: "Burnaby First",
       website: "https://burnabyfirst.ca/",
       platform: "party-first",
@@ -114,6 +130,8 @@ window.GUIDE = {
     },
     "green": {
       name: "Burnaby Green Party",
+      lean: [{ label: "Centre-left", src: ["wiki-green"] }, { label: "Independent of provincial/federal Greens (self-described)", src: ["party-green-home"] }],
+      role: "Challenger",
       short: "Burnaby Greens",
       website: "https://burnabygreenparty.com/",
       platform: "party-green",
@@ -131,7 +149,7 @@ window.GUIDE = {
         "Grow purpose-built rentals to 40,000 by 2050, with non-market housing at 20% of all homes",
         "“Never sell public land”",
         "A bench and shelter at every bus stop by 2030; complete the initial Major Cycling Network within 3 years",
-        "Support north–south rapid transit, including upgrading the R2 to bus rapid transit",
+        "Support north-south rapid transit, including upgrading the R2 to bus rapid transit",
         "Advocate for Burnaby Hospital Phase 2",
         "A Heat Resilience Strategy and cooling bylaw; clean-air spaces during wildfire smoke",
         "Tree canopy of 40% city-wide by 2050",
@@ -141,10 +159,13 @@ window.GUIDE = {
     },
     "new-burnaby": {
       name: "New Burnaby Party",
+      lean: null,
+      role: "Challenger",
       short: "New Burnaby",
       website: "https://newburnaby.ca/",
       platform: "party-newburnaby",
       context: [
+        { text: "Includes current councillor Richard T. Lee, elected in 2022 with One Burnaby and described by the Vancouver Sun as \"the sole opposition councillor\".", src: ["freshet-council-race", "sun-giant"] },
         { text: "Council candidate David Xie says he is no longer seeking a council seat, though his name is still on the ballot.", src: ["dailyhive-xie"] },
       ],
       says: [
@@ -163,6 +184,8 @@ window.GUIDE = {
     },
     "restore": {
       name: "Restore Burnaby Alliance",
+      lean: null,
+      role: "Challenger",
       short: "Restore Burnaby",
       website: "https://www.restoreburnaby.ca/",
       platform: "party-restore",
@@ -253,7 +276,10 @@ window.GUIDE = {
     "council-richard-t-lee": {
       flags: ["incumbent"],
       points: ["Current councillor; MLA for Burnaby North for 16 years", "Make Burnaby “safer and more affordable for families”", "22 years at TRIUMF before politics"],
-      notes: [{ text: "Listed by the City as a current councillor.", src: ["city-council-members"] }],
+      notes: [
+        { text: "Current councillor, elected in 2022 with One Burnaby; the only councillor not from the BCA.", src: ["city-council-members", "freshet-council-race", "sun-giant"] },
+        { text: "Former B.C. Liberal MLA.", src: ["sun-giant"] },
+      ],
     },
     "council-jason-martin": { points: ["Capital projects shouldn't be an automatic reason to raise taxes", "Question waste; scale back programs that don't serve Burnaby as a whole", "Protect parks and trees", "Vice-president of a 280-unit strata"] },
     "council-carrie-mclaren": { points: ["Board member of her housing co-op", "Expand affordable housing", "Local climate action", "“Housing is a human right”"] },
@@ -276,7 +302,7 @@ window.GUIDE = {
       flags: ["incumbent"],
       points: ["Former teacher and Burnaby Teachers' Association president", "Cut swimming-lesson waitlists; build more sidewalks", "Fast-track affordable housing"],
     },
-    "council-vincent-tong": { points: ["BC Public Service professional (homelessness, disability, healthcare)", "“Safe communities — no drug houses”", "Affordability and lower taxes", "Keep green space"] },
+    "council-vincent-tong": { points: ["BC Public Service professional (homelessness, disability, healthcare)", "“Safe communities - no drug houses”", "Affordability and lower taxes", "Keep green space"] },
     "council-neha-unadkat": { points: ["Founding director of the Burnaby Builders and Developers Association", "Responsible, transparent spending", "Make Burnaby Hospital Phase 2 a priority", "Apprenticeships and career pathways"] },
     "council-mary-b-villa-y-battenberg": { points: ["Non-profit professional; licensed financial professional", "Organized 200+ community events", "Bring people together and turn community ideas into action"] },
     "council-james-wang": {
@@ -301,7 +327,7 @@ window.GUIDE = {
       flags: ["incumbent"],
       points: ["Second-term trustee and former board chair", "Chaired the district's audit sub-committee", "Schools where children feel “safe, supported, and valued”"],
     },
-    "trustee-jen-jang": { points: ["Parent; strata president overseeing budgets", "Concerned about overcrowding and cuts to counselling and other programs", "Inclusive schools"] },
+    "trustee-jen-jang": { points: ["Parent; president and treasurer of a 340+ home strata", "Concerned about overcrowding and cuts to counselling and other programs", "Inclusive schools"] },
     "trustee-paul-kwon": { points: ["Former chair of the Burnaby District Parent Advisory Council", "Protect student supports", "Plan school space as Burnaby grows", "Make budget decisions “openly and responsibly”"] },
     "trustee-jen-mezei": {
       flags: ["incumbent"],
@@ -334,7 +360,7 @@ window.GUIDE = {
     {
       id: "housing",
       title: "Housing & multiplexes (Bill 44)",
-      summary: "Provincial law now requires cities to allow 3–6 homes on most single-family lots. Candidates disagree about that and about how much new housing the city should build itself.",
+      summary: "Provincial law now requires cities to allow 3-6 homes on most single-family lots. Candidates disagree about that and about how much new housing the city should build itself.",
       facts: [
         { text: "Bill 44 (2023) requires municipalities over 5,000 people to allow at least 3 units on lots of 280 m² or less, at least 4 on larger lots, and 6 near frequent bus service.", src: ["bc-ssmuh"] },
         { text: "Bill 25 (2025) tightened those rules; cities had until June 30, 2026 to update bylaws.", src: ["bc-ssmuh"] },
@@ -355,9 +381,9 @@ window.GUIDE = {
       title: "Property taxes & city finances",
       summary: "Burnaby raised property taxes 2.9% for 2026. Its plan pencils in larger increases after that. Candidates range from tax freezes to keeping increases near the regional average.",
       facts: [
-        { text: "Council approved a 2.9% property tax increase for 2026 — about $61 for an average home. The draft plan had needed 6.05% before savings and new revenue.", src: ["city-budget-2026"] },
+        { text: "Council approved a 2.9% property tax increase for 2026 - about $61 for an average home. The draft plan had needed 6.05% before savings and new revenue.", src: ["city-budget-2026"] },
         { text: "Water rates stayed flat and sewer rose 3.5%, even though Metro Vancouver's charges rose faster; the City covered the gap from reserves.", src: ["city-budget-2026"] },
-        { text: "The five-year plan projects 7% annual increases for 2027–2030, to be reassessed each year. 2026 capital spending ($506.8 million) is funded from reserves rather than debt.", src: ["city-budget-2026"] },
+        { text: "The five-year plan projects 7% annual increases for 2027-2030, to be reassessed each year. 2026 capital spending ($506.8 million) is funded from reserves rather than debt.", src: ["city-budget-2026"] },
       ],
       positions: [
         { who: "Mike Hurley", text: "Keep the city debt-free and taxes at or below the regional average.", src: ["dailyhive-hurley"] },
@@ -385,7 +411,7 @@ window.GUIDE = {
       title: "Shelters, supportive housing & drug use",
       summary: "Shelter and supportive-housing locations have drawn large protests. Some parties want to pause or restrict these projects. Others focus on health-based responses.",
       facts: [
-        { text: "BC Housing (provincial) — not the City — is primarily responsible for building, funding and running shelters and supportive housing. The City advocates and sometimes provides land.", src: ["city-homelessness"] },
+        { text: "BC Housing (provincial) - not the City - is primarily responsible for building, funding and running shelters and supportive housing. The City advocates and sometimes provides land.", src: ["city-homelessness"] },
         { text: "The most recent count found 205 people experiencing homelessness in Burnaby, 97 of them unsheltered.", src: ["city-homelessness"] },
         { text: "BC Housing dropped a proposed 50-unit supportive and complex-care building at 5389 Imperial St. in February 2026 after protests.", src: ["freshet-imperial"] },
         { text: "The City says the temporary shelter at 7320 Buller Ave. will be removed for a park when its lease ends in 2028.", src: ["city-homelessness"] },

@@ -3,10 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Burnaby Votes 2026 – Voter Guide</title>
+  <title>Burnaby Votes 2026 - Voter Guide</title>
   <meta name="description" content="A plain-language, sourced guide to all 64 candidates in Burnaby's October 17, 2026 local election: mayor, council and school trustees.">
-  <meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#151618" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#0f172a">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗳️</text></svg>">
   <link rel="stylesheet" href="assets/css/style.css">
   <script>
@@ -23,20 +22,22 @@
         <span class="brand-mark" aria-hidden="true">🗳️</span>
         <span>
           <span class="brand-name">Burnaby Votes 2026</span>
-          <span class="brand-sub">Independent voter guide</span>
+          <span class="brand-sub">Independent voter guide · General Local Election · Sat, Oct 17</span>
         </span>
       </a>
-      <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch colour theme">
-        <span aria-hidden="true" id="theme-icon">◐</span>
-      </button>
+      <div class="top-actions">
+        <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch colour theme">
+          <span aria-hidden="true" id="theme-icon">💻</span><span class="lbl" id="theme-label">System</span>
+        </button>
+      </div>
     </div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#start" data-tab="start">Start</a>
-      <a href="#candidates" data-tab="candidates">Candidates</a>
-      <a href="#parties" data-tab="parties">Parties</a>
-      <a href="#issues" data-tab="issues">Issues</a>
-      <a href="#picks" data-tab="picks">My picks <span class="pill" id="picks-count" hidden>0</span></a>
-      <a href="#about" data-tab="about">About</a>
+      <a href="#start" data-tab="start">📊 Overview</a>
+      <a href="#candidates" data-tab="candidates">👥 Candidates</a>
+      <a href="#parties" data-tab="parties">🏛️ Parties</a>
+      <a href="#issues" data-tab="issues">⚡ Issues</a>
+      <a href="#picks" data-tab="picks">🗳️ My ballot <span class="pill" id="picks-count" hidden>0</span></a>
+      <a href="#about" data-tab="about">ℹ️ About</a>
     </nav>
   </header>
 
@@ -54,16 +55,21 @@
     </noscript>
   </main>
 
+  <dialog class="profile" id="profile" aria-labelledby="pf-name"></dialog>
+
   <footer class="foot">
-    <p>Not affiliated with any candidate, party, or the City of Burnaby. Candidate statements are reproduced from the
-      <a href="https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates">City's official profiles</a>.</p>
-    <p>Spotted an error? <a href="#about">How to report a correction</a>.</p>
+    <div class="foot-inner">
+      <p><strong>Burnaby Votes 2026</strong> is independent and non-partisan. It isn't affiliated with any candidate, party, or the City of Burnaby.</p>
+      <p>Candidate statements are reproduced from the <a href="https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates">City's official profiles</a>. Spotted an error? <a href="#about">Report a correction</a>.</p>
+    </div>
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <script src="data/profiles.js"></script>
   <script src="data/guide.js"></script>
+  <script src="data/opinions.js"></script>
+  <script src="data/polls.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
 </html>
