@@ -1,0 +1,72 @@
+Build a comprehensive and complete guide to the October 2026 Burnaby general local election, voters will elect 1 Mayor, 8 City Councillors, and 7 School Board Trustees. With 64 total candidates.
+
+
+
+I need to know about every candidate, this is a complete guide.
+
+
+
+Show every person that's included in this vote for every role, and every group, they're platform, the issues they stand for, pros and cons, what they're criticized for, and links to anything you can to prove what you're including.
+
+
+
+Include anything for everyone so a person could look at this for the one source of the whole election, do not fizzle out and give me limited information on anyone. 
+
+Here's my plan to tackle that topic. Let me know if you need to make changes.
+
+ Burnaby 2026 Election Voter Guide 
+Research Websites
+(1) Locate the official candidate declaration list for the October 2026 Burnaby general local election to identify all 64 individuals running for Mayor, City Councillor, and School Board Trustee.
+(2) Determine the electoral organizations or political slates operating in Burnaby and map each candidate to their respective group or identify them as independent.
+(3) Research the mayoral candidates by reviewing their campaign materials and local news coverage to extract their central platforms, primary issues, and any documented public criticisms.
+(4) Investigate the candidates for the 8 City Councillor seats by analyzing slate-wide manifestos and individual priorities, looking for reported pros, cons, and critiques from civic groups.
+(5) Gather data on the candidates for the 7 School Board Trustee positions, focusing on their educational policies, community advocacy, and perspectives on district issues.
+(6) Compile verifiable URLs from local journalism outlets, official municipal voter guides, and candidate web pages to substantiate the platforms and critiques for every individual.
+(7) Synthesize all collected data into a complete, unbiased voter guide organized by role, ensuring no candidate is omitted and all requested aspects are thoroughly detailed.
+Analyze Results
+Create Report
+Ready in a few mins
+Start research
+
+I've completed your research. Feel free to ask me follow-up questions or request changes.
+
+Burnaby 2026 Election Voter Guide
+Oct 10, 12:18 p.m.
+Can you also add to the breakdown how the voting is handled, if each person is voted or if you're voting for a group? Also if there's any polling or data that suggests front runners that are likely to be in a better position to win let's include that.
+
+Sure, I'll make those changes. Here's your updated research:
+
+Burnaby 2026 Election Voter Guide
+Oct 10, 12:27 p.m.
+I've added a section specifically detailing the polling data, voter sentiment, and frontrunner expectations, and I've updated the executive summary to clarify how the ballot system allows voters to pick individuals rather than being forced to vote for an entire group or slate. Let me know if there is anything else I can help with.
+
+I will now generate a comprehensive single-page interactive web application for the October 2026 Burnaby General Local Election Voter Guide. This application translates all dataset information—covering all 64 candidates, 3 electoral races, 6 party slates, voting mechanisms, regional polling data, and strategic analytical insights—into an interactive experience with search, dynamic filtering, slate comparisons, interactive ballot simulations, and visualizations using Chart.js.
+
+Burnaby 2026 Election Interactive Guide
+Oct 10, 12:52 p.m.
+Summary of Created Web Application
+Information Architecture: The application transforms the entire multi-section report into a single-page web app with 5 interactive views:
+
+Dashboard: High-level overview, voter sentiment charts (Leger polling data), priority issues, and 4 core systemic flashpoints.
+
+Candidate Explorer: Interactive, searchable roster featuring all 64 candidates across Mayor (6), Council (42), and School Board Trustee (16). Includes filters by office, party slate, and keywords, along with a full modal profile view detailing pros, cons, and criticisms.
+
+Party Slates: Side-by-side comparison matrix for the Burnaby Citizens Association (BCA), Restore Burnaby Alliance, New Burnaby, Burnaby First, Burnaby Green Party, and Independents.
+
+Voting Simulator: Practice ballot builder demonstrating plurality block voting mechanics (1 Mayor, up to 8 Councillors, up to 7 Trustees) and showing real-time vote-splitting tallies across slates.
+
+Strategic Analysis: Second and third-order analytical breakdowns detailing vote fragmentation mathematics, the 2028 reserve depletion tax cliff, dual provincial/municipal candidacies, and the public safety shift.
+
+Technical Compliance:
+
+Zero SVG and zero Mermaid JS used.
+
+Includes Chart.js visualizations wrapped in responsive container <div> elements with constrained height and width.
+
+Built with Tailwind CSS and Vanilla JS for fast, self-contained performance in a single standard .html file.
+
+Let's add a dark mode switcher that matches to the system it's on
+
+I will now update the application to include a dark mode switcher that matches the user's system preferences by default (via OS prefers-color-scheme) and provides manual toggle options (System, Light, Dark). All UI components, charts, candidate cards, modals, and ballot simulators have been styled with responsive dark mode classes.
+
+Burnaby 2026 Elec

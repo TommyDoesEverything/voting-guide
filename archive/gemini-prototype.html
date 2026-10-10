@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burnaby 2026 General Local Election - Interactive Voter Guide</title>
+    <!-- Configure Tailwind Dark Mode Class -->
+    <script>
+        tailwind = {
+            config: {
+                darkMode: 'class'
+            }
+        }
+    </script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        /* Custom scrollbar styling for candidate cards and sidebars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<!-- Chosen Palette: Warm Civic Harmony with Adaptive Dark Mode (Light: #F8FAFC / Dark: #020617, Primary: #2563EB, Accent: #059669) -->
+<!-- Application Structure Plan: Designed as a single-page interactive dashboard featuring 5 intuitive core views: 1) Executive Dashboard & Sentiment, 2) Candidate Directory (with multi-faceted search, race filter, slate filter, and detailed modal views for all 64 candidates), 3) Slate Comparison Matrix, 4) Interactive Block Voting Simulator, and 5) Strategic Analysis & Insights. Added a native dark mode theme switcher matching OS preferences automatically with manual overrides. -->
+<!-- Visualization & Content Choices: Used Chart.js Canvas for dynamic voter sentiment and priority charts with dynamic light/dark theme grid recoloring; custom interactive HTML/Tailwind cards; vanilla JS for real-time search, filters, ballot simulation, theme switching, and modal popups. NO SVG or Mermaid JS used. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-blue-100 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-100 min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Sticky Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-slate-900 dark:bg-slate-950 text-white shadow-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-lg text-white shadow">
+                        🗳️
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-bold tracking-tight">Burnaby Election 2026</h1>
+                        <p class="text-xs text-slate-400 hidden sm:block">General Local Election Voter Guide • Saturday, Oct 17, 2026</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs & Theme Selector -->
+                <div class="flex items-center space-x-3">
+                    <nav class="hidden md:flex space-x-1 text-sm font-medium">
+                        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-3 py-2 rounded-md transition text-slate-300 hover:text-white hover:bg-slate-800">Dashboard</button>
+                        <button onclick="switchTab('candidates')" id="nav-candidates" class="px-3 py-2 rounded-md transition text-slate-300 hover:text-white hover:bg-slate-800">Candidates (64)</button>
+                        <button onclick="switchTab('slates')" id="nav-slates" class="px-3 py-2 rounded-md transition text-slate-300 hover:text-white hover:bg-slate-800">Party Slates</button>
+                        <button onclick="switchTab('simulator')" id="nav-simulator" class="px-3 py-2 rounded-md transition text-slate-300 hover:text-white hover:bg-slate-800">Voting Simulator</button>
+                        <button onclick="switchTab('analysis')" id="nav-analysis" class="px-3 py-2 rounded-md transition text-slate-300 hover:text-white hover:bg-slate-800">Strategic Insights</button>
+                    </nav>
+
+                    <!-- Dark Mode Theme Switcher Dropdown -->
+                    <div class="relative inline-block text-left">
+                        <button onclick="toggleThemeMenu()" id="theme-menu-btn" aria-label="Toggle theme" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm flex items-center gap-1.5 border border-slate-700 transition focus:outline-none">
+                            <span id="theme-icon">💻</span>
+                            <span id="theme-label" class="hidden sm:inline text-xs font-semibold">System</span>
+                            <span class="text-[10px] text-slate-400">▼</span>
+                        </button>
+                        <div id="theme-dropdown" class="hidden absolute right-0 mt-2 w-36 rounded-xl bg-slate-800 border border-slate-700 shadow-xl py-1 z-50 text-xs">
+                            <button onclick="setThemeMode('system')" class="w-full text-left px-3 py-2 text-slate-200 hover:bg-slate-700 flex items-center justify-between">
+                                <span>💻 System</span>
+                                <span id="check-system" class="text-blue-400 font-bold">✓</span>
+                            </button>
+                            <button onclick="setThemeMode('light')" class="w-full text-left px-3 py-2 text-slate-200 hover:bg-slate-700 flex items-center justify-between">
+                                <span>☀️ Light</span>
+                                <span id="check-light" class="text-blue-400 font-bold hidden">✓</span>
+                            </button>
+                            <button onclick="setThemeMode('dark')" class="w-full text-left px-3 py-2 text-slate-200 hover:bg-slate-700 flex items-center justify-between">
+                                <span>🌙 Dark</span>
+                                <span id="check-dark" class="text-blue-400 font-bold hidden">✓</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none">
+                        <span class="text-xl">☰</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-800 border-t border-slate-700 px-4 pt-2 pb-4 space-y-1">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-700">📊 Dashboard & Polling</button>
+            <button onclick="switchTab('candidates'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-700">👥 Candidate Explorer (64)</button>
+            <button onclick="switchTab('slates'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-700">🏛️ Party Slates & Platforms</button>
+            <button onclick="switchTab('simulator'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-700">🗳️ How to Vote Simulator</button>
+            <button onclick="switchTab('analysis'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-700">💡 Strategic Analysis & Insights</button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ================= SECTION 1: DASHBOARD & VOTER SENTIMENT ================= -->
+        <section id="section-dashboard" class="space-y-8">
+            <!-- Introduction Header -->
+            <div class="bg-gradient-to-r from-slate-900 to-blue-900 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-slate-800">
+                <div class="max-w-3xl">
+                    <span class="inline-block px-3 py-1 bg-blue-500/30 text-blue-200 text-xs font-semibold uppercase tracking-wider rounded-full mb-3 border border-blue-400/20">
+                        Municipal Election Briefing • October 17, 2026
+                    </span>
+                    <h2 class="text-2xl md:text-4xl font-extrabold tracking-tight mb-3">Burnaby Civic Governance & Voter Decision Guide</h2>
+                    <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+                        Welcome to the interactive voter analysis guide for Burnaby's 2026 General Local Election. Eligible voters will elect 16 officials for 4-year terms: <strong>1 Mayor</strong>, <strong>8 City Councillors</strong>, and <strong>7 School Board Trustees</strong>. Explore candidate platforms, analyze slate dynamics, review regional polling data, and test your voting options.
+                    </p>
+                </div>
+
+                <!-- Key Metrics Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-slate-700/60">
+                    <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                        <div class="text-3xl font-black text-blue-400">64</div>
+                        <div class="text-xs text-slate-300 uppercase tracking-wider font-semibold mt-1">Total Candidates</div>
+                    </div>
+                    <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                        <div class="text-3xl font-black text-emerald-400">16</div>
+                        <div class="text-xs text-slate-300 uppercase tracking-wider font-semibold mt-1">Elected Seats</div>
+                    </div>
+                    <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                        <div class="text-3xl font-black text-amber-400">19%</div>
+                        <div class="text-xs text-slate-300 uppercase tracking-wider font-semibold mt-1">2022 Turnout Baseline</div>
+                    </div>
+                    <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                        <div class="text-3xl font-black text-purple-400">6</div>
+                        <div class="text-xs text-slate-300 uppercase tracking-wider font-semibold mt-1">Active Slates/Groups</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Introductory Paragraph for Dashboard Section -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Section Context: The Political Landscape & Voter Mood</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    This executive dashboard details the regional voter sentiment, critical municipal flashpoints, and polling data leading into the October 17, 2026 election. Following decades of growth that transformed Burnaby from a suburban bedroom community into high-density urban nodes (Metrotown, Brentwod, Lougheed), electors face rising property taxes, infrastructure debt overruns from Metro Vancouver, housing density debates, and public safety concerns. Use the charts below to explore voter priorities and local approval ratings.
+                </p>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Polling Chart 1: Resident Satisfaction & Mood -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-slate-800 dark:text-slate-100 text-lg">Voter Sentiment & Satisfaction</h3>
+                            <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded">Leger Poll (Sept 2026)</span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Public sentiment reveals a widespread desire for change across municipal leadership, despite high candidate indecision.</p>
+                        <div class="chart-container">
+                            <canvas id="chart-sentiment"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex justify-between">
+                        <span>• Wrong Track: 51%</span>
+                        <span>• Change Council: 57%</span>
+                        <span>• Undecided Mayoral Voters: 34% - 64%</span>
+                    </div>
+                </div>
+
+                <!-- Polling Chart 2: Top Election Issues -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-slate-800 dark:text-slate-100 text-lg">Top Voter Priority Concerns</h3>
+                            <span class="text-xs font-semibold px-2.5 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 rounded">Electorate Focus</span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Percentage of Burnaby residents identifying key issues as top factors in their vote choice.</p>
+                        <div class="chart-container">
+                            <canvas id="chart-issues"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex justify-between">
+                        <span>• Cost of Living: 47%</span>
+                        <span>• Housing Affordability: 34%</span>
+                        <span>• Property Tax Hikes: 27%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 Major Systemic Flashpoints -->
+            <div>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                    <span>⚡</span> 4 Systemic Flashpoints Driving the 2026 Discourse
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Flashpoint 1 -->
+                    <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold flex items-center justify-center text-sm">1</span>
+                            <h4 class="font-bold text-slate-800 dark:text-slate-100">Housing Affordability & "Demovictions"</h4>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Following the trauma of Metrotown renter displacements during the 2010s, Mayor Hurley enacted strong tenant protection policies. However, 2026 debates have shifted toward single-family multiplexes, "monster homes," and social housing placements.
+                        </p>
+                    </div>
+
+                    <!-- Flashpoint 2 -->
+                    <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold flex items-center justify-center text-sm">2</span>
+                            <h4 class="font-bold text-slate-800 dark:text-slate-100">Metro Vancouver Utility & Tax Shock</h4>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Burnaby proposed a modest 2.9% property tax increase ($61/avg home), but regional North Shore Wastewater Plant cost overruns ($3 Billion boondoggle) imposed 6.4% water and 7.6% sewer rate hikes, currently buffered temporarily by municipal reserves.
+                        </p>
+                    </div>
+
+                    <!-- Flashpoint 3 -->
+                    <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold flex items-center justify-center text-sm">3</span>
+                            <h4 class="font-bold text-slate-800 dark:text-slate-100">Public Safety & Harm Reduction Shift</h4>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            A sharp divide has emerged: Right-leaning slates (Restore Burnaby, Burnaby First) campaign against safe injection sites and supportive housing placements in commercial cores, while progressive groups defend harm reduction and social infrastructure.
+                        </p>
+                    </div>
+
+                    <!-- Flashpoint 4 -->
+                    <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 font-bold flex items-center justify-center text-sm">4</span>
+                            <h4 class="font-bold text-slate-800 dark:text-slate-100">Provincial Dual-Candidacy Conflict</h4>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Because the municipal election overlaps with the BC Provincial Election (Oct 24, 2026), several candidates (e.g., David Xie, Jenny Yamagata, Martin Kendell) are running for both municipal office and provincial MLA seats simultaneously, drawing intense opportunism critiques.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 2: CANDIDATE EXPLORER (64 CANDIDATES) ================= -->
+        <section id="section-candidates" class="hidden space-y-6">
+            <!-- Introductory Paragraph for Candidates Section -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Section Context: Complete 64-Candidate Roster & Platform Search</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    This directory provides an exhaustive, unfiltered catalog of every single officially declared candidate in the 2026 Burnaby election across all three races: <strong>Mayor (6)</strong>, <strong>City Council (42)</strong>, and <strong>School Board Trustee (16)</strong>. Filter candidates by office, slate affiliation, or specific key topics (such as tax freezes, harm reduction, or dual-candidacies). Click any candidate card to open their full detailed breakdown, including key pros, cons, platform stances, and system criticisms.
+                </p>
+            </div>
+
+            <!-- Filter Controls Panel -->
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+                <div class="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
+                    <!-- Search Input -->
+                    <div class="relative flex-grow max-w-md">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">🔍</span>
+                        <input type="text" id="candidate-search" oninput="filterCandidates()" placeholder="Search candidates, platform keywords, tags..." class="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                    </div>
+
+                    <!-- Counter Badge -->
+                    <div id="candidate-count-badge" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg self-start md:self-auto border border-slate-200 dark:border-slate-700">
+                        Showing 64 of 64 Candidates
+                    </div>
+                </div>
+
+                <!-- Filter Button Groups -->
+                <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <!-- Office Filter Buttons -->
+                    <div class="flex flex-wrap gap-1 mr-4">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider self-center mr-2">Race:</span>
+                        <button onclick="setFilter('office', 'all')" id="filter-office-all" class="filter-btn-office px-3 py-1 rounded-lg text-xs font-medium bg-blue-600 text-white shadow-sm">All Races</button>
+                        <button onclick="setFilter('office', 'Mayor')" id="filter-office-Mayor" class="filter-btn-office px-3 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">Mayor (6)</button>
+                        <button onclick="setFilter('office', 'Councillor')" id="filter-office-Councillor" class="filter-btn-office px-3 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">Council (42)</button>
+                        <button onclick="setFilter('office', 'School Trustee')" id="filter-office-School Trustee" class="filter-btn-office px-3 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">Trustee (16)</button>
+                    </div>
+
+                    <!-- Slate Filter Dropdown -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Slate:</span>
+                        <select id="slate-select-filter" onchange="filterCandidates()" class="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="all">All Slates / Affiliations</option>
+                            <option value="Burnaby Citizens Association">Burnaby Citizens Association (BCA)</option>
+                            <option value="Restore Burnaby Alliance">Restore Burnaby Alliance</option>
+                            <option value="New Burnaby">New Burnaby</option>
+                            <option value="Burnaby First">Burnaby First</option>
+                            <option value="Burnaby Green Party">Burnaby Green Party</option>
+                            <option value="Action One">Action One</option>
+                            <option value="Independent">Independent</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidate Cards Grid -->
+            <div id="candidate-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamic cards populated via JavaScript -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden bg-white dark:bg-slate-900 rounded-2xl p-12 text-center border border-slate-200 dark:border-slate-800">
+                <div class="text-4xl mb-3">🔍</div>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">No candidates match your current filter criteria</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Try clearing your search query or switching selected office/slate filters.</p>
+                <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition">Reset All Filters</button>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 3: PARTY SLATES MATRIX ================= -->
+        <section id="section-slates" class="hidden space-y-8">
+            <!-- Introductory Paragraph for Slates Section -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Section Context: Party Slate Formations & Ideological Spectrum</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    While Burnaby voters elect individual candidates, organized slates play a major role in coordinating campaigns, pooling funding, and whipping votes. This section analyzes all six party groups and independent blocks competing in 2026. Review their total candidate slates across races, core platform focus, fiscal stances, and structural political liabilities.
+                </p>
+            </div>
+
+            <!-- Slate Comparison Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- BCA -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border-2 border-blue-500 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="px-2.5 py-1 bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-200 text-xs font-bold rounded-full">Established / Incumbent Powerhouse</span>
+                                <h3 class="text-xl font-black text-slate-900 dark:text-slate-100 mt-2">Burnaby Citizens Association (BCA)</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                            The dominant center-left municipal party in Burnaby for decades. Strongly aligned with organized labor, progressive housing, tenant protections, and environmental sustainability.
+                        </p>
+                        
+                        <div class="space-y-2 text-xs border-t border-slate-100 dark:border-slate-800 pt-3">
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Candidates Fielded:</span> <span class="font-bold text-slate-800 dark:text-slate-200">15 Total (1 Mayor*, 8 Council, 7 Trustee)</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Fiscal Policy:</span> <span class="font-bold text-slate-800 dark:text-slate-200">Balanced / Reserve-Backed</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Harm Reduction:</span> <span class="font-bold text-slate-800 dark:text-slate-200">Supportive</span></div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Strengths & Pros:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>Unmatched voter turnout machine & union backing</li>
+                                <li>Tangible record stopping Metrotown demovictions</li>
+                                <li>Debt-free municipal status maintainer</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Vulnerabilities & Criticisms:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>Risk of monolithic "one-party" council governance</li>
+                                <li>Metro Van $3B wastewater plant overrun fallout</li>
+                                <li>Accused of leftward drift post-veteran retirements</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <span class="text-xs text-slate-400 dark:text-slate-500 italic">* Mayor Hurley runs as Independent aligned with BCA.</span>
+                    </div>
+                </div>
+
+                <!-- Restore Burnaby Alliance -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border-2 border-rose-500 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="px-2.5 py-1 bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 text-xs font-bold rounded-full">Main Right-Wing Opposition</span>
+                                <h3 class="text-xl font-black text-slate-900 dark:text-slate-100 mt-2">Restore Burnaby Alliance</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                            A right-leaning populist coalition campaigning heavily on public safety, strict fiscal austerity, neighborhood character protection, and stopping harm reduction housing.
+                        </p>
+                        
+                        <div class="space-y-2 text-xs border-t border-slate-100 dark:border-slate-800 pt-3">
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Candidates Fielded:</span> <span class="font-bold text-slate-800 dark:text-slate-200">11 Total (0 Mayor, 7 Council, 4 Trustee)</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Fiscal Policy:</span> <span class="font-bold text-slate-800 dark:text-slate-200">4-Year Property Tax Freeze</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Harm Reduction:</span> <span class="font-bold text-slate-800 dark:text-slate-200">Strongly Opposed</span></div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Strengths & Pros:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>Appeals directly to safety & tax concerns</li>
+                                <li>Clear, aggressive populist alternative</li>
+                                <li>Pro-business & merchant support</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Vulnerabilities & Criticisms:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>Tax freeze deemed mathematically unviable vs inflation</li>
+                                <li>Parental rights rhetoric alienates progressive voters</li>
+                                <li>No mayoral candidate fielded</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <span class="text-xs text-slate-400 dark:text-slate-500 italic">Key figure: Rocky Dong (Tax Freeze advocate).</span>
+                    </div>
+                </div>
+
+                <!-- New Burnaby -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border-2 border-purple-500 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="px-2.5 py-1 bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 text-xs font-bold rounded-full">Centrist Alternative</span>
+                                <h3 class="text-xl font-black text-slate-900 dark:text-slate-100 mt-2">New Burnaby</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                            Positioned as a pragmatic, moderate alternative to BCA dominance, advocating balanced growth, responsive local governance, and diverse representation.
+                        </p>
+                        
+                        <div class="space-y-2 text-xs border-t border-slate-100 dark:border-slate-800 pt-3">
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Candidates Fielded:</span> <span class="font-bold text-slate-800 dark:text-slate-200">7 Total (0 Mayor, 6 Council, 1 Trustee)</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Fiscal Policy:</span> <span class="font-bold text-slate-800 dark:text-slate-200">Pragmatic Moderation</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Harm Reduction:</span> <span class="font-bold text-slate-800 dark:text-slate-200">Case-by-Case</span></div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Strengths & Pros:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>Experienced candidates like ex-MLA Richard T. Lee</li>
+                                <li>Broad centrist appeal to moderate residents</li>
+                                <li>Focus on neighborhood-level solutions</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Vulnerabilities & Criticisms:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>David Xie dual-candidacy (BC Con MLA) controversy</li>
+                                <li>Platform overshadowed by political opportunism attacks</li>
+                                <li>Incomplete slate limits majority ability</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <span class="text-xs text-slate-400 dark:text-slate-500 italic">Key figures: Ex-MLA Richard T. Lee, David Xie.</span>
+                    </div>
+                </div>
+
+                <!-- Burnaby First -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border-2 border-amber-500 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="px-2.5 py-1 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 text-xs font-bold rounded-full">Pro-Business / Anti-Monster Homes</span>
+                                <h3 class="text-xl font-black text-slate-900 dark:text-slate-100 mt-2">Burnaby First</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                            Led by Mayoral candidate Heymann Yip, focusing on bringing a "CEO management style" to City Hall, opposing oversized monster homes, and demanding fiscal transparency.
+                        </p>
+                        
+                        <div class="space-y-2 text-xs border-t border-slate-100 dark:border-slate-800 pt-3">
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Candidates Fielded:</span> <span class="font-bold text-slate-800 dark:text-slate-200">4 Total (1 Mayor, 3 Council, 0 Trustee)</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Fiscal Policy:</span> <span class="font-bold text-slate-800 dark:text-slate-200">Corporate Audit & Cut Friction</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Harm Reduction:</span> <span class="font-bold text-slate-800 dark:text-slate-200">Strict Restrictions</span></div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Strengths & Pros:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>Clear pro-business and merchant advocate</li>
+                                <li>Strong stance against oversized neighborhood developments</li>
+                                <li>Experienced leadership under Heymann Yip</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Vulnerabilities & Criticisms:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>Mathematical impossibility to hold council majority (only 3 council candidates)</li>
+                                <li>Hardline social stances alienate progressive voters</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <span class="text-xs text-slate-400 dark:text-slate-500 italic">Mayoral Leader: Heymann Yip.</span>
+                    </div>
+                </div>
+
+                <!-- Burnaby Greens -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border-2 border-emerald-500 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 text-xs font-bold rounded-full">Environmental & Climate Action</span>
+                                <h3 class="text-xl font-black text-slate-900 dark:text-slate-100 mt-2">Burnaby Green Party</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                            Champions aggressive climate action, active transit infrastructure (bike paths, Bus Rapid Transit), deep housing affordability, and green school infrastructure.
+                        </p>
+                        
+                        <div class="space-y-2 text-xs border-t border-slate-100 dark:border-slate-800 pt-3">
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Candidates Fielded:</span> <span class="font-bold text-slate-800 dark:text-slate-200">6 Total (0 Mayor, 4 Council, 2 Trustee)</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Fiscal Policy:</span> <span class="font-bold text-slate-800 dark:text-slate-200">Green Investment Focus</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Harm Reduction:</span> <span class="font-bold text-slate-800 dark:text-slate-200">Pro-Health / Compassionate</span></div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Strengths & Pros:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>Principled environmental leadership</li>
+                                <li>Consistent focus on transit and urban livability</li>
+                                <li>Active grass-roots community engagement</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Vulnerabilities & Criticisms:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>Struggles for relevancy amidst immediate tax/crime fears</li>
+                                <li>Martin Kendell dual-candidacy critique (Burnaby North MLA)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <span class="text-xs text-slate-400 dark:text-slate-500 italic">Key figures: Joel Gibbs, Martin Kendell.</span>
+                    </div>
+                </div>
+
+                <!-- Independents & Micro-Slates -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border-2 border-slate-400 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-full">Independent Voices Block</span>
+                                <h3 class="text-xl font-black text-slate-900 dark:text-slate-100 mt-2">Independents & Micro-Groups</h3>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                            Includes 4 Independent Mayoral candidates (MichaelAngelo, Petrovas, Wang, Hsu/Action One), 14 Independent Council candidates, and 2 Independent Trustee candidates.
+                        </p>
+                        
+                        <div class="space-y-2 text-xs border-t border-slate-100 dark:border-slate-800 pt-3">
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Candidates Fielded:</span> <span class="font-bold text-slate-800 dark:text-slate-200">21 Total across all races</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Fiscal Policy:</span> <span class="font-bold text-slate-800 dark:text-slate-200">Diverse / Individual</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Harm Reduction:</span> <span class="font-bold text-slate-800 dark:text-slate-200">Varies Widely</span></div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Strengths & Pros:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>Free from party whips; vote purely on personal conviction</li>
+                                <li>Diverse single-issue advocates (e.g. Dr. Allen Chen on senior healthcare, Natalia Bember on disability ramps)</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Key Vulnerabilities & Criticisms:</h4>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc pl-4">
+                                <li>Lack of get-out-the-vote organizational machinery</li>
+                                <li>Extreme risk of vote dilution against organized slates</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <span class="text-xs text-slate-400 dark:text-slate-500 italic">Includes candidates like MichaelAngelo, Dr. Allen Chen, Natalia Bember.</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= SECTION 4: VOTING SIMULATOR & MECHANICS ================= -->
+        <section id="section-simulator" class="hidden space-y-8">
+            <!-- Introductory Paragraph for Simulator Section -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Section Context: How Plurality Block Voting Works in Practice</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Burnaby uses a <strong>plurality block voting system</strong>. Electors do NOT vote for a party block as a single unit; instead, you cast individual votes for up to <strong>1 Mayor</strong>, <strong>8 Council Seats</strong>, and <strong>7 School Board Seats</strong>. You are completely free to mix-and-match candidates across different slates or vote for fewer than the maximum allowed. Use the interactive simulator below to practice building your ballot and learn why vote-splitting occurs.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Ballot Construction Interface -->
+                <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 space-y-6">
+                    <div class="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100">Interactive Practice Ballot</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Select candidates to see how your choices tally across slates.</p>
+                        </div>
+                        <button onclick="resetSimulator()" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">Clear Selected Ballot</button>
+                    </div>
+
+                    <!-- Mayor Selection (Max 1) -->
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm">1. Select Office of Mayor <span class="text-xs font-normal text-slate-500 dark:text-slate-400">(Choose up to 1)</span></h4>
+                            <span id="sim-mayor-count" class="text-xs font-bold px-2 py-0.5 bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-200 rounded">0 / 1 Selected</span>
+                        </div>
+                        <div id="sim-mayor-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Council Selection (Max 8) -->
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm">2. Select City Councillors <span class="text-xs font-normal text-slate-500 dark:text-slate-400">(Choose up to 8)</span></h4>
+                            <span id="sim-council-count" class="text-xs font-bold px-2 py-0.5 bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-200 rounded">0 / 8 Selected</span>
+                        </div>
+                        <div id="sim-council-grid" class="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-3 gap-2 max-h-72 overflow-y-auto p-1 border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-950">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Trustee Selection (Max 7) -->
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm">3. Select School Board Trustees <span class="text-xs font-normal text-slate-500 dark:text-slate-400">(Choose up to 7)</span></h4>
+                            <span id="sim-trustee-count" class="text-xs font-bold px-2 py-0.5 bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-200 rounded">0 / 7 Selected</span>
+                        </div>
+                        <div id="sim-trustee-grid" class="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-3 gap-2 max-h-60 overflow-y-auto p-1 border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-950">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ballot Analysis Summary Panel -->
+                <div class="bg-slate-900 dark:bg-slate-950 text-white rounded-2xl p-6 shadow-xl border border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                            <span>📋</span> Your Ballot Analysis
+                        </h3>
+
+                        <div class="space-y-4">
+                            <div class="bg-slate-800/90 p-4 rounded-xl border border-slate-700">
+                                <span class="text-xs text-slate-400 uppercase font-semibold">Total Votes Cast</span>
+                                <div id="sim-total-votes" class="text-3xl font-black text-blue-400 mt-1">0 / 16</div>
+                                <p class="text-xs text-slate-400 mt-1">You are not required to use all votes. You can select fewer if you choose.</p>
+                            </div>
+
+                            <div class="bg-slate-800/90 p-4 rounded-xl border border-slate-700">
+                                <span class="text-xs text-slate-400 uppercase font-semibold">Slate Mix Breakdown</span>
+                                <div id="sim-slate-breakdown" class="text-xs space-y-1.5 mt-2">
+                                    <p class="text-slate-400 italic">No candidates selected yet. Click candidates on the left to test your ballot.</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 text-xs text-slate-300 space-y-2">
+                                <div class="font-bold text-amber-400 flex items-center gap-1">
+                                    <span>⚠️</span> Mathematical Insight:
+                                </div>
+                                <p class="leading-relaxed">
+                                    If you split your votes evenly among multiple opposition slates, disciplined party voters who cast a straight "8-vote BCA ticket" gain a structural advantage in plurality block voting.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-800 text-center">
+                        <span class="text-xs text-slate-400">Advance Polling: Oct 3, 7, 10 • General Voting: Oct 17</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 5: STRATEGIC ANALYSIS & INSIGHTS ================= -->
+        <section id="section-analysis" class="hidden space-y-8">
+            <!-- Introductory Paragraph for Analysis Section -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Section Context: Second and Third-Order Strategic Analysis</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Beyond individual candidate promises, local elections are dictated by underlying structural mechanisms, fiscal constraints, and broader political trends. This section explores four critical second- and third-order analytical insights that explain how vote-splitting mathematics, regional debt, dual-candidacies, and shifting public safety discourse will impact Burnaby's governance regardless of who wins on October 17.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Analysis Card 1 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-black text-lg flex items-center justify-center">1</span>
+                        <h3 class="font-bold text-slate-900 dark:text-slate-100 text-lg">The Mathematics of Opposition Fragmentation</h3>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        In a plurality block voting system with 8 council seats available, voter discipline determines electoral success. If a disciplined 35% to 40% of the electorate votes straight down the BCA ballot, and the remaining 60% of the change-seeking electorate splits their choices among 34 non-BCA candidates across 5 opposition slates and independents, the BCA can mathematically sweep all 8 council seats despite holding a minority of overall support.
+                    </p>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 font-medium">
+                        💡 Key Takeaway: The failure of center-right and centrist slates (Restore Burnaby, New Burnaby, Burnaby First) to form a unified coalition works as a major structural advantage for the incumbent BCA.
+                    </div>
+                </div>
+
+                <!-- Analysis Card 2 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-black text-lg flex items-center justify-center">2</span>
+                        <h3 class="font-bold text-slate-900 dark:text-slate-100 text-lg">The Fiscal Illusion & 2028 Tax Cliff</h3>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Opposition promises of absolute property tax freezes fail to account for mandatory regional cost pass-throughs. Metro Vancouver mandated 6.4% water and 7.6% sewer rate increases to fund the $3 Billion North Shore Wastewater Plant disaster. The current city administration is artificially holding resident water hikes at 0% by depleting strategic reserves—a temporary election-year maneuver that creates an inevitable fiscal cliff post-2026.
+                    </p>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 font-medium">
+                        💡 Key Takeaway: Depleting reserve funds to buffer regional utility overruns means steep municipal property tax increases or major service cuts will be unavoidable by 2028.
+                    </div>
+                </div>
+
+                <!-- Analysis Card 3 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 font-black text-lg flex items-center justify-center">3</span>
+                        <h3 class="font-bold text-slate-900 dark:text-slate-100 text-lg">Provincialization & Dual-Candidacy Risks</h3>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        With the BC Provincial Election occurring on October 24, 2026 (one week after the municipal vote), multiple candidates are seeking municipal office while actively campaigning for provincial MLA seats. Critics argue provincial parties treat civic elections as data-harvesting exercises and farm leagues, creating potential conflict of interest risks and costly municipal by-elections if dual-running candidates win both seats.
+                    </p>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 font-medium">
+                        💡 Key Takeaway: Dual-candidacies erode civic institutional focus and create potential taxpayer-funded by-election liabilities.
+                    </div>
+                </div>
+
+                <!-- Analysis Card 4 -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-black text-lg flex items-center justify-center">4</span>
+                        <h3 class="font-bold text-slate-900 dark:text-slate-100 text-lg">Paradigm Shift in Public Safety Debate</h3>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        The 2026 election marks a sharp rightward turn in public safety rhetoric regarding addiction and homelessness. Right-leaning slates are explicitly opposing safe injection sites and supportive housing in urban cores. Even if these slates fail to win a council majority, their presence signals a major shift away from the harm-reduction consensus that governed Metro Vancouver for over a decade.
+                    </p>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 font-medium">
+                        💡 Key Takeaway: Increased merchant and public frustration is forcing traditional progressive parties to spend political capital defending harm reduction infrastructure.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Candidate Detailed Drawer / Modal Window -->
+    <div id="candidate-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+            <div class="p-6">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-start pb-4 border-b border-slate-100 dark:border-slate-800">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span id="modal-office-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200">Office</span>
+                            <span id="modal-slate-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">Slate</span>
+                        </div>
+                        <h2 id="modal-name" class="text-2xl font-black text-slate-900 dark:text-slate-100">Candidate Name</h2>
+                    </div>
+                    <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 font-bold text-lg">✕</button>
+                </div>
+
+                <!-- Modal Body Content -->
+                <div class="space-y-4 py-4">
+                    <!-- Core Platform Focus -->
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Core Campaign Focus & Platform</h4>
+                        <p id="modal-platform" class="text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-medium">Platform description goes here.</p>
+                    </div>
+
+                    <!-- Detailed Background & Specific Proposals -->
+                    <div id="modal-details-container" class="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Detailed Background & Policy Stances</h4>
+                        <p id="modal-details" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Detailed policy stances and candidate background snippet.</p>
+                    </div>
+
+                    <!-- Pros & Key Strengths -->
+                    <div>
+                        <h4 class="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                            <span>✅</span> Key Strengths & Campaign Pros
+                        </h4>
+                        <p id="modal-pros" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Candidate pros snippet.</p>
+                    </div>
+
+                    <!-- Cons & Systemic Criticisms -->
+                    <div>
+                        <h4 class="text-xs font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                            <span>⚠️</span> Key Weaknesses & Systemic Criticisms
+                        </h4>
+                        <p id="modal-cons" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Candidate criticisms snippet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center rounded-b-2xl">
+                <span id="modal-tag-info" class="text-xs text-slate-400">Burnaby Election Voter Guide 2026</span>
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-semibold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition">Close Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 dark:bg-slate-950 text-slate-400 py-8 border-t border-slate-800 text-xs mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <p class="font-bold text-slate-200">Burnaby 2026 General Local Election Comprehensive Voter Guide</p>
+                <p class="mt-0.5">Single-source analytical application covering all 64 candidates, 3 races, and 6 slates.</p>
+            </div>
+            <div class="text-slate-500 text-right">
+                <p>Voting Day: Saturday, October 17, 2026 (8:00 AM – 8:00 PM)</p>
+                <p class="mt-0.5">Plurality Block Voting System • City of Burnaby</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic & Complete Data Set -->
+    <script>
+        // Complete Data Set of all 64 Candidates across Mayor, Councillor, and School Trustee
+        const CANDIDATES_DATA = [
+            // ================= MAYORAL CANDIDATES (6) =================
+            {
+                id: "m-hurley",
+                name: "Mike HURLEY",
+                office: "Mayor",
+                slate: "Independent",
+                slateBadge: "Independent (BCA Aligned Incumbent)",
+                platform: "Continuity, tenant protections, Metro Vancouver oversight, maintaining debt-free city status, stopped demovictions.",
+                details: "Seeking 3rd term. Points to tangible record of stopping Metrotown demovictions, maintaining debt-free city status, 2.9% property tax proposal, and collaborating with Host Nations. Serves as Metro Vancouver Chair.",
+                pros: "Unmatched name recognition, deep institutional knowledge, stopped tenant displacement scandal, solid fiscal track record.",
+                cons: "Facing intense criticism over $3B Metro Vancouver Wastewater Plant cost overruns; accused of ordering 'studies' over provincial audits and announcement fatigue.",
+                incumbent: true,
+                dual: false,
+                tags: ["Incumbent", "Debt-Free Status", "Tenant Protection", "BCA Aligned"]
+            },
+            {
+                id: "m-yip",
+                name: "Heymann YIP",
+                office: "Mayor",
+                slate: "Burnaby First",
+                slateBadge: "Burnaby First",
+                platform: "CEO-style corporate management, absolute fiscal accountability, opposing 'monster homes', business friction reduction.",
+                details: "35-year resident and co-founder of Burnaby First. Campaigns on stopping oversized monster homes, removing bureaucratic hurdles for merchants, and restricting safe injection sites.",
+                pros: "Offers clear, pro-business center-right management alternative; strong neighborhood character protection focus.",
+                cons: "Party fields only 3 council candidates, making it mathematically impossible to form a voting majority even if elected.",
+                incumbent: false,
+                dual: false,
+                tags: ["Pro-Business", "Anti-Monster Homes", "Fiscal Audit"]
+            },
+            {
+                id: "m-robinhood",
+                name: "MichaelAngelo ABCROBINHOOD",
+                office: "Mayor",
+                slate: "Independent",
+                slateBadge: "Independent Populist",
+                platform: "Populist wealth redistribution, 100% salary donation, 10% senior tax discount for garden growers, moving recovery centers outside cities.",
+                details: "40-year resident and painting business owner known for free repairs to seniors. Promises to donate 100% of mayoral salary to school lunches and single parents; move recovery centers outside urban boundaries.",
+                pros: "Strong philanthropic local record; resonates with disenfranchised voters seeking radical change.",
+                cons: "Promises (tuition reductions, geographic banishment of addiction centers) fall completely outside municipal jurisdiction.",
+                incumbent: false,
+                dual: false,
+                tags: ["Populist", "Salary Donation", "Anti-Injection Sites"]
+            },
+            {
+                id: "m-hsu",
+                name: "Sabina HSU",
+                office: "Mayor",
+                slate: "Action One",
+                slateBadge: "Action One (Independent)",
+                platform: "Neighborhood Block Watch expansion, wildfire smoke bylaws, AI and Sign Language public courses.",
+                details: "37-year resident with Business Administration background. Led federal petitions on tobacco reduction; advocates street-level community organizing and micro-policies.",
+                pros: "Proven street-level community organizer with concrete, actionable micro-policy proposals.",
+                cons: "Lacks comprehensive macroeconomic vision required for managing a major urban core facing multi-billion infrastructure deficits.",
+                incumbent: false,
+                dual: false,
+                tags: ["Block Watch", "AI Education", "Micro-Policy"]
+            },
+            {
+                id: "m-petrovas",
+                name: "Bill PETROVAS",
+                office: "Mayor",
+                slate: "Independent",
+                slateBadge: "Independent",
+                platform: "Deep local roots, traditional community nostalgia, small business advocacy.",
+                details: "Cites upbringing in Burnaby and father's 50-year Metrotown barbershop tenure as proof of dedication to traditional civic values.",
+                pros: "Authentic deep local roots; effective advocate for traditional small business merchants.",
+                cons: "Published campaign materials lack specific budgetary frameworks, policy depth, or actionable legislative proposals.",
+                incumbent: false,
+                dual: false,
+                tags: ["Local Nostalgia", "Small Business"]
+            },
+            {
+                id: "m-wang",
+                name: "Hanzhi WANG",
+                office: "Mayor",
+                slate: "Independent",
+                slateBadge: "Independent",
+                platform: "Managing rapid urban growth, forward-looking optimism, inclusive community integration for immigrants.",
+                details: "Campaign focuses on Burnaby's role as one of the fastest-growing regional hubs, appealing to new families and immigrants.",
+                pros: "Positive, inclusive vision tailored to dynamic newcomer demographic.",
+                cons: "Sparse platform lacking mechanical explanations of how to achieve growth goals under municipal financial constraints.",
+                incumbent: false,
+                dual: false,
+                tags: ["Urban Growth", "Inclusive Vision"]
+            },
+
+            // ================= COUNCILLOR CANDIDATES (42) =================
+            // --- BCA (8) ---
+            { id: "c-erwin", name: "Ryan ERWIN", office: "Councillor", slate: "Burnaby Citizens Association", slateBadge: "BCA", platform: "Workers' rights, progressive housing, decarbonizing developments.", details: "Focuses on labor standards, expanded public amenities, and climate-friendly building standards.", pros: "Backed by BCA machine and union support.", cons: "Part of monolithic BCA slate.", incumbent: false, dual: false, tags: ["Labor", "Progressive Housing"] },
+            { id: "c-keithley", name: "Joe KEITHLEY", office: "Councillor", slate: "Burnaby Citizens Association", slateBadge: "BCA Incumbent", platform: "Arts and culture funding, tenant protections, affordable civic services.", details: "Incumbent councillor and legendary punk musician (D.O.A.). Advocate for affordable housing and cultural arts.", pros: "Strong incumbent popularity and name recognition.", cons: "Critiqued for supporting party-line voting.", incumbent: true, dual: false, tags: ["Incumbent", "Arts & Culture"] },
+            { id: "c-clee", name: "Cindy LEE", office: "Councillor", slate: "Burnaby Citizens Association", slateBadge: "BCA", platform: "Legal accountability, supporting diverse families, inclusive social services.", details: "UBC law graduate and community advocate focusing on legal equity and family support.", pros: "Strong legal and advocacy background.", cons: "Lacks prior municipal elected experience.", incumbent: false, dual: false, tags: ["Legal Advocacy", "Families"] },
+            { id: "c-park", name: "Rea PARK", office: "Councillor", slate: "Burnaby Citizens Association", slateBadge: "BCA", platform: "Multicultural inclusion, youth programs, sustainable development.", details: "Focuses on immigrant integration, multicultural community centers, and youth engagement.", pros: "Represents growing newcomer populations.", cons: "Tied to BCA party whip.", incumbent: false, dual: false, tags: ["Multicultural", "Youth"] },
+            { id: "c-santiago", name: "Maita SANTIAGO", office: "Councillor", slate: "Burnaby Citizens Association", slateBadge: "BCA Incumbent", platform: "Worker advocacy, tenant security, equity initiatives.", details: "Incumbent councillor with extensive experience in grassroots migrant worker and labor advocacy.", pros: "Proven track record on council and deep community roots.", cons: "Faces opposition criticism over municipal tax increases.", incumbent: true, dual: false, tags: ["Incumbent", "Worker Security"] },
+            { id: "c-singh", name: "Kiran SINGH", office: "Councillor", slate: "Burnaby Citizens Association", slateBadge: "BCA", platform: "Community safety, neighborhood facilities, affordable childcare.", details: "Focuses on expanding accessible childcare and civic sports amenities for working families.", pros: "Solid grassroots organizing background.", cons: "New candidate reliant on slate voting.", incumbent: false, dual: false, tags: ["Childcare", "Civic Amenities"] },
+            { id: "c-tetrault", name: "Daniel TETRAULT", office: "Councillor", slate: "Burnaby Citizens Association", slateBadge: "BCA Incumbent", platform: "Non-profit housing, teacher advocate, active transportation.", details: "Incumbent councillor and former Burnaby Teachers' Association president.", pros: "Strong knowledge of education and municipal housing policy.", cons: "Targeted by conservative slates over housing spending.", incumbent: true, dual: false, tags: ["Incumbent", "Non-Profit Housing"] },
+            { id: "c-jwang", name: "James WANG", office: "Councillor", slate: "Burnaby Citizens Association", slateBadge: "BCA Incumbent", platform: "Senior services, inter-cultural bridge building, economic development.", details: "Long-serving incumbent councillor with strong ties to multicultural business and senior communities.", pros: "Deep institutional knowledge and veteran voter base.", cons: "Criticized for long party tenure without dissenting votes.", incumbent: true, dual: false, tags: ["Incumbent", "Senior Services"] },
+
+            // --- RESTORE BURNABY ALLIANCE (7) ---
+            { id: "c-cai", name: "Jessica CAI", office: "Councillor", slate: "Restore Burnaby Alliance", slateBadge: "Restore Burnaby", platform: "Public safety for children, quality senior care, Traditional Chinese Medicine advocacy.", details: "Licensed acupuncturist and TCM practitioner campaigning for safer parks and senior protection.", pros: "Strong appeal to health-focused and senior demographics.", cons: "Platform lacks detailed municipal infrastructure financing plans.", incumbent: false, dual: false, tags: ["Senior Care", "Public Safety"] },
+            { id: "c-chapman", name: "Neil CHAPMAN", office: "Councillor", slate: "Restore Burnaby Alliance", slateBadge: "Restore Burnaby", platform: "Common-sense practical policies, accountable taxation, efficient core services.", details: "Campaigns as a practical business candidate focused on holding municipal spending accountable.", pros: "Clear focus on core municipal service delivery.", cons: "Tied to slate's controversial 4-year tax freeze promise.", incumbent: false, dual: false, tags: ["Fiscal Responsibility", "Core Services"] },
+            { id: "c-cheung", name: "Daniel CHEUNG", office: "Councillor", slate: "Restore Burnaby Alliance", slateBadge: "Restore Burnaby", platform: "Restoring fairness, halting unvetted density, neighborhood character.", details: "Advocates for slowing down rapid multiplex rezoning in established single-family zones.", pros: "Resonates with homeowners concerned about rapid development.", cons: "Opposed by housing affordability advocates.", incumbent: false, dual: false, tags: ["Neighborhood Character", "Anti-Density"] },
+            { id: "c-dong", name: "Rocky DONG", office: "Councillor", slate: "Restore Burnaby Alliance", slateBadge: "Restore Burnaby", platform: "Absolute 4-year property tax freeze, opposing drug-use housing, stopping unvetted projects.", details: "Pledges an absolute 4-year tax freeze and fierce opposition to harm reduction housing sites.", pros: "Very high visibility populist tax-hawk campaign.", cons: "Tax freeze deemed mathematically impossible by fiscal analysts given regional inflation.", incumbent: false, dual: false, tags: ["Tax Freeze", "Anti-Injection Sites"] },
+            { id: "c-fiorda", name: "Tina FIORDA", office: "Councillor", slate: "Restore Burnaby Alliance", slateBadge: "Restore Burnaby", platform: "Financial accountability, 'know the cost before building', halting overruns.", details: "Demands strict financial audits of major capital projects before municipal approval.", pros: "Disciplined focus on municipal spending transparency.", cons: "Risk of delaying critical infrastructure updates.", incumbent: false, dual: false, tags: ["Financial Audit", "Austerity"] },
+            { id: "c-naidu", name: "Ragina NAIDU", office: "Councillor", slate: "Restore Burnaby Alliance", slateBadge: "Restore Burnaby", platform: "Scientist perspective, business-friendly policies, efficient public transit.", details: "Entrepreneur and scientist advocating for streamlined commercial permitting and tech innovation.", pros: "Strong professional scientific and business background.", cons: "Supports party's controversial tax freeze line.", incumbent: false, dual: false, tags: ["Pro-Business", "Science"] },
+            { id: "c-poon", name: "Janet POON", office: "Councillor", slate: "Restore Burnaby Alliance", slateBadge: "Restore Burnaby", platform: "Safety in town centers, merchant support, tax relief.", details: "Rounds out the Restore Burnaby push for street safety and commercial tax relief.", pros: "Focuses directly on small merchant security.", cons: "Lacks detailed independent platform materials.", incumbent: false, dual: false, tags: ["Merchant Safety", "Tax Relief"] },
+
+            // --- NEW BURNABY (6) ---
+            { id: "c-dhinsa", name: "Avtar DHINSA", office: "Councillor", slate: "New Burnaby", slateBadge: "New Burnaby", platform: "Pragmatic middle-ground governance, responsive local representation.", details: "Advocates for balanced growth and breaking single-party dominance on city council.", pros: "Centrist appeal to non-partisan voters.", cons: "Under-resourced slate infrastructure.", incumbent: false, dual: false, tags: ["Centrist", "Balanced Growth"] },
+            { id: "c-rtlee", name: "Richard T. LEE", office: "Councillor", slate: "New Burnaby", slateBadge: "New Burnaby", platform: "Veteran legislative experience, pragmatic infrastructure development, senior support.", details: "Former long-serving provincial MLA bring decades of legislative experience to city hall.", pros: "High name recognition and deep government experience.", cons: "Associated with older political establishment.", incumbent: false, dual: false, tags: ["Ex-MLA", "Veteran Governance"] },
+            { id: "c-nicholsfig", name: "Morgan NICHOLSFIGUEIREDO", office: "Councillor", slate: "New Burnaby", slateBadge: "New Burnaby", platform: "Community youth engagement, transparent budgeting, balanced transit.", details: "Focuses on practical civic amenities and youth sport infrastructure.", pros: "Energetic new centrist voice.", cons: "Low name recognition across city.", incumbent: false, dual: false, tags: ["Youth Amenities", "Centrist"] },
+            { id: "c-unadkat", name: "Neha UNADKAT", office: "Councillor", slate: "New Burnaby", slateBadge: "New Burnaby", platform: "Diverse representation, commercial district revitalization, housing balance.", details: "Advocates for supporting local commercial districts and pragmatic housing choices.", pros: "Brings strong community diversity perspective.", cons: "Overshadowed by party dual-candidacy controversies.", incumbent: false, dual: false, tags: ["Commercial Revitalization"] },
+            { id: "c-xie", name: "David XIE", office: "Councillor", slate: "New Burnaby", slateBadge: "New Burnaby (Dual MLA Candidate)", platform: "Public safety, lower taxes, efficient municipal approval processes.", details: "Running simultaneously as the BC Conservative MLA candidate for Burnaby South-Metrotown.", pros: "High political profile and strong conservative network.", cons: "Fiercely criticized for political opportunism and using municipal run as a provincial fallback.", incumbent: false, dual: true, tags: ["Dual Candidate (BC Con MLA)", "Public Safety"] },
+            { id: "c-yang", name: "Sabrina YANG", office: "Councillor", slate: "New Burnaby", slateBadge: "New Burnaby", platform: "Family-first policies, neighborhood parks, fiscal accountability.", details: "Advocates for expanding neighborhood green spaces and family-friendly infrastructure.", pros: "Strong focus on family amenities.", cons: "Relatively low campaign visibility.", incumbent: false, dual: false, tags: ["Family Amenities", "Parks"] },
+
+            // --- BURNABY FIRST (3) ---
+            { id: "c-dchen", name: "Daniel CHEN", office: "Councillor", slate: "Burnaby First", slateBadge: "Burnaby First", platform: "Harnessing urban energy while protecting natural green spaces, BRT consultation.", details: "Creative entrepreneur demanding consultation before removing curbside parking for Bus Rapid Transit.", pros: "Strong creative and green space protection vision.", cons: "Slate cannot win council majority (only 3 candidates).", incumbent: false, dual: false, tags: ["Green Space", "Transit Consultation"] },
+            { id: "c-ravelli", name: "Fiorella RAVELLI", office: "Councillor", slate: "Burnaby First", slateBadge: "Burnaby First", platform: "Anti-monster homes, pro-business, transparent budgeting.", details: "Focuses on preserving single-family neighborhood aesthetics and reducing business fees.", pros: "Dedicated advocate for homeowner character.", cons: "Limited platform on broader social housing.", incumbent: false, dual: false, tags: ["Anti-Monster Homes", "Pro-Business"] },
+            { id: "c-battenberg", name: "Mary B VILLA Y BATTENBERG", office: "Councillor", slate: "Burnaby First", slateBadge: "Burnaby First", platform: "Merchant security, fiscal audits, neighborhood consulting.", details: "Campaigns alongside Heymann Yip for fiscal restraint and street merchant protection.", pros: "Direct focus on small business security.", cons: "Small slate footprint.", incumbent: false, dual: false, tags: ["Merchant Security"] },
+
+            // --- BURNABY GREEN PARTY (4) ---
+            { id: "c-gibbs", name: "Joel GIBBS", office: "Councillor", slate: "Burnaby Green Party", slateBadge: "Burnaby Greens", platform: "Aggressive climate action, active transit networks, deep non-profit affordability.", details: "Experienced climate advocate pushing for protected bike networks and rapid decarbonization.", pros: "Deep technical expertise on urban planning and sustainability.", cons: "Green platform struggles against tax/crime concerns.", incumbent: false, dual: false, tags: ["Climate Action", "Active Transit"] },
+            { id: "c-kendell", name: "Martin KENDELL", office: "Councillor", slate: "Burnaby Green Party", slateBadge: "Burnaby Greens (Dual MLA Candidate)", platform: "Civic transparency, environmental protection, public transit.", details: "Community activist running simultaneously for Burnaby North MLA provincially.", pros: "Relentless civic accountability watchdog.", cons: "Facing criticism for dual provincial/municipal candidacies.", incumbent: false, dual: true, tags: ["Dual Candidate (MLA)", "Watchdog"] },
+            { id: "c-mclaren", name: "Carrie MCLAREN", office: "Councillor", slate: "Burnaby Green Party", slateBadge: "Burnaby Greens", platform: "Urban canopy protection, climate resilience, community gardens.", details: "Focuses on preserving Burnaby's tree canopy and expanding local food security programs.", pros: "Clear environmental priorities.", cons: "Limited economic policy focus.", incumbent: false, dual: false, tags: ["Urban Canopy", "Food Security"] },
+            { id: "c-shushtarian", name: "Tara SHUSHTARIAN", office: "Councillor", slate: "Burnaby Green Party", slateBadge: "Burnaby Greens", platform: "Environmental justice, equity in transit, sustainable housing.", details: "Advocates for equitable climate transit access across working-class neighborhoods.", pros: "Strong intersectional approach to environment and equity.", cons: "Niche political voter base.", incumbent: false, dual: false, tags: ["Climate Equity", "Transit"] },
+
+            // --- INDEPENDENTS (14) ---
+            { id: "c-achen", name: "Dr. Allen CHEN", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Senior healthcare, dementia day programs, community health centers.", details: "Medical doctor who founded 7 senior day programs serving dementia patients.", pros: "Invaluable medical and senior care expertise.", cons: "Lacks party backing to pass broader infrastructure policy.", incumbent: false, dual: false, tags: ["Medical Doctor", "Senior Healthcare"] },
+            { id: "c-bember", name: "Natalia BEMBER", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Disability rights, sidewalk ramp upgrades, accessible public facilities.", details: "Accessibility advocate and BCIT graduate who uses a mobility scooter.", pros: "Brings vital, often-overlooked disability accessibility perspective.", cons: "Single-issue focus limits overall campaign scope.", incumbent: false, dual: false, tags: ["Accessibility", "Disability Rights"] },
+            { id: "c-milani", name: "Nash MILANI", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Multigenerational roots, environmental protection, community dialogue.", details: "Self-described 'insider turned outsider' with environmentalist focus.", pros: "Deep local multigenerational roots.", cons: "Criticized for previously running for school trustee in neighboring Coquitlam.", incumbent: false, dual: false, tags: ["Environment", "Local Roots"] },
+            { id: "c-bazarov", name: "Akmal BAZAROV", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Workable housing, fair parking policies, 'Buy Canadian' municipal preference.", details: "Pledges to promote Canadian products and services at the municipal procurement level.", pros: "Focuses on practical resident parking issues.", cons: "Procurement promises exceed municipal constitutional authority.", incumbent: false, dual: false, tags: ["Parking", "Buy Canadian"] },
+            { id: "c-lchin", name: "Larry CHIN", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Independent conscience voting, civic accountability.", details: "Independent candidate running without party backing.", pros: "Free from party whip.", cons: "Near-total lack of campaign visibility.", incumbent: false, dual: false, tags: ["Independent"] },
+            { id: "c-alchen", name: "Allen CHEN (Ind)", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Fiscal restraint, practical governance.", details: "Independent council candidate.", pros: "Unbiased perspective.", cons: "Low profile.", incumbent: false, dual: false, tags: ["Independent"] },
+            { id: "c-firdos", name: "Gulam FIRDOS", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Small business support, community safety.", details: "Independent campaign focusing on neighborhood business safety.", pros: "Independent voice.", cons: "Limited funding.", incumbent: false, dual: false, tags: ["Independent"] },
+            { id: "c-heidt", name: "Garnet HEIDT", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Taxpayer advocacy, stopping municipal waste.", details: "Campaigns on strict municipal fiscal oversight.", pros: "Taxpayer focus.", cons: "No organized get-out-the-vote machine.", incumbent: false, dual: false, tags: ["Independent"] },
+            { id: "c-inouye", name: "Darren INOUYE", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Community sports, youth facilities, transparent council.", details: "Focuses on expanding local sports fields and youth amenities.", pros: "Community sports background.", cons: "Limited policy breadth.", incumbent: false, dual: false, tags: ["Independent", "Youth Sports"] },
+            { id: "c-lhlee", name: "Lynette Hyerin LEE", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Youth representation, multicultural inclusion.", details: "Independent candidate advocating for young family representation.", pros: "Fresh perspective.", cons: "Low voter awareness.", incumbent: false, dual: false, tags: ["Independent"] },
+            { id: "c-martin", name: "Jason MARTIN", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Neighborhood preservation, pragmatic transit.", details: "Independent candidate focusing on neighborhood preservation.", pros: "Non-partisan.", cons: "Minimal platform detail.", incumbent: false, dual: false, tags: ["Independent"] },
+            { id: "c-roccas", name: "Konstantine ROCCAS", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Fiscal restraint, public safety.", details: "Independent candidate emphasizing street safety.", pros: "Independent.", cons: "Low campaign budget.", incumbent: false, dual: false, tags: ["Independent"] },
+            { id: "c-stojanovski", name: "Philip STOJANOVSKI", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Core municipal services, road maintenance.", details: "Focuses on basic infrastructure repair and road quality.", pros: "Core service focus.", cons: "Limited campaign reach.", incumbent: false, dual: false, tags: ["Independent"] },
+            { id: "c-tao", name: "Tom TAO", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Economic efficiency, public consultation.", details: "Independent candidate calling for expanded resident referendums.", pros: "Direct democracy advocate.", cons: "Low profile.", incumbent: false, dual: false, tags: ["Independent"] },
+            { id: "c-tong", name: "Vincent TONG", office: "Councillor", slate: "Independent", slateBadge: "Independent", platform: "Urban density balance, parks protection.", details: "Independent candidate advocating for urban park preservation.", pros: "Parks focus.", cons: "Low campaign funding.", incumbent: false, dual: false, tags: ["Independent"] },
+
+            // ================= SCHOOL TRUSTEE CANDIDATES (16) =================
+            // --- BCA (7) ---
+            { id: "t-andrada", name: "Stephen ANDRADA", office: "School Trustee", slate: "Burnaby Citizens Association", slateBadge: "BCA Trustee", platform: "Public funding, 2SLGBTQ+ inclusion, modern school facilities.", details: "Progressive candidate advocating for fully funded inclusive public schools.", pros: "Supported by BCA teacher and labor network.", cons: "Part of monolithic trustee slate.", incumbent: false, dual: false, tags: ["Inclusive Education"] },
+            { id: "t-bergshoeff", name: "Hillary BERGSHOEFF", office: "School Trustee", slate: "Burnaby Citizens Association", slateBadge: "BCA Trustee", platform: "Safety, inclusive belonging, Artificial Intelligence (AI) policy in classrooms.", details: "Labor activist proposing concrete guidelines for managing AI integration in schools.", pros: "Forward-looking focus on technology and AI ethics.", cons: "Relies on slate vote.", incumbent: false, dual: false, tags: ["AI Classroom Policy", "Inclusion"] },
+            { id: "t-brassington", name: "Bill BRASSINGTON", office: "School Trustee", slate: "Burnaby Citizens Association", slateBadge: "BCA Trustee Incumbent", platform: "Capital school expansions, nutrition programs, mental health support.", details: "Incumbent trustee advocating for new school builds in high-density centers.", pros: "Proven trustee experience.", cons: "Criticized by opposition over administrative budgets.", incumbent: true, dual: false, tags: ["Incumbent", "School Builds"] },
+            { id: "t-kwon", name: "Paul KWON", office: "School Trustee", slate: "Burnaby Citizens Association", slateBadge: "BCA Trustee", platform: "Parent advocacy, multicultural integration, classroom safety.", details: "Dedicated parent advocate focusing on practical classroom support.", pros: "Strong parent engagement.", cons: "Tied to BCA party line.", incumbent: false, dual: false, tags: ["Parent Advocacy"] },
+            { id: "t-mezei", name: "Jen MEZEI", office: "School Trustee", slate: "Burnaby Citizens Association", slateBadge: "BCA Trustee Incumbent", platform: "Special education funding, reconciliation, equitable student support.", details: "Veteran incumbent trustee with extensive background in special needs advocacy.", pros: "Deep knowledge of school district operations.", cons: "Targeted by parental rights slates.", incumbent: true, dual: false, tags: ["Incumbent", "Special Education"] },
+            { id: "t-schnider", name: "Kristin SCHNIDER", office: "School Trustee", slate: "Burnaby Citizens Association", slateBadge: "BCA Trustee Incumbent", platform: "Administrative stability, provincial funding advocacy, inclusive culture.", details: "Incumbent Board Chair bringing over 20 years of school community experience.", pros: "Unmatched board leadership stability.", cons: "Accused of stifling board dissent.", incumbent: true, dual: false, tags: ["Incumbent", "Board Chair"] },
+            { id: "t-zuo", name: "Colin ZUO", office: "School Trustee", slate: "Burnaby Citizens Association", slateBadge: "BCA Trustee", platform: "STEM education, language programs, school safety.", details: "Advocates for expanding science/tech programs and dual-language options.", pros: "Strong STEM education focus.", cons: "New candidate on BCA ticket.", incumbent: false, dual: false, tags: ["STEM Education"] },
+
+            // --- RESTORE BURNABY ALLIANCE (4) ---
+            { id: "t-sun", name: "Benita SUN", office: "School Trustee", slate: "Restore Burnaby Alliance", slateBadge: "Restore Burnaby Trustee", platform: "Back-to-basics education, parental rights, fiscal oversight.", details: "Campaigns on elevating parental involvement in curriculum decisions.", pros: "Resonates with conservative parent groups.", cons: "SOGI criticism from progressive educators.", incumbent: false, dual: false, tags: ["Parental Rights", "Back-to-Basics"] },
+            { id: "t-wei", name: "Daisy WEI", office: "School Trustee", slate: "Restore Burnaby Alliance", slateBadge: "Restore Burnaby Trustee", platform: "Academic excellence, administrative cost cutting, basic skills.", details: "Advocates for shifting district administrative spending directly into classrooms.", pros: "Focus on administrative efficiency.", cons: "Division over inclusion policies.", incumbent: false, dual: false, tags: ["Academic Excellence"] },
+            { id: "t-jwong", name: "John WONG", office: "School Trustee", slate: "Restore Burnaby Alliance", slateBadge: "Restore Burnaby Trustee", platform: "Parental consultation, school safety, basic math/reading focus.", details: "Focuses on core academic fundamentals and parental notification.", pros: "Clear conservative educational vision.", cons: "Polarizing ideological clash with BCA.", incumbent: false, dual: false, tags: ["Parental Rights"] },
+            { id: "t-yeh", name: "Angel YEH", office: "School Trustee", slate: "Restore Burnaby Alliance", slateBadge: "Restore Burnaby Trustee", platform: "Financial audits of school board, classroom safety, core standards.", details: "Demands comprehensive audits of school district administrative overhead.", pros: "Disciplined fiscal stance.", cons: "Opposed by teacher associations.", incumbent: false, dual: false, tags: ["District Audit"] },
+
+            // --- BURNABY GREENS (2) ---
+            { id: "t-jang", name: "Jen JANG", office: "School Trustee", slate: "Burnaby Green Party", slateBadge: "Burnaby Greens Trustee", platform: "Environmental education, safe active school transit routes, climate resilience.", details: "Advocates for safe bike/walk paths to all public schools and climate-resilient buildings.", pros: "Focuses on child physical safety and environment.", cons: "Small party slate.", incumbent: false, dual: false, tags: ["Active School Transit"] },
+            { id: "t-jnichols", name: "Jasmine NICHOLSFIGUEIREDO", office: "School Trustee", slate: "Burnaby Green Party", slateBadge: "Burnaby Greens Trustee", platform: "School gardens, outdoor education, mental health resources.", details: "Promotes hands-on environmental learning and expanded student mental health support.", pros: "Holistic student wellbeing approach.", cons: "Lacks slate majority.", incumbent: false, dual: false, tags: ["Outdoor Education"] },
+
+            // --- NEW BURNABY (1) ---
+            { id: "t-xiao", name: "Haini XIAO", office: "School Trustee", slate: "New Burnaby", slateBadge: "New Burnaby Trustee", platform: "Balanced educational focus, multicultural parent support.", details: "Sole New Burnaby trustee candidate running on moderate centrist school policies.", pros: "Independent centrist alternative.", cons: "Single candidate lacks vote-sharing slate benefit.", incumbent: false, dual: false, tags: ["Centrist"] },
+
+            // --- INDEPENDENTS (2) ---
+            { id: "t-yamagata", name: "Jenny YAMAGATA", office: "School Trustee", slate: "Independent", slateBadge: "Independent (Dual Provincial Candidate)", platform: "Parent advisory council voice, classroom resources.", details: "Running for Trustee while simultaneously running for provincial MLA under OneBC in Burnaby North.", pros: "Active PAC advocate.", cons: "Fiercely criticized for political opportunism and using high school PAC meetings for political exposure.", incumbent: false, dual: true, tags: ["Dual Candidate (OneBC)", "PAC Advocate"] },
+            { id: "t-pearce", name: "Diane PEARCE", office: "School Trustee", slate: "Independent", slateBadge: "Independent Trustee", platform: "Independent trustee oversight, practical classroom support.", details: "Independent candidate seeking non-partisan board oversight.", pros: "Unbiased perspective.", cons: "Limited campaign reach.", incumbent: false, dual: false, tags: ["Independent"] }
+        ];
+
+        // State Management
+        let currentFilters = {
+            search: "",
+            office: "all",
+            slate: "all"
+        };
+
+        let selectedBallot = {
+            Mayor: null,
+            Council: [],
+            Trustee: []
+        };
+
+        let chartSentimentInstance = null;
+        let chartIssuesInstance = null;
+
+        // Initialize Theme & Application
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initCharts();
+            renderCandidates();
+            initSimulator();
+
+            // Listen for system color preference changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                const currentMode = localStorage.getItem('theme_mode') || 'system';
+                if (currentMode === 'system') {
+                    applyTheme('system');
+                }
+            });
+        });
+
+        // Theme Handling (System / Light / Dark)
+        function initTheme() {
+            const savedMode = localStorage.getItem('theme_mode') || 'system';
+            setThemeMode(savedMode, false);
+        }
+
+        function toggleThemeMenu() {
+            const dropdown = document.getElementById('theme-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const btn = document.getElementById('theme-menu-btn');
+            const dropdown = document.getElementById('theme-dropdown');
+            if (btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        function setThemeMode(mode, save = true) {
+            if (save) {
+                localStorage.setItem('theme_mode', mode);
+            }
+            applyTheme(mode);
+            updateThemeUI(mode);
+            const dropdown = document.getElementById('theme-dropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+        }
+
+        function applyTheme(mode) {
+            let isDark = false;
+            if (mode === 'dark') {
+                isDark = true;
+            } else if (mode === 'light') {
+                isDark = false;
+            } else { // system
+                isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            updateChartColors(isDark);
+        }
+
+        function updateThemeUI(mode) {
+            const label = document.getElementById('theme-label');
+            const icon = document.getElementById('theme-icon');
+            const checkSystem = document.getElementById('check-system');
+            const checkLight = document.getElementById('check-light');
+            const checkDark = document.getElementById('check-dark');
+
+            checkSystem.classList.add('hidden');
+            checkLight.classList.add('hidden');
+            checkDark.classList.add('hidden');
+
+            if (mode === 'light') {
+                if (label) label.innerText = 'Light';
+                if (icon) icon.innerText = '☀️';
+                if (checkLight) checkLight.classList.remove('hidden');
+            } else if (mode === 'dark') {
+                if (label) label.innerText = 'Dark';
+                if (icon) icon.innerText = '🌙';
+                if (checkDark) checkDark.classList.remove('hidden');
+            } else {
+                if (label) label.innerText = 'System';
+                if (icon) icon.innerText = '💻';
+                if (checkSystem) checkSystem.classList.remove('hidden');
+            }
+        }
+
+        function updateChartColors(isDark) {
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const gridColor = isDark ? 'rgba(148, 163, 184, 0.15)' : 'rgba(203, 213, 225, 0.3)';
+
+            if (chartSentimentInstance) {
+                chartSentimentInstance.options.scales.x.ticks.color = textColor;
+                chartSentimentInstance.options.scales.y.ticks.color = textColor;
+                chartSentimentInstance.options.scales.x.grid.color = gridColor;
+                chartSentimentInstance.options.scales.y.grid.color = gridColor;
+                chartSentimentInstance.update();
+            }
+
+            if (chartIssuesInstance) {
+                chartIssuesInstance.options.scales.x.ticks.color = textColor;
+                chartIssuesInstance.options.scales.y.ticks.color = textColor;
+                chartIssuesInstance.options.scales.x.grid.color = gridColor;
+                chartIssuesInstance.options.scales.y.grid.color = gridColor;
+                chartIssuesInstance.update();
+            }
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            const sections = ['dashboard', 'candidates', 'slates', 'simulator', 'analysis'];
+            sections.forEach(s => {
+                const secEl = document.getElementById(`section-${s}`);
+                const navEl = document.getElementById(`nav-${s}`);
+                if (s === tabId) {
+                    secEl.classList.remove('hidden');
+                    if (navEl) {
+                        navEl.classList.add('bg-blue-600', 'text-white');
+                        navEl.classList.remove('text-slate-300');
+                    }
+                } else {
+                    secEl.classList.add('hidden');
+                    if (navEl) {
+                        navEl.classList.remove('bg-blue-600', 'text-white');
+                        navEl.classList.add('text-slate-300');
+                    }
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Initialize Chart.js
+        function initCharts() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const gridColor = isDark ? 'rgba(148, 163, 184, 0.15)' : 'rgba(203, 213, 225, 0.3)';
+
+            // Chart 1: Sentiment
+            const ctxSentiment = document.getElementById('chart-sentiment').getContext('2d');
+            chartSentimentInstance = new Chart(ctxSentiment, {
+                type: 'bar',
+                data: {
+                    labels: ['Wrong Track', 'Time for Council Change', 'Mayor Approval', 'Council Approval'],
+                    datasets: [{
+                        label: 'Voter Percentage (%)',
+                        data: [51, 57, 42, 39],
+                        backgroundColor: ['#DC2626', '#EA580C', '#2563EB', '#0284C7'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => ` ${context.raw}% of polled residents`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { color: textColor, callback: v => v + '%' }, grid: { color: gridColor } },
+                        x: { 
+                            ticks: { 
+                                color: textColor,
+                                callback: function(val) {
+                                    let label = this.getLabelForValue(val);
+                                    return label.length > 16 ? label.substr(0, 16) + '...' : label;
+                                }
+                            },
+                            grid: { color: gridColor }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Priority Issues
+            const ctxIssues = document.getElementById('chart-issues').getContext('2d');
+            chartIssuesInstance = new Chart(ctxIssues, {
+                type: 'bar',
+                data: {
+                    labels: ['Cost of Living', 'Housing Affordability', 'Property Taxes', 'Public Safety / Crime'],
+                    datasets: [{
+                        label: 'Top Electorate Priority (%)',
+                        data: [47, 34, 27, 21],
+                        backgroundColor: '#2563EB',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => ` ${context.raw}% cite as top priority`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, max: 60, ticks: { color: textColor, callback: v => v + '%' }, grid: { color: gridColor } },
+                        y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                    }
+                }
+            });
+        }
+
+        // Filter Candidate Logic
+        function filterCandidates() {
+            currentFilters.search = document.getElementById('candidate-search').value.toLowerCase();
+            currentFilters.slate = document.getElementById('slate-select-filter').value;
+            renderCandidates();
+        }
+
+        function setFilter(type, value) {
+            if (type === 'office') {
+                currentFilters.office = value;
+                document.querySelectorAll('.filter-btn-office').forEach(btn => {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+                });
+                const activeBtn = document.getElementById(`filter-office-${value}`);
+                if (activeBtn) {
+                    activeBtn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+                    activeBtn.classList.add('bg-blue-600', 'text-white');
+                }
+            }
+            renderCandidates();
+        }
+
+        function resetFilters() {
+            currentFilters = { search: "", office: "all", slate: "all" };
+            document.getElementById('candidate-search').value = "";
+            document.getElementById('slate-select-filter').value = "all";
+            setFilter('office', 'all');
+        }
+
+        // Render Candidates Grid
+        function renderCandidates() {
+            const grid = document.getElementById('candidate-grid');
+            const emptyState = document.getElementById('empty-state');
+            const counter = document.getElementById('candidate-count-badge');
+
+            const filtered = CANDIDATES_DATA.filter(c => {
+                const matchesOffice = currentFilters.office === 'all' || c.office === currentFilters.office;
+                const matchesSlate = currentFilters.slate === 'all' || c.slate === currentFilters.slate;
+                const searchStr = `${c.name} ${c.slate} ${c.platform} ${c.tags.join(' ')}`.toLowerCase();
+                const matchesSearch = !currentFilters.search || searchStr.includes(currentFilters.search);
+                return matchesOffice && matchesSlate && matchesSearch;
+            });
+
+            counter.innerText = `Showing ${filtered.length} of ${CANDIDATES_DATA.length} Candidates`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = "";
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = filtered.map(c => `
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition flex flex-col justify-between">
+                    <div>
+                        <!-- Header Badges -->
+                        <div class="flex flex-wrap justify-between items-start gap-1 mb-2">
+                            <span class="px-2.5 py-0.5 text-xs font-bold rounded-full ${getOfficeBadgeClass(c.office)}">${c.office}</span>
+                            <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">${c.slateBadge}</span>
+                        </div>
+
+                        <!-- Name -->
+                        <h3 class="text-lg font-black text-slate-900 dark:text-slate-100 mt-1">${c.name}</h3>
+
+                        <!-- Tags -->
+                        <div class="flex flex-wrap gap-1 my-2">
+                            ${c.incumbent ? '<span class="px-2 py-0.5 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 text-[10px] font-bold rounded">Incumbent</span>' : ''}
+                            ${c.dual ? '<span class="px-2 py-0.5 bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 text-[10px] font-bold rounded">Dual MLA Run</span>' : ''}
+                            ${c.tags.slice(0, 2).map(t => `<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] rounded">${t}</span>`).join('')}
+                        </div>
+
+                        <!-- Core Platform Focus -->
+                        <p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed mt-2 mb-3">
+                            <strong class="text-slate-800 dark:text-slate-200">Platform Focus:</strong> ${c.platform}
+                        </p>
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <span class="text-[10px] text-slate-400">Click for full profile</span>
+                        <button onclick="openModal('${c.id}')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900 text-xs font-bold rounded-lg transition">
+                            View Full Bio →
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getOfficeBadgeClass(office) {
+            switch(office) {
+                case 'Mayor': return 'bg-blue-600 text-white';
+                case 'Councillor': return 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800';
+                case 'School Trustee': return 'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-800';
+                default: return 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200';
+            }
+        }
+
+        // Modal Handling
+        function openModal(candidateId) {
+            const c = CANDIDATES_DATA.find(item => item.id === candidateId);
+            if (!c) return;
+
+            document.getElementById('modal-name').innerText = c.name;
+            document.getElementById('modal-office-badge').innerText = c.office;
+            document.getElementById('modal-office-badge').className = `px-2.5 py-0.5 rounded-full text-xs font-bold ${getOfficeBadgeClass(c.office)}`;
+            document.getElementById('modal-slate-badge').innerText = c.slateBadge;
+            document.getElementById('modal-platform').innerText = c.platform;
+            document.getElementById('modal-details').innerText = c.details;
+            document.getElementById('modal-pros').innerText = c.pros;
+            document.getElementById('modal-cons').innerText = c.cons;
+            document.getElementById('modal-tag-info').innerText = `Affiliation: ${c.slate} • Office: ${c.office}`;
+
+            document.getElementById('candidate-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('candidate-modal').classList.add('hidden');
+        }
+
+        // Interactive Voting Simulator Logic
+        function initSimulator() {
+            const mayorGrid = document.getElementById('sim-mayor-grid');
+            const councilGrid = document.getElementById('sim-council-grid');
+            const trusteeGrid = document.getElementById('sim-trustee-grid');
+
+            // Render Mayors
+            const mayors = CANDIDATES_DATA.filter(c => c.office === 'Mayor');
+            mayorGrid.innerHTML = mayors.map(c => `
+                <button onclick="toggleSimVote('Mayor', '${c.id}')" id="sim-btn-${c.id}" class="sim-card p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:border-blue-400 dark:hover:border-blue-600 text-left transition flex justify-between items-center">
+                    <div>
+                        <div class="text-xs font-bold text-slate-800 dark:text-slate-200">${c.name}</div>
+                        <div class="text-[10px] text-slate-500 dark:text-slate-400">${c.slate}</div>
+                    </div>
+                    <span id="sim-check-${c.id}" class="text-slate-300 dark:text-slate-600 text-sm">◯</span>
+                </button>
+            `).join('');
+
+            // Render Council
+            const council = CANDIDATES_DATA.filter(c => c.office === 'Councillor');
+            councilGrid.innerHTML = council.map(c => `
+                <button onclick="toggleSimVote('Council', '${c.id}')" id="sim-btn-${c.id}" class="sim-card p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:border-blue-400 dark:hover:border-blue-600 text-left transition flex justify-between items-center">
+                    <div class="truncate">
+                        <div class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${c.name}</div>
+                        <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">${c.slate}</div>
+                    </div>
+                    <span id="sim-check-${c.id}" class="text-slate-300 dark:text-slate-600 text-xs ml-1">◯</span>
+                </button>
+            `).join('');
+
+            // Render Trustee
+            const trustees = CANDIDATES_DATA.filter(c => c.office === 'School Trustee');
+            trusteeGrid.innerHTML = trustees.map(c => `
+                <button onclick="toggleSimVote('Trustee', '${c.id}')" id="sim-btn-${c.id}" class="sim-card p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:border-blue-400 dark:hover:border-blue-600 text-left transition flex justify-between items-center">
+                    <div class="truncate">
+                        <div class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${c.name}</div>
+                        <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">${c.slate}</div>
+                    </div>
+                    <span id="sim-check-${c.id}" class="text-slate-300 dark:text-slate-600 text-xs ml-1">◯</span>
+                </button>
+            `).join('');
+        }
+
+        function toggleSimVote(race, id) {
+            if (race === 'Mayor') {
+                if (selectedBallot.Mayor === id) {
+                    selectedBallot.Mayor = null;
+                } else {
+                    selectedBallot.Mayor = id;
+                }
+            } else if (race === 'Council') {
+                const idx = selectedBallot.Council.indexOf(id);
+                if (idx > -1) {
+                    selectedBallot.Council.splice(idx, 1);
+                } else {
+                    if (selectedBallot.Council.length >= 8) {
+                        alert("You can select up to 8 City Councillors maximum.");
+                        return;
+                    }
+                    selectedBallot.Council.push(id);
+                }
+            } else if (race === 'Trustee') {
+                const idx = selectedBallot.Trustee.indexOf(id);
+                if (idx > -1) {
+                    selectedBallot.Trustee.splice(idx, 1);
+                } else {
+                    if (selectedBallot.Trustee.length >= 7) {
+                        alert("You can select up to 7 School Board Trustees maximum.");
+                        return;
+                    }
+                    selectedBallot.Trustee.push(id);
+                }
+            }
+            updateSimUI();
+        }
+
+        function resetSimulator() {
+            selectedBallot = { Mayor: null, Council: [], Trustee: [] };
+            updateSimUI();
+        }
+
+        function updateSimUI() {
+            // Update Mayors UI
+            CANDIDATES_DATA.filter(c => c.office === 'Mayor').forEach(c => {
+                const btn = document.getElementById(`sim-btn-${c.id}`);
+                const check = document.getElementById(`sim-check-${c.id}`);
+                if (selectedBallot.Mayor === c.id) {
+                    btn.classList.add('bg-blue-50', 'dark:bg-blue-950/60', 'border-blue-500', 'ring-1', 'ring-blue-500');
+                    check.innerText = '●';
+                    check.classList.add('text-blue-600', 'dark:text-blue-400');
+                } else {
+                    btn.classList.remove('bg-blue-50', 'dark:bg-blue-950/60', 'border-blue-500', 'ring-1', 'ring-blue-500');
+                    check.innerText = '◯';
+                    check.classList.remove('text-blue-600', 'dark:text-blue-400');
+                }
+            });
+
+            // Update Council UI
+            CANDIDATES_DATA.filter(c => c.office === 'Councillor').forEach(c => {
+                const btn = document.getElementById(`sim-btn-${c.id}`);
+                const check = document.getElementById(`sim-check-${c.id}`);
+                if (selectedBallot.Council.includes(c.id)) {
+                    btn.classList.add('bg-blue-50', 'dark:bg-blue-950/60', 'border-blue-500', 'ring-1', 'ring-blue-500');
+                    check.innerText = '●';
+                    check.classList.add('text-blue-600', 'dark:text-blue-400');
+                } else {
+                    btn.classList.remove('bg-blue-50', 'dark:bg-blue-950/60', 'border-blue-500', 'ring-1', 'ring-blue-500');
+                    check.innerText = '◯';
+                    check.classList.remove('text-blue-600', 'dark:text-blue-400');
+                }
+            });
+
+            // Update Trustee UI
+            CANDIDATES_DATA.filter(c => c.office === 'School Trustee').forEach(c => {
+                const btn = document.getElementById(`sim-btn-${c.id}`);
+                const check = document.getElementById(`sim-check-${c.id}`);
+                if (selectedBallot.Trustee.includes(c.id)) {
+                    btn.classList.add('bg-blue-50', 'dark:bg-blue-950/60', 'border-blue-500', 'ring-1', 'ring-blue-500');
+                    check.innerText = '●';
+                    check.classList.add('text-blue-600', 'dark:text-blue-400');
+                } else {
+                    btn.classList.remove('bg-blue-50', 'dark:bg-blue-950/60', 'border-blue-500', 'ring-1', 'ring-blue-500');
+                    check.innerText = '◯';
+                    check.classList.remove('text-blue-600', 'dark:text-blue-400');
+                }
+            });
+
+            // Update Counters & Analysis
+            const totalMayor = selectedBallot.Mayor ? 1 : 0;
+            const totalCouncil = selectedBallot.Council.length;
+            const totalTrustee = selectedBallot.Trustee.length;
+            const totalVotes = totalMayor + totalCouncil + totalTrustee;
+
+            document.getElementById('sim-mayor-count').innerText = `${totalMayor} / 1 Selected`;
+            document.getElementById('sim-council-count').innerText = `${totalCouncil} / 8 Selected`;
+            document.getElementById('sim-trustee-count').innerText = `${totalTrustee} / 7 Selected`;
+            document.getElementById('sim-total-votes').innerText = `${totalVotes} / 16`;
+
+            // Calculate Slate Tally
+            const selectedIDs = [
+                ...(selectedBallot.Mayor ? [selectedBallot.Mayor] : []),
+                ...selectedBallot.Council,
+                ...selectedBallot.Trustee
+            ];
+
+            const slateCounts = {};
+            selectedIDs.forEach(id => {
+                const cand = CANDIDATES_DATA.find(c => c.id === id);
+                if (cand) {
+                    slateCounts[cand.slate] = (slateCounts[cand.slate] || 0) + 1;
+                }
+            });
+
+            const breakdownEl = document.getElementById('sim-slate-breakdown');
+            if (selectedIDs.length === 0) {
+                breakdownEl.innerHTML = `<p class="text-slate-400 italic">No candidates selected yet. Click candidates on the left to test your ballot.</p>`;
+            } else {
+                breakdownEl.innerHTML = Object.entries(slateCounts).map(([slate, count]) => `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-300 font-medium">${slate}:</span>
+                        <span class="font-bold text-blue-400">${count} vote(s)</span>
+                    </div>
+                `).join('');
+            }
+        }
+    </script>
+</body>
+</html>
