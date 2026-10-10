@@ -47,6 +47,8 @@ window.GUIDE = {
     "party-green-home": { title: "Burnaby Green Party home page", publisher: "Burnaby Green Party", url: "https://burnabygreenparty.com/", type: "party" },
     "party-newburnaby": { title: "Platform", publisher: "New Burnaby Party", url: "https://newburnaby.ca/platform/", type: "party" },
     "party-restore": { title: "Our Platform", publisher: "Restore Burnaby Alliance", url: "https://restoreburnaby.ca/?page_id=1282", type: "party" },
+    "party-newburnaby-home": { title: "New Burnaby Party home page", publisher: "New Burnaby Party", url: "https://newburnaby.ca/", type: "party" },
+    "party-restore-home": { title: "Restore Burnaby Alliance home page", publisher: "Restore Burnaby Alliance", url: "https://www.restoreburnaby.ca/", type: "party" },
     "party-restore-edu": { title: "Our Education", publisher: "Restore Burnaby Alliance", url: "https://restoreburnaby.ca/?page_id=1259", type: "party" },
 
     "freshet-bca-slate": { title: "Burnaby's ruling party announces council candidates for October election", publisher: "Freshet News", date: "2026-03-23", url: "https://www.freshetnews.ca/?p=7607", type: "news" },
@@ -79,6 +81,14 @@ window.GUIDE = {
   // ---------------------------------------------------------------------------
   orgs: {
     "bca": {
+      tagline: { text: "Burnaby is headed in the right direction, but we've got more to do.", src: ["party-bca-home"] },
+      stances: {
+        taxes: { text: "“Maintain the City's track record of zero debt and low, predictable taxes”", src: ["party-bca"] },
+        housing: { text: "“Start at least 1,000 new rental homes through the Housing Authority by 2030”", src: ["party-bca"] },
+        safety: null,
+        hospital: { text: "“Fight for Phase 2, the beds and the cancer centre”", src: ["party-bca"] },
+        schools: { text: "“Keep the SOGI policy strong”; press the province to build for projected enrolment; grow school meals", src: ["party-bca"] },
+      },
       name: "Burnaby Citizens Association",
       lean: [{ label: "Centre-left", src: ["wiki-bca"] }, { label: "NDP-affiliated", src: ["sun-giant", "wiki-bca"] }],
       role: "Governing party",
@@ -106,6 +116,14 @@ window.GUIDE = {
       ],
     },
     "burnaby-first": {
+      tagline: { text: "A clear alternative at City Hall.", src: ["party-first-home"] },
+      stances: {
+        taxes: { text: "“Open the books on major capital projects”; “Slow the property tax hikes”", src: ["party-first", "party-first-home"] },
+        housing: { text: "“Rezone to reflect neighbourhood character”; make it easier to add a suite or laneway home", src: ["party-first"] },
+        safety: { text: "Hire more police; “Pause the approval of new low-barrier supportive housing projects”", src: ["party-first"] },
+        hospital: null,
+        schools: { text: "“Plan schools and amenities alongside growth” (no trustee candidates)", src: ["party-first"] },
+      },
       name: "Burnaby First",
       lean: null,
       role: "Challenger",
@@ -113,7 +131,6 @@ window.GUIDE = {
       website: "https://burnabyfirst.ca/",
       platform: "party-first",
       context: [
-        { text: "Running Heymann Yip for mayor, plus three council candidates.", src: ["city-profiles-mayor", "city-profiles-council"] },
       ],
       says: [
         "“Open the books on major capital projects”, require “independent peer reviews”, “Hold Council accountable for cost overruns”",
@@ -132,6 +149,14 @@ window.GUIDE = {
       ],
     },
     "green": {
+      tagline: { text: "A completely independent Party working inside Burnaby, for Burnaby residents.", src: ["party-green-home"] },
+      stances: {
+        taxes: null,
+        housing: { text: "1,500+ non-market rental homes a year; “Never sell public land”", src: ["party-green"] },
+        safety: { text: "A non-police response for non-violent mental-health and wellness calls", src: ["party-green"] },
+        hospital: { text: "Advocate for completing Phase 2", src: ["party-green"] },
+        schools: null,
+      },
       name: "Burnaby Green Party",
       lean: [{ label: "Centre-left", src: ["wiki-green"] }],
       role: "Challenger",
@@ -161,6 +186,14 @@ window.GUIDE = {
       ],
     },
     "new-burnaby": {
+      tagline: { text: "Safer Communities, Affordable Living & Responsible Growth.", src: ["party-newburnaby-home"] },
+      stances: {
+        taxes: { text: "“A 0% increase” in the first budget, then no more than inflation over four years", src: ["party-newburnaby"] },
+        housing: null,
+        safety: { text: "Ban illicit drug use in “public spaces and all government-funded housing”", src: ["party-newburnaby"] },
+        hospital: { text: "Demand the province give “a start date” and the funds", src: ["party-newburnaby"] },
+        schools: null,
+      },
       name: "New Burnaby Party",
       lean: null,
       role: "Challenger",
@@ -186,6 +219,14 @@ window.GUIDE = {
       ],
     },
     "restore": {
+      tagline: { text: "Demand accountability from our municipal governments and seriously address public safety concerns.", src: ["party-restore-home"] },
+      stances: {
+        taxes: { text: "Opposes the “perpetual increase of property tax”", src: ["party-restore"] },
+        housing: { text: "“Blanket zoning threatens the sustainability of our neighborhoods”; supports “affordable housing for lower-income families”", src: ["party-restore"] },
+        safety: { text: "“Firmly reject” open, supervised or concealed consumption of hard drugs", src: ["party-restore"] },
+        hospital: null,
+        schools: { text: "“Oppose gender education that is not suitable for children's age”", src: ["party-restore-edu"] },
+      },
       name: "Restore Burnaby Alliance",
       lean: null,
       role: "Challenger",
@@ -193,7 +234,6 @@ window.GUIDE = {
       website: "https://www.restoreburnaby.ca/",
       platform: "party-restore",
       context: [
-        { text: "Not running a candidate for mayor; seven council and four trustee candidates.", src: ["city-profiles-mayor", "city-profiles-council", "city-profiles-trustee"] },
       ],
       says: [
         "“Firmly reject” open, supervised or concealed consumption of hard drugs in Burnaby",
@@ -213,6 +253,15 @@ window.GUIDE = {
       moreSrc: ["party-restore", "party-restore-edu"],
     },
   },
+
+  // Topics for the party comparison table on the Parties page.
+  compareTopics: [
+    { id: "taxes", label: "Property taxes", issue: "taxes" },
+    { id: "housing", label: "Housing", issue: "housing" },
+    { id: "safety", label: "Public safety & drug use", issue: "safety" },
+    { id: "hospital", label: "Burnaby Hospital", issue: "hospital" },
+    { id: "schools", label: "Schools", issue: "schools" },
+  ],
 
   // ---------------------------------------------------------------------------
   // Per-candidate curation, keyed by the id in data/profiles.js.

@@ -495,3 +495,43 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
 }
 @keyframes cue-bob { 50% { transform: translate(-50%, 3px) rotate(90deg); } }
 @media print { .scroll-cue, .cue-anchor, .tabs-wrap::after { display: none !important; } }
+
+/* ---------- Parties page ---------- */
+.party-grid .party { gap: 0; }
+.party-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: .8rem; font-weight: 700; }
+.party h2 { font-size: 1.35rem; margin: 10px 0 4px; }
+.tagline { font-size: .9rem; font-style: italic; color: var(--text-2); margin: 0 0 12px; }
+.party-counts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 4px 0 8px; }
+.party-counts div { background: var(--surface-2); border-radius: 10px; padding: 8px 6px; text-align: center; }
+.party-counts b { display: block; font-size: 1.35rem; font-weight: 900; line-height: 1.1; }
+.party-counts span { display: block; font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-top: 2px; }
+.party-counts .none b { color: var(--muted); font-weight: 600; }
+.party-context { list-style: none; padding: 0; margin: 0 0 14px; font-size: .8rem; color: var(--muted); }
+.party-context li { margin: 0 0 4px; padding-left: 10px; border-left: 2px solid var(--line-strong); }
+.party .says { font-size: .86rem; }
+.party .opinion-box { margin-bottom: 4px; }
+.indep-roster { margin-top: 6px; }
+.indep-roster p { margin-bottom: .5rem; }
+
+/* Comparison table: real table on wide screens, one card per topic on phones. */
+.compare-card h2 { margin-bottom: .3rem; }
+.compare-scroll { margin-top: 12px; }
+.compare { width: 100%; border-collapse: collapse; font-size: .8rem; line-height: 1.45; }
+.compare th, .compare td { text-align: left; vertical-align: top; padding: 10px; border-top: 1px solid var(--line); }
+.compare thead th { border-top: 0; font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.compare thead a, .compare tbody th a { color: var(--text); font-weight: 800; text-decoration: none; }
+.compare tbody th { width: 12%; font-size: .82rem; }
+.compare tbody th a:hover, .compare thead a:hover { text-decoration: underline; }
+.compare td { width: 17.6%; color: var(--text-2); }
+.compare .na { color: var(--muted); font-style: italic; }
+.compare tbody tr:nth-child(odd) td, .compare tbody tr:nth-child(odd) th { background: var(--surface-2); }
+@media (max-width: 899px) {
+  .compare, .compare tbody, .compare tr, .compare td, .compare tbody th { display: block; width: auto; }
+  .compare thead { display: none; }
+  .compare tbody tr { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+  .compare tbody tr:nth-child(odd) td, .compare tbody tr:nth-child(odd) th { background: none; }
+  .compare tbody th { background: var(--surface-2) !important; border-top: 0; font-size: .9rem; }
+  .compare td { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 10px; }
+  .compare td::before { content: attr(data-label); font-weight: 800; color: var(--text); }
+}
+.kv dd .muted { font-weight: 500; }
