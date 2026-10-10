@@ -274,7 +274,7 @@
         '<div class="stats">' +
           '<div class="stat"><b>64</b><span>Candidates</span></div>' +
           '<div class="stat"><b>16</b><span>Seats</span></div>' +
-          '<div class="stat"><b>5</b><span>Civic parties</span></div>' +
+          '<div class="stat"><b>5</b><span>Civic parties ' + srcChips(["freshet-council-race"]) + "</span></div>" +
           '<div class="stat"><b>19.3%</b><span>Turnout in 2022 ' + srcChips(["freshet-bca-slate"]) + "</span></div>" +
         "</div>" +
       "</div>" +
@@ -312,7 +312,20 @@
       "<div><h2>What's on your ballot</h2></div>" +
       '<div class="tiles">' + tiles + "</div>" +
 
+      keyIssues() +
+
       pollSection();
+  }
+
+  // Compact preview of the Issues tab; each card links to the full, sourced issue.
+  function keyIssues() {
+    return '<div><h2>Key issues in this election</h2><p class="small muted">The debates candidates and parties return to most. Each links to sourced background and what each side has said.</p></div>' +
+      '<div class="grid-3 issue-previews">' + G.issues.map(function (iss, i) {
+        return '<a class="card issue-preview" href="#issues/' + iss.id + '">' +
+          '<div class="issue-head"><span class="issue-num">' + (i + 1) + "</span><h3>" + esc(iss.title) + "</h3></div>" +
+          '<p class="sum">' + esc(iss.summary) + "</p>" +
+          '<span class="more-link">Facts and positions →</span></a>';
+      }).join("") + "</div>";
   }
 
   // -------------------------------------------------------------- CANDIDATES
@@ -697,7 +710,15 @@
       var target = parts[1] && document.getElementById("org-" + parts[1]);
       if (target) { target.scrollIntoView({ block: "start" }); keepScroll = true; }
     }
-    if (view === "issues" && !rendered.issues) { renderIssues(); rendered.issues = true; }
+    if (view === "issues") {
+      if (!rendered.issues) { renderIssues(); rendered.issues = true; }
+      var issue = parts[1] && document.getElementById("issue-" + parts[1]);
+      if (issue) {
+        issue.scrollIntoView({ block: "start" });
+        $all("details", issue).forEach(function (d) { d.open = true; });
+        keepScroll = true;
+      }
+    }
     if (view === "picks") renderPicks();
     if (view === "about" && !rendered.about) { renderAbout(); rendered.about = true; }
 
