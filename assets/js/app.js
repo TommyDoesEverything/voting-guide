@@ -354,6 +354,14 @@
     $("#cand-list").addEventListener("click", function (ev) {
       var pick = ev.target.closest(".pick-btn");
       if (pick) { togglePick(pick.dataset.id); return; }
+      var more = ev.target.closest(".focus-toggle");
+      if (more) {
+        var expanded = more.getAttribute("aria-expanded") !== "true";
+        more.previousElementSibling.classList.toggle("clamped", !expanded);
+        more.setAttribute("aria-expanded", expanded);
+        more.textContent = expanded ? "Show less" : "Show all";
+        return;
+      }
       var open = ev.target.closest("[data-open]");
       if (open) location.hash = "#candidates/" + BY_ID[open.dataset.open].office + "/" + open.dataset.open;
     });
@@ -395,7 +403,9 @@
         '<div class="cc-top"><span class="badge' + (c.office === "mayor" ? " solid" : "") + '">' + esc(OFFICES[c.office].label) + '</span><span class="badge">' + esc(orgShort(c)) + "</span></div>" +
         '<h3 class="cc-name">' + esc(c.name) + "</h3>" +
         (tags ? '<div class="cc-tags">' + tags + "</div>" : "") +
-        '<p class="cc-focus"><strong>Focus:</strong> ' + esc(c.points.join(" · ")) + "</p>" +
+        '<div class="cc-focus-wrap"><p class="cc-focus-label">Focus</p>' +
+          '<ul class="cc-focus clamped">' + c.points.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ul>" +
+          '<button type="button" class="focus-toggle" aria-expanded="false" hidden>Show all</button></div>' +
       "</div>" +
       '<div class="cc-foot">' + pickButton(c) +
         (debate ? '<span class="cc-debate" title="Arguments for, against, and news reports in the full profile">' + debate + "</span>" : "") +
@@ -417,7 +427,27 @@
       '<div class="card empty"><p>No candidates match that search.</p><button class="btn" type="button" id="clear-filters">Reset filters</button></div>';
     var clr = $("#clear-filters");
     if (clr) clr.addEventListener("click", function () { state.query = ""; state.org = "all"; $("#cand-q").value = ""; $("#cand-org").value = "all"; renderCandidateList(); });
+    fitFocusLists();
   }
+
+  // Show the whole focus list unless it is unusually long; only then keep it
+  // clamped and reveal a Show all / Show less toggle.
+  function fitFocusLists() {
+    $all("#cand-list .cc-focus").forEach(function (ul) {
+      var btn = ul.nextElementSibling;
+      ul.classList.add("clamped");
+      var overflows = ul.scrollHeight > ul.clientHeight + 2;
+      ul.classList.toggle("clamped", overflows);
+      btn.hidden = !overflows;
+      btn.setAttribute("aria-expanded", "false");
+      btn.textContent = "Show all";
+    });
+  }
+  var fitTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(fitTimer);
+    fitTimer = setTimeout(function () { if (route.view === "candidates") fitFocusLists(); }, 150);
+  });
 
   function showCandidates(office) {
     if (!OFFICES[office]) office = "mayor";
