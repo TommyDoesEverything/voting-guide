@@ -173,8 +173,14 @@ section[data-view] > * + * { margin-top: 20px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
 .card > :last-child { margin-bottom: 0; }
 .intro h1 { margin-bottom: .35rem; }
-.intro p { color: var(--text-2); font-size: .93rem; max-width: 70ch; }
+.intro p { color: var(--text-2); font-size: .93rem; }
 .intro p:last-child { margin-bottom: 0; }
+/* Wide screens: title on the left, intro text beside it, so the card is filled
+   without overly long lines. */
+@media (min-width: 900px) {
+  .intro { display: grid; grid-template-columns: minmax(0, 14rem) minmax(0, 1fr); gap: 32px; align-items: center; padding: 24px 28px; }
+  .intro h1 { margin: 0; }
+}
 .grid-2, .grid-3 { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 760px) { .grid-2, .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1040px) { .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
