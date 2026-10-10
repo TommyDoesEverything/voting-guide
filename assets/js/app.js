@@ -839,7 +839,7 @@
       "</ul></div>" +
       "</div>" +
       '<div class="card"><h2>Corrections</h2>' +
-        "<p>Found a mistake, a missing source, or wording that seems unfair to someone? Please open an issue or pull request on this guide's code repository, with a link to a source. Candidates and parties can request corrections the same way.</p>" +
+        "<p>Found a mistake, a missing source, or wording that seems unfair to someone? Please <a href=\"https://github.com/TommyDoesEverything/voting-guide/issues/new\" target=\"_blank\" rel=\"noopener\">open an issue on GitHub</a> with a link to a source (or send a pull request to <a href=\"https://github.com/TommyDoesEverything/voting-guide\" target=\"_blank\" rel=\"noopener\">the repository</a>). Candidates and parties can request corrections the same way.</p>" +
         '<p class="small muted">Content last updated ' + esc(G.lastUpdated) + ". Candidate statements fetched " + esc(P.fetched) + ".</p></div>" +
       '<div class="card"><h2>All sources</h2>' + srcList + "</div>";
   }
