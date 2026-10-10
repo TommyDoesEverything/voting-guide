@@ -81,6 +81,7 @@ window.GUIDE = {
   // ---------------------------------------------------------------------------
   orgs: {
     "bca": {
+      color: { brand: "#f7632f", ink: "#b4451b", inkDark: "#fb8a5e", src: "party-bca-home" },
       tagline: { text: "Burnaby is headed in the right direction, but we've got more to do.", src: ["party-bca-home"] },
       stances: {
         taxes: { text: "“Maintain the City's track record of zero debt and low, predictable taxes”", src: ["party-bca"] },
@@ -116,6 +117,7 @@ window.GUIDE = {
       ],
     },
     "burnaby-first": {
+      color: { brand: "#1aa3c4", ink: "#0e7490", inkDark: "#5cc8e0", src: "party-first-home" },
       tagline: { text: "A clear alternative at City Hall.", src: ["party-first-home"] },
       stances: {
         taxes: { text: "“Open the books on major capital projects”; “Slow the property tax hikes”", src: ["party-first", "party-first-home"] },
@@ -149,6 +151,7 @@ window.GUIDE = {
       ],
     },
     "green": {
+      color: { brand: "#3e9a35", ink: "#2f7a28", inkDark: "#7bd16f", src: "party-green-home" },
       tagline: { text: "A completely independent Party working inside Burnaby, for Burnaby residents.", src: ["party-green-home"] },
       stances: {
         taxes: null,
@@ -186,6 +189,7 @@ window.GUIDE = {
       ],
     },
     "new-burnaby": {
+      color: { brand: "#dd1a60", ink: "#b8124c", inkDark: "#f47aa5", src: "party-newburnaby-home" },
       tagline: { text: "Safer Communities, Affordable Living & Responsible Growth.", src: ["party-newburnaby-home"] },
       stances: {
         taxes: { text: "“A 0% increase” in the first budget, then no more than inflation over four years", src: ["party-newburnaby"] },
@@ -219,6 +223,7 @@ window.GUIDE = {
       ],
     },
     "restore": {
+      color: { brand: "#1f4070", ink: "#1f4070", inkDark: "#93b4ea", src: "party-restore-home" },
       tagline: { text: "Demand accountability from our municipal governments and seriously address public safety concerns.", src: ["party-restore-home"] },
       stances: {
         taxes: { text: "Opposes the “perpetual increase of property tax”", src: ["party-restore"] },
@@ -253,6 +258,9 @@ window.GUIDE = {
       moreSrc: ["party-restore", "party-restore-edu"],
     },
   },
+
+  // Neutral colour for independents (no party branding).
+  independentColor: { brand: "#64748b", ink: "#475569", inkDark: "#cbd5e1" },
 
   // Topics for the party comparison table on the Parties page.
   compareTopics: [

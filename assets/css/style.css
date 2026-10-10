@@ -1,7 +1,7 @@
 /* Burnaby Votes 2026
    Layout follows the original prototype (header bar, hero tiles, badge cards,
-   profile popup), recoloured to one neutral slate palette so no colour is
-   tied to any party. Mobile-first. */
+   profile popup) on a neutral slate palette. Party colours (each party's own
+   branding, set from data/guide.js) appear only as accents. Mobile-first. */
 
 :root {
   --bg: #f8fafc;
@@ -535,3 +535,25 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
   .compare td::before { content: attr(data-label); font-weight: 800; color: var(--text); }
 }
 .kv dd .muted { font-weight: 500; }
+
+/* ---------- Party colours (vars injected from data: --pc brand, --pc-ink text) ---------- */
+.party-dot { display: inline-block; width: .62em; height: .62em; border-radius: 50%; background: var(--pc, var(--muted)); margin-right: .4em; vertical-align: .05em; flex: 0 0 auto; }
+.party-text { color: var(--pc-ink) !important; }
+.party-badge { background: color-mix(in srgb, var(--pc) 13%, var(--surface)); border-color: color-mix(in srgb, var(--pc) 45%, var(--surface)); color: var(--pc-ink); }
+.party-badge:hover { border-color: var(--pc); color: var(--pc-ink); }
+.party-badge::before { content: ""; width: .5em; height: .5em; border-radius: 50%; background: var(--pc); margin-right: 2px; }
+.cc.party-edge { border-left: 4px solid var(--pc); }
+.pf.party-edge { border-top: 5px solid var(--pc); }
+.party-top-edge { border-top: 5px solid var(--pc); }
+.party-top-edge .party-counts div { background: color-mix(in srgb, var(--pc) 9%, var(--surface-2)); }
+.party-top-edge .party-counts b { color: var(--pc-ink); }
+.party-top-edge .party-counts .none b { color: var(--muted); }
+.bar-row.party-bar .bar-fill { background: var(--pc); }
+.compare thead th { border-bottom: 3px solid var(--pc, transparent); }
+.compare thead th:first-child { border-bottom-color: var(--line); }
+.ballot li .party-dot { background: var(--pc); }
+.positions .who.party-text { display: flex; align-items: center; }
+@media (max-width: 899px) {
+  .compare td { border-left: 4px solid var(--pc); }
+  .compare td::before { color: var(--pc-ink); }
+}

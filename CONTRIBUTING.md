@@ -48,7 +48,7 @@ This guide is only useful if people of every political view can trust it. These 
 ## 6. Equal treatment
 
 - Candidates appear in the City's alphabetical order. Parties appear alphabetically.
-- No party colours. The design uses one neutral palette.
+- Party colours are each party's own branding, taken from its website and recorded in `GUIDE.orgs[...].color` with a source. Independents use a neutral slate. Colours are accents only (edges, dots, badges); the base design stays neutral.
 - Issue sections list positions from whoever has published one. Silence isn't treated as a position.
 
 ## 7. Corrections

@@ -81,10 +81,33 @@
   }
   function orgName(c) { return c.org ? G.orgs[c.org].name : "Independent / no organization listed"; }
   function orgShort(c) { return c.org ? G.orgs[c.org].short : "Independent"; }
+  // Colour class for a party key (or null for independents). Colours are each
+  // party's own branding; independents get a neutral slate.
+  function pc(key) { return " pc-" + (key && G.orgs[key] ? key : "independent"); }
+
+  // Build CSS custom properties for every party from the data, for light and dark themes.
+  function injectPartyColors() {
+    var all = {};
+    Object.keys(G.orgs).forEach(function (k) { all[k] = G.orgs[k].color; });
+    all.independent = G.independentColor;
+    var light = "", dark = "";
+    Object.keys(all).forEach(function (k) {
+      var c = all[k];
+      light += ".pc-" + k + "{--pc:" + c.brand + ";--pc-ink:" + c.ink + ";}";
+      dark += ".pc-" + k + "{--pc-ink:" + c.inkDark + ";}";
+    });
+    var css = light +
+      "@media (prefers-color-scheme: dark){:root:not([data-theme=light]) " + dark.replace(/\}\./g, "} :root:not([data-theme=light]) .") + "}" +
+      ":root[data-theme=dark] " + dark.replace(/\}\./g, "} :root[data-theme=dark] .");
+    var el = document.createElement("style");
+    el.id = "party-colors";
+    el.textContent = css;
+    document.head.appendChild(el);
+  }
   // Party badge that links to the party (or the Independents card) on the Parties page.
   function orgBadge(c) {
     var target = c.org || "independent";
-    return '<a class="badge badge-link" href="#parties/' + target + '" title="About ' + esc(c.org ? G.orgs[c.org].name : "independent candidates") + '">' + esc(orgShort(c)) + "</a>";
+    return '<a class="badge badge-link party-badge' + pc(c.org) + '" href="#parties/' + target + '" title="About ' + esc(c.org ? G.orgs[c.org].name : "independent candidates") + '">' + esc(orgShort(c)) + "</a>";
   }
   function plainName(c) {
     // "Mike HURLEY" -> "Mike Hurley" for running text.
@@ -183,9 +206,9 @@
 
   // ---------------------------------------------------------------- OPINIONS
   function voiceLine(v) {
-    var parts = ["<b>" + esc(v.name) + "</b>"];
+    var parts = ['<b class="' + (v.org ? "party-text" + pc(v.org) : "") + '">' + esc(v.name) + "</b>"];
     var org = v.org && G.orgs[v.org];
-    if (org && org.name !== v.name) parts.push(esc(org.short));
+    if (org && org.name !== v.name) parts.push('<span class="party-text' + pc(v.org) + '">' + esc(org.short) + "</span>");
     if (v.role) parts.push(esc(v.role));
     var lean = org && org.lean ? '<span class="lean-tags">' + leanTags(org) + "</span>" : "";
     return '<div class="voice"><span>Said by ' + parts.join(" · ") + "</span></div>" +
@@ -234,7 +257,8 @@
     return rows.map(function (r) {
       var name = r.name || r.label;
       var nm = r.id ? '<a class="nm" href="#candidates/' + linkOffice + "/" + r.id + '">' + esc(name) + "</a>" : '<span class="nm">' + esc(name) + "</span>";
-      return '<div class="bar-row' + (r.other ? " other" : "") + '">' + nm +
+      var cls = r.id && BY_ID[r.id] ? pc(BY_ID[r.id].org) + " party-bar" : "";
+      return '<div class="bar-row' + (r.other ? " other" : "") + cls + '">' + nm +
         '<div class="bar-track" aria-hidden="true"><div class="bar-fill" style="width:' + (r.pct / max * 100) + '%"></div></div>' +
         '<span class="pct">' + r.pct + "%</span></div>";
     }).join("");
@@ -403,7 +427,7 @@
   function candidateCard(c) {
     var tags = tagRow(c, 2);
     var debate = debateCount(c.ops);
-    return '<article class="cc' + (isPicked(c.id) ? " is-picked" : "") + '" id="card-' + esc(c.id) + '">' +
+    return '<article class="cc party-edge' + pc(c.org) + (isPicked(c.id) ? " is-picked" : "") + '" id="card-' + esc(c.id) + '">' +
       "<div>" +
         '<div class="cc-top"><span class="badge' + (c.office === "mayor" ? " solid" : "") + '">' + esc(OFFICES[c.office].label) + '</span>' + orgBadge(c) + "</div>" +
         '<h3 class="cc-name">' + esc(c.name) + "</h3>" +
@@ -494,8 +518,8 @@
     var statement = '<div class="statement">' + c.statement.map(function (p) { return "<p>" + esc(p).replace(/\n/g, "<br>") + "</p>"; }).join("") +
       '<p class="small muted">Written by the candidate, as published by the City of Burnaby.' + srcChips([o.src]) + "</p></div>";
 
-    dlg.innerHTML = '<div class="pf">' +
-      '<div class="pf-head"><div><div class="badges">' + badges + '</div><h2 class="pf-name" id="pf-name">' + esc(c.name) + '</h2><div class="pf-aff">' + esc(orgName(c)) + '</div><div class="cc-tags pf-tags">' +
+    dlg.innerHTML = '<div class="pf party-edge' + pc(c.org) + '">' +
+      '<div class="pf-head"><div><div class="badges">' + badges + '</div><h2 class="pf-name" id="pf-name">' + esc(c.name) + '</h2><div class="pf-aff"><span class="party-dot' + pc(c.org) + '"></span>' + esc(orgName(c)) + '</div><div class="cc-tags pf-tags">' +
         c.sig.map(function (t) { return '<span class="tag sig">' + esc(t) + "</span>"; }).join("") +
         c.topics.map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div></div>" +
         '<button type="button" class="x-btn" data-close aria-label="Close profile">✕</button></div>' +
@@ -605,12 +629,12 @@
   function compareTable() {
     var keys = Object.keys(G.orgs);
     var head = "<tr><th scope=\"col\">Topic</th>" + keys.map(function (k) {
-      return '<th scope="col"><a href="#parties/' + k + '">' + esc(G.orgs[k].short) + "</a></th>";
+      return '<th scope="col" class="' + pc(k).trim() + '"><a class="party-text" href="#parties/' + k + '"><span class="party-dot"></span>' + esc(G.orgs[k].short) + "</a></th>";
     }).join("") + "</tr>";
     var rows = G.compareTopics.map(function (t) {
       return '<tr><th scope="row"><a href="#issues/' + t.issue + '">' + esc(t.label) + "</a></th>" + keys.map(function (k) {
         var st = (G.orgs[k].stances || {})[t.id];
-        return '<td data-label="' + esc(G.orgs[k].short) + '">' +
+        return '<td class="' + pc(k).trim() + '" data-label="' + esc(G.orgs[k].short) + '">' +
           "<div>" + (st ? esc(st.text) + srcChips(st.src) : '<span class="na">Not in their platform</span>') + "</div></td>";
       }).join("") + "</tr>";
     }).join("");
@@ -625,10 +649,10 @@
       var mine = CANDS.filter(function (c) { return c.org === k; });
       // Their mayoral candidate and anyone currently in office.
       var notable = mine.filter(function (c) { return c.office === "mayor" || c.flags.indexOf("incumbent") > -1; });
-      return '<article class="card party" id="org-' + k + '">' +
+      return '<article class="card party party-top-edge' + pc(k) + '" id="org-' + k + '">' +
         '<div class="party-top"><span class="badge' + (o.role === "Governing party" ? " solid" : "") + '">' + esc(o.role) + "</span>" +
           ext(o.website, "Website") + "</div>" +
-        "<h2>" + esc(o.name) + "</h2>" +
+        '<h2><span class="party-dot"></span>' + esc(o.name) + "</h2>" +
         (o.tagline ? '<p class="tagline">“' + esc(o.tagline.text) + "”" + srcChips(o.tagline.src) + "</p>" : "") +
         countTiles(mine) +
         '<dl class="kv"><div><dt>Political lean</dt><dd>' + leanText(o) + "</dd></div>" +
@@ -653,7 +677,7 @@
       intro("Parties", "Candidates can run with a civic party (officially an \"elector organization\") or on their own. These are local groups, separate from provincial and federal parties. Listed alphabetically. Promises are quoted or closely paraphrased from each party's platform. A political lean is shown only where an independent source states one.") +
       compareTable() +
       '<div class="grid-2 party-grid">' + cards +
-      '<article class="card party" id="org-independent"><div class="party-top"><span class="badge">No party</span></div><h2>Independents</h2>' +
+      '<article class="card party party-top-edge' + pc(null) + '" id="org-independent"><div class="party-top"><span class="badge">No party</span></div><h2><span class="party-dot"></span>Independents</h2>' +
         '<p class="tagline">' + indep.length + " candidates have no party listed on their City profile. Each sets out their own priorities on their candidate card.</p>" +
         countTiles(indep) +
         (indepNotable.length ? '<dl class="kv"><div><dt>Notable</dt><dd>' + indepNotable.map(function (c) {
@@ -664,6 +688,13 @@
   }
 
   // ------------------------------------------------------------------ ISSUES
+  // Party key for an issue "who" label: a party name/short name, or a candidate's name.
+  // Returns null for an independent candidate, undefined when it isn't a single party or person.
+  function whoParty(who) {
+    for (var k in G.orgs) if (who === G.orgs[k].short || who === G.orgs[k].name) return k;
+    var c = CANDS.filter(function (x) { return plainName(x) === who; })[0];
+    return c ? c.org : undefined;
+  }
   function renderIssues() {
     $("#view-issues").innerHTML =
       intro("Issues", "The big debates in this election. Each starts with sourced background facts, then what candidates and parties have said. Positions are examples from published platforms and statements, not a ranking, and not everyone has spoken to every issue.") +
@@ -674,7 +705,8 @@
           '<p class="sum">' + esc(iss.summary) + "</p>" +
           more("The facts", "<ul>" + iss.facts.map(function (f) { return "<li>" + esc(f.text) + srcChips(f.src) + "</li>"; }).join("") + "</ul>") +
           more("What they say", '<ul class="positions">' + iss.positions.map(function (p) {
-            return '<li><span class="who">' + esc(p.who) + "</span>" + esc(p.text) + srcChips(p.src) + "</li>";
+            var key = whoParty(p.who);
+          return '<li><span class="who' + (key !== undefined ? " party-text" + pc(key) : "") + '">' + (key !== undefined ? '<span class="party-dot"></span>' : "") + esc(p.who) + "</span>" + esc(p.text) + srcChips(p.src) + "</li>";
           }).join("") + "</ul>") +
           (iss.further ? more("Further reading", "<ul>" + iss.further.map(function (id) {
             var s = G.sources[id];
@@ -707,7 +739,7 @@
         '<span class="count' + (ids.length >= seats ? " full" : "") + '">' + ids.length + " / " + seats + "</span></div>" +
         (ids.length ? "<ul>" + ids.map(function (id) {
           var c = BY_ID[id];
-          return '<li><span><a href="#candidates/' + o + "/" + id + '">' + esc(c.name) + "</a><small>" + esc(orgName(c)) + "</small></span>" +
+          return '<li class="' + pc(c.org).trim() + '"><span><a href="#candidates/' + o + "/" + id + '">' + esc(c.name) + '</a><small><span class="party-dot"></span>' + esc(orgName(c)) + "</small></span>" +
             '<button type="button" class="no-print" data-remove="' + esc(id) + '" aria-label="Remove ' + esc(plainName(c)) + '">Remove</button></li>';
         }).join("") + "</ul>" : '<p class="none">None picked yet. <a href="#candidates/' + o + '">Browse ' + esc(OFFICES[o].plural) + " →</a></p>") +
         "</div>";
@@ -770,7 +802,7 @@
         '<li><strong>Opinions are labelled.</strong> Arguments for and against sit in a box marked <span class="badge opinion">Opinion</span>, and each one names who is speaking. A party\'s political lean is shown only when an independent source states it.</li>' +
         "<li><strong>Who decides this?</strong> When a candidate promises to directly do something another government controls (like setting tuition), a sourced note says who controls it. Promises to advocate don't get one. The same test applies to everyone.</li>" +
         "<li><strong>Facts carry a source.</strong> Tap the small ↗ tags to see where anything came from.</li>" +
-        "<li><strong>No party colours</strong> and no predictions.</li>" +
+        "<li><strong>Party colours are their own.</strong> Each party is shown in the main colour from its own website; independents are a neutral grey. No predictions.</li>" +
       "</ul></div>" +
       '<div class="card"><h2>Things to keep in mind</h2><ul>' +
         "<li><strong>Criticism isn't evenly spread.</strong> Incumbents have a record, so they attract more of it. A candidate with nothing listed hasn't been endorsed; we just haven't found published arguments about them.</li>" +
@@ -836,6 +868,7 @@
     document.title = (view === "start" ? "" : tabName + " · ") + "Burnaby Votes 2026 - Voter Guide";
   }
 
+  injectPartyColors();
   initTheme();
   initDialog();
   updatePickCount();

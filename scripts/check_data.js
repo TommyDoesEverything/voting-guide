@@ -24,6 +24,7 @@ function walk(o, where) {
   for (const [k, v] of Object.entries(o)) {
     if (["src", "moreSrc", "further"].includes(k)) checkSources(v, `${where}.${k}`);
     else if (k === "signature") continue;
+    else if (k === "color") { if (v.src && !sources.has(v.src)) problems.push(`${where}.color: unknown source "${v.src}"`); }
     else if (k === "platform") sources.has(v) || problems.push(`${where}: unknown platform source "${v}"`);
     else walk(v, `${where}.${k}`);
   }
