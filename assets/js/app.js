@@ -43,7 +43,7 @@
   // Merge official profiles with curated content.
   var CANDS = P.candidates.map(function (c) {
     var extra = G.candidates[c.id] || {};
-    var cand = Object.assign({}, c, { points: extra.points || [], flags: extra.flags || [], notes: extra.notes || [], ops: OPS[c.id] || [] });
+    var cand = Object.assign({}, c, { points: extra.points || [], flags: extra.flags || [], notes: extra.notes || [], ops: OPS[c.id] || [], sig: (G.signature || {})[c.id] || [] });
     cand.topics = topicsFor(cand);
     return cand;
   });
@@ -380,9 +380,15 @@
     $("#race-count").innerHTML = '<span class="count' + (n >= o.seats ? " full" : "") + '">' + n + " / " + o.seats + " picked</span>";
   }
 
+  // Status flags, then the candidate's two signature tags, then broad topics.
+  function tagRow(c, topicLimit) {
+    return c.flags.map(function (f) { return '<span class="tag ' + FLAGS[f].cls + '">' + esc(FLAGS[f].text) + "</span>"; })
+      .concat(c.sig.map(function (t) { return '<span class="tag sig">' + esc(t) + "</span>"; }))
+      .concat(c.topics.slice(0, topicLimit).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; })).join("");
+  }
+
   function candidateCard(c) {
-    var tags = c.flags.map(function (f) { return '<span class="tag ' + FLAGS[f].cls + '">' + esc(FLAGS[f].text) + "</span>"; })
-      .concat(c.topics.map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; })).join("");
+    var tags = tagRow(c, 2);
     var debate = debateCount(c.ops);
     return '<article class="cc' + (isPicked(c.id) ? " is-picked" : "") + '" id="card-' + esc(c.id) + '">' +
       "<div>" +
@@ -401,7 +407,7 @@
     if (c.office !== state.office) return false;
     if (state.org !== "all" && (c.org || "none") !== state.org) return false;
     if (!state.query) return true;
-    var hay = [c.name, orgName(c), c.points.join(" "), c.topics.join(" "), c.statement.join(" ")].join(" ").toLowerCase();
+    var hay = [c.name, orgName(c), c.points.join(" "), c.sig.join(" "), c.topics.join(" "), c.statement.join(" ")].join(" ").toLowerCase();
     return state.query.split(/\s+/).every(function (w) { return hay.indexOf(w) > -1; });
   }
 
@@ -450,7 +456,9 @@
       '<p class="small muted">Written by the candidate, as published by the City of Burnaby.' + srcChips([o.src]) + "</p></div>";
 
     dlg.innerHTML = '<div class="pf">' +
-      '<div class="pf-head"><div><div class="badges">' + badges + '</div><h2 class="pf-name" id="pf-name">' + esc(c.name) + '</h2><div class="pf-aff">' + esc(orgName(c)) + "</div></div>" +
+      '<div class="pf-head"><div><div class="badges">' + badges + '</div><h2 class="pf-name" id="pf-name">' + esc(c.name) + '</h2><div class="pf-aff">' + esc(orgName(c)) + '</div><div class="cc-tags pf-tags">' +
+        c.sig.map(function (t) { return '<span class="tag sig">' + esc(t) + "</span>"; }).join("") +
+        c.topics.map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div></div>" +
         '<button type="button" class="x-btn" data-close aria-label="Close profile">✕</button></div>' +
       '<div class="pf-body">' +
         '<div class="pf-sec"><p class="label">Campaign focus <span class="muted">(from their statement)</span></p><ul class="pf-focus">' +

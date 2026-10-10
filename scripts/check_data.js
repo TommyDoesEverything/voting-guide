@@ -23,12 +23,19 @@ function walk(o, where) {
   if (!o || typeof o !== "object") return;
   for (const [k, v] of Object.entries(o)) {
     if (["src", "moreSrc", "further"].includes(k)) checkSources(v, `${where}.${k}`);
+    else if (k === "signature") continue;
     else if (k === "platform") sources.has(v) || problems.push(`${where}: unknown platform source "${v}"`);
     else walk(v, `${where}.${k}`);
   }
 }
 
 for (const k of Object.keys(g.candidates)) ids.has(k) || problems.push(`guide: unknown candidate "${k}"`);
+for (const c of p.candidates) {
+  const sig = (g.signature || {})[c.id];
+  if (!Array.isArray(sig) || sig.length !== 2) problems.push(`signature: "${c.id}" needs exactly 2 tags`);
+  else sig.forEach((t) => t.length > 40 && problems.push(`signature: "${c.id}" tag too long: "${t}"`));
+}
+for (const k of Object.keys(g.signature || {})) ids.has(k) || problems.push(`signature: unknown candidate "${k}"`);
 for (const c of p.candidates) g.candidates[c.id] || problems.push(`guide: no curation for "${c.id}"`);
 walk(g, "guide");
 

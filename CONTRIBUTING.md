@@ -7,6 +7,7 @@ This guide is only useful if people of every political view can trust it. These 
 - `data/profiles.*` holds candidates' official statements, verbatim from the City of Burnaby. Never hand-edit it. Re-run `scripts/fetch_profiles.py` instead.
 - A candidate's `points` (2-4 short items) must come **only** from their own statement. Paraphrase faithfully, and quote distinctive phrases. Don't add priorities they didn't state, and don't drop the ones they lead with.
 - Keep `points` roughly the same length and number for everyone.
+- Every candidate has exactly two `signature` tags: short phrases naming a specific promise or background fact from their own statement (for example "4-year tax freeze", "Doctor of Medicine"). Use quote marks only for their exact words. No adjectives or labels like "populist" or "anti-density".
 
 ## 2. Every added fact needs a source
 

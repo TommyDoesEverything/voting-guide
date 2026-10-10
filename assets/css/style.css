@@ -243,6 +243,9 @@ section[data-view] > * + * { margin-top: 20px; }
 .tag { display: inline-block; padding: 1px 8px; border-radius: 6px; font-size: .68rem; font-weight: 700; background: var(--surface-2); color: var(--muted); line-height: 1.7; }
 .tag.strong { background: var(--surface-3); color: var(--text); }
 .tag.warn { background: var(--warn-soft); color: var(--warn-text); }
+/* Signature tags: the candidate's own headline promise or background. */
+.tag.sig { background: var(--surface); color: var(--text); border: 1px solid var(--line-strong); font-weight: 700; }
+.pf-tags { margin: 10px 0 0; }
 
 /* ---------- Sources ---------- */
 .src { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-left: 4px; vertical-align: baseline; }
