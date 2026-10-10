@@ -266,9 +266,11 @@
 
     $("#view-start").innerHTML =
       '<div class="hero">' +
-        '<span class="eyebrow">Municipal election · ' + esc(e.day) + "</span>" +
-        "<h1>Burnaby votes on " + esc(e.day.replace(", 2026", "")) + "</h1>" +
-        '<p><span class="countdown">' + esc(countdownText()) + "</span> You'll elect 1 mayor, 8 councillors and 7 school trustees for four-year terms. Every candidate is here in their own words, with sources for everything else.</p>" +
+        '<div class="hero-text">' +
+          '<span class="eyebrow">Municipal election · ' + esc(e.day) + "</span>" +
+          "<h1>Burnaby votes on " + esc(e.day.replace(", 2026", "")) + "</h1>" +
+          '<p><span class="countdown">' + esc(countdownText()) + "</span> You'll elect 1 mayor, 8 councillors and 7 school trustees for four-year terms. Every candidate is here in their own words, with sources for everything else.</p>" +
+        "</div>" +
         '<div class="stats">' +
           '<div class="stat"><b>64</b><span>Candidates</span></div>' +
           '<div class="stat"><b>16</b><span>Seats</span></div>' +
