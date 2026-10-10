@@ -39,6 +39,10 @@ for (const c of p.candidates) {
 for (const k of Object.keys(g.signature || {})) ids.has(k) || problems.push(`signature: unknown candidate "${k}"`);
 for (const c of p.candidates) g.candidates[c.id] || problems.push(`guide: no curation for "${c.id}"`);
 walk(g, "guide");
+for (const iss of g.issues) {
+  (iss.candidates || []).forEach((c) => ids.has(c.id) || problems.push(`issues.${iss.id}: unknown candidate "${c.id}"`));
+  if (!g.compareTopics.some((t) => t.issue === iss.id)) problems.push(`issues.${iss.id}: no matching compareTopics entry`);
+}
 
 for (const [k, list] of Object.entries(ops)) {
   if (!ids.has(k) && !g.orgs[k]) problems.push(`opinions: unknown subject "${k}"`);

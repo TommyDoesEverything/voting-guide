@@ -19,7 +19,7 @@ To publish it, host the folder on any static host. For GitHub Pages: Settings â†
 | **Overview** | Voting day facts (when, where, ID, accessibility), how the ballot works, anything voters should know first (for example, a candidate who has withdrawn but is still on the ballot), and Burnaby results from the October 2026 Leger poll with caveats. |
 | **Candidates** | Every candidate by race, in the City's alphabetical order, as cards with tags. "View full profile" opens a popup with their focus, sourced context, labelled arguments for and against, their full official statement, and links to nomination papers and financial disclosures. |
 | **Parties** | Each civic party's promises in its own words, its political lean (only where a source states one), arguments for and against, and its roster. |
-| **Issues** | Sourced background facts on the main debates, then what candidates and parties have said. |
+| **Issues** | For each debate: sourced background facts, where every party stands (the same data as the Parties comparison table, stored once in `GUIDE.orgs[...].stances`), and examples of candidates who have spoken to it. |
 | **My ballot** | A personal checklist (limited to 1 / 8 / 7). It's stored only in the browser and can be copied or printed. |
 | **About** | Neutrality rules, what was left out and why, how to request corrections, and every source. |
 

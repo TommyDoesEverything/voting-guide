@@ -121,8 +121,8 @@ window.GUIDE = {
       tagline: { text: "A clear alternative at City Hall.", src: ["party-first-home"] },
       stances: {
         taxes: { text: "“Open the books on major capital projects”; “Slow the property tax hikes”", src: ["party-first", "party-first-home"] },
-        housing: { text: "“Rezone to reflect neighbourhood character”; make it easier to add a suite or laneway home", src: ["party-first"] },
-        safety: { text: "Hire more police; “Pause the approval of new low-barrier supportive housing projects”", src: ["party-first"] },
+        housing: { text: "“Rezone to reflect neighbourhood character”; more on-site parking; make it easier to add a suite or laneway home", src: ["party-first"] },
+        safety: { text: "Hire more police; “Pause the approval of new low-barrier supportive housing projects”; no-drugs and no-weapons rules; more treatment and recovery", src: ["party-first"] },
         hospital: null,
         schools: { text: "“Plan schools and amenities alongside growth” (no trustee candidates)", src: ["party-first"] },
       },
@@ -155,7 +155,7 @@ window.GUIDE = {
       tagline: { text: "A completely independent Party working inside Burnaby, for Burnaby residents.", src: ["party-green-home"] },
       stances: {
         taxes: null,
-        housing: { text: "1,500+ non-market rental homes a year; “Never sell public land”", src: ["party-green"] },
+        housing: { text: "1,500+ non-market rental homes a year; 40,000 purpose-built rentals by 2050; “Never sell public land”", src: ["party-green"] },
         safety: { text: "A non-police response for non-violent mental-health and wellness calls", src: ["party-green"] },
         hospital: { text: "Advocate for completing Phase 2", src: ["party-green"] },
         schools: null,
@@ -228,9 +228,9 @@ window.GUIDE = {
       stances: {
         taxes: { text: "Opposes the “perpetual increase of property tax”", src: ["party-restore"] },
         housing: { text: "“Blanket zoning threatens the sustainability of our neighborhoods”; supports “affordable housing for lower-income families”", src: ["party-restore"] },
-        safety: { text: "“Firmly reject” open, supervised or concealed consumption of hard drugs", src: ["party-restore"] },
+        safety: { text: "“Firmly reject” open, supervised or concealed consumption of hard drugs; no “co-location of incompatible facility within residential area”", src: ["party-restore"] },
         hospital: null,
-        schools: { text: "“Oppose gender education that is not suitable for children's age”", src: ["party-restore-edu"] },
+        schools: { text: "“Oppose gender education that is not suitable for children's age”; keep “partisan politics and ideology out of the classroom”", src: ["party-restore-edu"] },
       },
       name: "Restore Burnaby Alliance",
       lean: null,
@@ -495,8 +495,10 @@ window.GUIDE = {
   },
 
   // ---------------------------------------------------------------------------
-  // Issues. `facts` are sourced background. `positions` quote what candidates
-  // or parties have said; they are not a complete list of everyone's views.
+  // Issues. `facts` are sourced background. Party positions come from
+  // GUIDE.orgs[...].stances (shared with the Parties comparison table).
+  // `candidates` are examples of individual candidates who have spoken to the
+  // issue in their own statement or in coverage; not a complete list.
   // ---------------------------------------------------------------------------
   issues: [
     {
@@ -507,14 +509,11 @@ window.GUIDE = {
         { text: "Bill 44 (2023) requires municipalities over 5,000 people to allow at least 3 units on lots of 280 m² or less, at least 4 on larger lots, and 6 near frequent bus service.", src: ["bc-ssmuh"] },
         { text: "Bill 25 (2025) tightened those rules; cities had until June 30, 2026 to update bylaws.", src: ["bc-ssmuh"] },
       ],
-      positions: [
-        { who: "Mike Hurley", text: "Wants the province to “repeal Bill 44” and return zoning control to the city; promises 1,000 affordable rental homes.", src: ["city-profiles-mayor"] },
-        { who: "Hanzhi Wang", text: "Wants “more missing-middle density and mixed-use developments”.", src: ["city-profiles-mayor"] },
-        { who: "Bill Petrovas", text: "Wants to expand rent-to-own housing.", src: ["city-profiles-mayor"] },
-        { who: "BCA", text: "Start at least 1,000 rental homes through the Housing Authority by 2030.", src: ["party-bca"] },
-        { who: "Burnaby First", text: "“Rezone to reflect neighbourhood character”, more on-site parking, and easier suites and laneway homes.", src: ["party-first"] },
-        { who: "Burnaby Greens", text: "1,500+ non-market rental homes a year; 40,000 purpose-built rentals by 2050.", src: ["party-green"] },
-        { who: "Restore Burnaby", text: "“Blanket zoning threatens the sustainability of our neighborhoods.”", src: ["party-restore"] },
+      candidates: [
+        { id: "mayor-mike-hurley", text: "Wants the province to “repeal Bill 44” and return zoning control to the city; 1,000 new affordable rental homes.", src: ["city-profiles-mayor"] },
+        { id: "mayor-hanzhi-wang", text: "Allow “more missing-middle density and mixed-use developments”.", src: ["city-profiles-mayor"] },
+        { id: "mayor-bill-petrovas", text: "Expand rent-to-own housing.", src: ["city-profiles-mayor"] },
+        { id: "council-daniel-cheung", text: "60 days' notice and a public town hall for all provincial housing and shelter projects.", src: ["city-profiles-council"] },
       ],
       further: ["multiliving"],
     },
@@ -527,12 +526,11 @@ window.GUIDE = {
         { text: "Water rates stayed flat and sewer rose 3.5%, even though Metro Vancouver's charges rose faster; the City covered the gap from reserves.", src: ["city-budget-2026"] },
         { text: "The five-year plan projects 7% annual increases for 2027-2030, to be reassessed each year. 2026 capital spending ($506.8 million) is funded from reserves rather than debt.", src: ["city-budget-2026"] },
       ],
-      positions: [
-        { who: "Mike Hurley", text: "Keep the city debt-free and taxes at or below the regional average.", src: ["dailyhive-hurley"] },
-        { who: "BCA", text: "“Zero debt and low, predictable taxes.”", src: ["party-bca"] },
-        { who: "New Burnaby", text: "0% increase in the first budget, then no more than inflation over four years.", src: ["party-newburnaby"] },
-        { who: "Restore Burnaby", text: "Opposes the “perpetual increase of property tax”. Candidate Rocky Dong proposes a four-year freeze on increases.", src: ["party-restore", "city-profiles-council"] },
-        { who: "Burnaby First", text: "Open the books on major capital projects and hold council accountable for overruns.", src: ["party-first"] },
+      candidates: [
+        { id: "mayor-mike-hurley", text: "Keep the city debt-free and taxes at or below the regional average.", src: ["dailyhive-hurley"] },
+        { id: "council-rocky-dong", text: "Freeze property tax increases for four years.", src: ["city-profiles-council"] },
+        { id: "council-jason-martin", text: "Capital projects shouldn't be “an automatic reason to raise taxes”.", src: ["city-profiles-council"] },
+        { id: "council-james-wang", text: "Keep property tax increases “among the lowest in the region”.", src: ["city-profiles-council"] },
       ],
     },
     {
@@ -544,8 +542,11 @@ window.GUIDE = {
         { text: "Premier David Eby said the expansion will still go ahead, but gave no completion date.", src: ["ctv-hospital"] },
         { text: "Fraser Health says about $50 million was spent under the cancelled agreement.", src: ["freshet-hospital-50m"] },
       ],
-      positions: [
-        { who: "Raised by", text: "Mike Hurley, the BCA, Burnaby Greens and New Burnaby platforms, and council candidates Allen Chen, Neha Unadkat and David Xie, among others.", src: ["city-profiles-mayor", "party-bca", "party-green", "party-newburnaby", "city-profiles-council"] },
+      candidates: [
+        { id: "mayor-mike-hurley", text: "“Fight to get the Burnaby Hospital redevelopment back on track.”", src: ["city-profiles-mayor"] },
+        { id: "council-allen-chen", text: "Advocate for Phase 2; more community clinics to attract family doctors.", src: ["city-profiles-council"] },
+        { id: "council-neha-unadkat", text: "Making Phase 2 a priority is “a key focus”.", src: ["city-profiles-council"] },
+        { id: "council-david-xie", text: "Has spoken for completing Phase 2.", src: ["city-profiles-council"] },
       ],
     },
     {
@@ -558,12 +559,11 @@ window.GUIDE = {
         { text: "BC Housing dropped a proposed 50-unit supportive and complex-care building at 5389 Imperial St. in February 2026 after protests.", src: ["freshet-imperial"] },
         { text: "The City says the temporary shelter at 7320 Buller Ave. will be removed for a park when its lease ends in 2028.", src: ["city-homelessness"] },
       ],
-      positions: [
-        { who: "Burnaby First", text: "“Pause the approval of new low-barrier supportive housing projects”; no-drugs and no-weapons rules; more treatment.", src: ["party-first"] },
-        { who: "New Burnaby", text: "Ban illicit drug use in “public spaces and all government-funded housing”.", src: ["party-newburnaby"] },
-        { who: "Restore Burnaby", text: "“Firmly reject” supervised or other consumption of hard drugs; no co-location of “incompatible” facilities in residential areas.", src: ["party-restore"] },
-        { who: "Burnaby Greens", text: "A non-police response model for non-violent mental-health and wellness calls.", src: ["party-green"] },
-        { who: "Mike Hurley", text: "Relocate the Buller Ave. shelter when its lease ends; finish the RCMP detachment expansion.", src: ["dailyhive-hurley"] },
+      candidates: [
+        { id: "mayor-mike-hurley", text: "Relocate the Buller Ave. shelter when its lease ends; finish the RCMP detachment expansion.", src: ["dailyhive-hurley"] },
+        { id: "mayor-michaelangelo-abcrobinhood", text: "Oppose injection sites; build recovery centres outside urban centres.", src: ["city-profiles-mayor"] },
+        { id: "council-daniel-cheung", text: "Stop concentrating supportive facilities in working-class transit corridors.", src: ["city-profiles-council"] },
+        { id: "council-vincent-tong", text: "“No drug houses”, with “practical, compassionate solutions” to homelessness.", src: ["city-profiles-council"] },
       ],
     },
     {
@@ -573,12 +573,12 @@ window.GUIDE = {
       facts: [
         { text: "The seven-member Board of Education sets procedures for Burnaby's public schools and oversees the district budget.", src: ["sd41-board"] },
       ],
-      positions: [
-        { who: "BCA", text: "“Keep the SOGI policy strong”, press the province to build for projected enrolment, grow school meals.", src: ["party-bca"] },
-        { who: "Restore Burnaby", text: "“Oppose gender education that is not suitable for children's age”; keep “partisan politics and ideology out of the classroom”.", src: ["party-restore-edu"] },
-        { who: "Burnaby Greens", text: "Trustee candidates cite overcrowding and want Grade 7 band restored and mental-health supports strengthened.", src: ["city-profiles-trustee"] },
-        { who: "New Burnaby", text: "Haini Xiao: substance-abuse prevention, funding to parent advisory councils, more STEM and robotics.", src: ["city-profiles-trustee"] },
-        { who: "Independents", text: "Jenny Yamagata: mental-health supports and Grade 7 band. Diane Pearce: support for families and students with learning needs.", src: ["city-profiles-trustee"] },
+      candidates: [
+        { id: "trustee-jen-jang", text: "Concerned about overcrowding and cuts to counselling and other programs.", src: ["city-profiles-trustee"] },
+        { id: "trustee-jasmine-nicholsfigueiredo", text: "Restore Grade 7 band; stronger mental-health supports.", src: ["city-profiles-trustee"] },
+        { id: "trustee-haini-xiao", text: "Substance-abuse prevention, funding to parent advisory councils, more STEM and robotics.", src: ["city-profiles-trustee"] },
+        { id: "trustee-jenny-yamagata", text: "Mental-health supports and revitalizing Grade 7 band.", src: ["city-profiles-trustee"] },
+        { id: "trustee-diane-pearce", text: "Support for families and students with learning needs.", src: ["city-profiles-trustee"] },
       ],
     },
   ],

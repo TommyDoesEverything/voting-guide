@@ -699,42 +699,43 @@
   }
 
   // ------------------------------------------------------------------ ISSUES
-  // Party key for an issue "who" label: a party name/short name, or a candidate's name.
-  // Returns null for an independent candidate, undefined when it isn't a single party or person.
-  function whoParty(who) {
-    for (var k in G.orgs) if (who === G.orgs[k].short || who === G.orgs[k].name) return k;
-    var c = CANDS.filter(function (x) { return plainName(x) === who; })[0];
-    return c ? c.org : undefined;
-  }
-  // Where an issue "who" label links: the party, or the candidate's profile.
-  function whoHref(who) {
-    for (var k in G.orgs) if (who === G.orgs[k].short || who === G.orgs[k].name) return "#parties/" + k;
-    var c = CANDS.filter(function (x) { return plainName(x) === who; })[0];
-    return c ? "#candidates/" + c.office + "/" + c.id : null;
-  }
   function renderIssues() {
+    var jump = '<nav class="issue-jump" aria-label="Jump to issue">' + G.issues.map(function (iss, i) {
+      return '<a href="#issues/' + iss.id + '"><span>' + (i + 1) + "</span>" + esc(iss.title) + "</a>";
+    }).join("") + "</nav>";
+
     $("#view-issues").innerHTML =
-      intro("Issues", "The big debates in this election. Each starts with sourced background facts, then what candidates and parties have said. Positions are examples from published platforms and statements, not a ranking, and not everyone has spoken to every issue.") +
-      '<div class="grid-2">' +
+      intro("Issues", "The big debates in this election. Each starts with sourced background facts, then where every party stands (the same positions as the comparison on the Parties page), then examples of individual candidates who have spoken to it.") +
+      jump +
       G.issues.map(function (iss, i) {
+        var topic = G.compareTopics.filter(function (t) { return t.issue === iss.id; })[0];
+        var parties = Object.keys(G.orgs).map(function (k) {
+          var st = topic && (G.orgs[k].stances || {})[topic.id];
+          return '<div class="stance' + pc(k) + (st ? "" : " empty") + '">' +
+            '<a class="stance-name party-link' + pc(k) + '" href="#parties/' + k + '"><span class="party-dot"></span>' + esc(G.orgs[k].short) + "</a>" +
+            (st ? "<p>" + esc(st.text) + srcChips(st.src) + "</p>" : '<p class="na">Not in their platform</p>') + "</div>";
+        }).join("");
+        var voices = (iss.candidates || []).map(function (v) {
+          var c = BY_ID[v.id];
+          return '<li class="' + pc(c.org).trim() + '"><a class="party-link' + pc(c.org) + '" href="#candidates/' + c.office + "/" + c.id + '"><span class="party-dot"></span>' + esc(plainName(c)) + "</a>" +
+            '<span class="voice-meta">' + esc(OFFICES[c.office].label) + " · " + esc(orgShort(c)) + "</span>" +
+            "<p>" + esc(v.text) + srcChips(v.src) + "</p></li>";
+        }).join("");
         return '<article class="card issue" id="issue-' + iss.id + '">' +
           '<div class="issue-head"><span class="issue-num">' + (i + 1) + "</span><h2>" + esc(iss.title) + "</h2></div>" +
           '<p class="sum">' + esc(iss.summary) + "</p>" +
-          more("The facts", "<ul>" + iss.facts.map(function (f) { return "<li>" + esc(f.text) + srcChips(f.src) + "</li>"; }).join("") + "</ul>") +
-          more("What they say", '<ul class="positions">' + iss.positions.map(function (p) {
-            var key = whoParty(p.who);
-            var href = whoHref(p.who);
-            var who = href
-              ? '<a class="who party-link' + pc(key) + '" href="' + href + '"><span class="party-dot"></span>' + esc(p.who) + "</a>"
-              : '<span class="who">' + esc(p.who) + "</span>";
-          return "<li>" + who + esc(p.text) + srcChips(p.src) + "</li>";
-          }).join("") + "</ul>") +
+          '<div class="issue-body">' +
+            '<div class="issue-facts"><p class="label">The facts</p><ul>' + iss.facts.map(function (f) { return "<li>" + esc(f.text) + srcChips(f.src) + "</li>"; }).join("") + "</ul></div>" +
+            '<div class="issue-parties"><p class="label">Where the parties stand <span class="muted">(from their platforms)</span></p><div class="stances">' + parties + "</div></div>" +
+          "</div>" +
+          (voices ? more("Candidates who've spoken to this (" + iss.candidates.length + ")", '<p class="small muted">Examples from candidates\' own statements and news coverage, not a complete list.</p><ul class="voices">' + voices + "</ul>") : "") +
           (iss.further ? more("Further reading", "<ul>" + iss.further.map(function (id) {
             var s = G.sources[id];
             return "<li>" + ext(s.url, s.title) + ' <span class="muted small">(' + esc(s.publisher) + ". Note the publisher's interest in the topic.)</span></li>";
           }).join("") + "</ul>") : "") +
+          '<p class="issue-foot"><a href="#parties">Compare all party platforms →</a></p>' +
           "</article>";
-      }).join("") + "</div>";
+      }).join("");
   }
 
   // ------------------------------------------------------------------- PICKS
