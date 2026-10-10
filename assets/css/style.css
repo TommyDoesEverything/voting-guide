@@ -29,9 +29,10 @@
   --warn-soft: #fff7ed;
   --warn-line: #fdba74;
   --warn-text: #7c2d12;
-  --opinion-soft: #f5f3ff;
-  --opinion-line: #c4b5fd;
-  --opinion-text: #4c1d95;
+  /* Opinion boxes stay neutral grey: colour is reserved for party links. */
+  --opinion-soft: var(--surface-2);
+  --opinion-line: var(--line-strong);
+  --opinion-text: var(--text-2);
   --radius: 16px;
   --radius-sm: 10px;
   --gutter: 16px;
@@ -67,9 +68,9 @@
     --warn-soft: #2a1a10;
     --warn-line: #9a4a14;
     --warn-text: #fdba74;
-    --opinion-soft: #1e1736;
-    --opinion-line: #5b4a99;
-    --opinion-text: #ddd6fe;
+    --opinion-soft: var(--surface-2);
+    --opinion-line: var(--line-strong);
+    --opinion-text: var(--text-2);
     --shadow: none;
     color-scheme: dark;
   }
@@ -98,9 +99,9 @@
   --warn-soft: #2a1a10;
   --warn-line: #9a4a14;
   --warn-text: #fdba74;
-  --opinion-soft: #1e1736;
-  --opinion-line: #5b4a99;
-  --opinion-text: #ddd6fe;
+  --opinion-soft: var(--surface-2);
+  --opinion-line: var(--line-strong);
+  --opinion-text: var(--text-2);
   --shadow: none;
   color-scheme: dark;
 }
@@ -545,9 +546,6 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
 .cc.party-edge { border-left: 4px solid var(--pc); }
 .pf.party-edge { border-top: 5px solid var(--pc); }
 .party-top-edge { border-top: 5px solid var(--pc); }
-.party-top-edge .party-counts div { background: color-mix(in srgb, var(--pc) 9%, var(--surface-2)); }
-.party-top-edge .party-counts b { color: var(--pc-ink); }
-.party-top-edge .party-counts .none b { color: var(--muted); }
 .bar-row.party-bar .bar-fill { background: var(--pc); }
 .compare thead th { border-bottom: 3px solid var(--pc, transparent); }
 .compare thead th:first-child { border-bottom-color: var(--line); }
@@ -557,3 +555,7 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
   .compare td { border-left: 4px solid var(--pc); }
   .compare td::before { color: var(--pc-ink); }
 }
+/* Coloured names are always links (to a party or a candidate). */
+.party-link { color: var(--pc-ink); font-weight: 700; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--pc) 45%, transparent); text-underline-offset: 3px; }
+.party-link:hover { text-decoration-color: var(--pc); }
+.positions a.who { display: flex; align-items: center; width: fit-content; }

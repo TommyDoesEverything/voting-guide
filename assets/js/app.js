@@ -205,10 +205,21 @@
   }
 
   // ---------------------------------------------------------------- OPINIONS
+  // A speaker's name as a link: to their candidate profile if they're running,
+  // to their party if the speaker is the party itself, otherwise plain text.
+  // Colour is only used when the name links somewhere.
+  function speakerLink(name, orgKey) {
+    if (orgKey && G.orgs[orgKey] && G.orgs[orgKey].name === name) {
+      return '<a class="party-link' + pc(orgKey) + '" href="#parties/' + orgKey + '">' + esc(name) + "</a>";
+    }
+    var c = CANDS.filter(function (x) { return plainName(x) === name; })[0];
+    if (c) return '<a class="party-link' + pc(c.org) + '" href="#candidates/' + c.office + "/" + c.id + '">' + esc(name) + "</a>";
+    return "<b>" + esc(name) + "</b>";
+  }
   function voiceLine(v) {
-    var parts = ['<b class="' + (v.org ? "party-text" + pc(v.org) : "") + '">' + esc(v.name) + "</b>"];
+    var parts = [speakerLink(v.name, v.org)];
     var org = v.org && G.orgs[v.org];
-    if (org && org.name !== v.name) parts.push('<span class="party-text' + pc(v.org) + '">' + esc(org.short) + "</span>");
+    if (org && org.name !== v.name) parts.push('<a class="party-link' + pc(v.org) + '" href="#parties/' + v.org + '">' + esc(org.short) + "</a>");
     if (v.role) parts.push(esc(v.role));
     var lean = org && org.lean ? '<span class="lean-tags">' + leanTags(org) + "</span>" : "";
     return '<div class="voice"><span>Said by ' + parts.join(" · ") + "</span></div>" +
@@ -695,6 +706,12 @@
     var c = CANDS.filter(function (x) { return plainName(x) === who; })[0];
     return c ? c.org : undefined;
   }
+  // Where an issue "who" label links: the party, or the candidate's profile.
+  function whoHref(who) {
+    for (var k in G.orgs) if (who === G.orgs[k].short || who === G.orgs[k].name) return "#parties/" + k;
+    var c = CANDS.filter(function (x) { return plainName(x) === who; })[0];
+    return c ? "#candidates/" + c.office + "/" + c.id : null;
+  }
   function renderIssues() {
     $("#view-issues").innerHTML =
       intro("Issues", "The big debates in this election. Each starts with sourced background facts, then what candidates and parties have said. Positions are examples from published platforms and statements, not a ranking, and not everyone has spoken to every issue.") +
@@ -706,7 +723,11 @@
           more("The facts", "<ul>" + iss.facts.map(function (f) { return "<li>" + esc(f.text) + srcChips(f.src) + "</li>"; }).join("") + "</ul>") +
           more("What they say", '<ul class="positions">' + iss.positions.map(function (p) {
             var key = whoParty(p.who);
-          return '<li><span class="who' + (key !== undefined ? " party-text" + pc(key) : "") + '">' + (key !== undefined ? '<span class="party-dot"></span>' : "") + esc(p.who) + "</span>" + esc(p.text) + srcChips(p.src) + "</li>";
+            var href = whoHref(p.who);
+            var who = href
+              ? '<a class="who party-link' + pc(key) + '" href="' + href + '"><span class="party-dot"></span>' + esc(p.who) + "</a>"
+              : '<span class="who">' + esc(p.who) + "</span>";
+          return "<li>" + who + esc(p.text) + srcChips(p.src) + "</li>";
           }).join("") + "</ul>") +
           (iss.further ? more("Further reading", "<ul>" + iss.further.map(function (id) {
             var s = G.sources[id];
