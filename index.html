@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Burnaby Votes 2026 - Voter Guide</title>
-  <meta name="description" content="A plain-language, sourced guide to all 64 candidates in Burnaby's October 17, 2026 local election: mayor, council and school trustees.">
+  <title>Voter Guide</title>
+  <meta name="description" content="An independent, plain-language, sourced voter guide: every candidate in their own words, party platforms side by side, and results after voting day.">
   <meta name="theme-color" content="#0f172a">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230f172a'/><text x='50' y='66' font-family='Arial,sans-serif' font-size='44' font-weight='700' fill='white' text-anchor='middle'>BV</text></svg>">
   <link rel="stylesheet" href="assets/css/style.css">
   <script>
     // Apply a saved theme before first paint to avoid a flash.
-    try { var t = localStorage.getItem("bv26-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+    try { var t = localStorage.getItem("vg-theme") || localStorage.getItem("bv26-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
 </head>
 <body>
@@ -50,6 +50,8 @@
     <symbol id="i-hospital" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
     <symbol id="i-school" viewBox="0 0 24 24"><path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.83l8.57 3.91a2 2 0 0 0 1.66 0z"/><path d="M22 10v6M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" stroke="none" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
   </svg>
   <a class="skip" href="#main">Skip to content</a>
@@ -57,13 +59,14 @@
   <header class="top">
     <div class="top-inner">
       <a class="brand" href="#start">
-        <span class="brand-mark" aria-hidden="true">BV</span>
+        <span class="brand-mark" aria-hidden="true"><svg class="i"><use href="#i-ballot"/></svg></span>
         <span>
-          <span class="brand-name">Burnaby Votes 2026</span>
-          <span class="brand-sub">Independent voter guide · General Local Election · Sat, Oct 17</span>
+          <span class="brand-name" id="brand-name">Voter Guide</span>
+          <span class="brand-sub" id="brand-sub">Independent voter guide</span>
         </span>
       </a>
       <div class="top-actions">
+        <a class="theme-btn" href="#elections" aria-label="All elections"><svg class="i" aria-hidden="true"><use href="#i-calendar"/></svg><span class="lbl">Elections</span></a>
         <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch colour theme">
           <svg class="i" aria-hidden="true"><use id="theme-icon" href="#i-monitor"/></svg><span class="lbl" id="theme-label">System</span>
         </button>
@@ -75,7 +78,8 @@
         <a href="#candidates" data-tab="candidates"><svg class="i" aria-hidden="true"><use href="#i-users"/></svg>Candidates</a>
         <a href="#parties" data-tab="parties"><svg class="i" aria-hidden="true"><use href="#i-landmark"/></svg>Parties</a>
         <a href="#issues" data-tab="issues"><svg class="i" aria-hidden="true"><use href="#i-message"/></svg>Issues</a>
-        <a href="#picks" data-tab="picks"><svg class="i" aria-hidden="true"><use href="#i-ballot"/></svg>My ballot <span class="pill" id="picks-count" hidden>0</span></a>
+        <a href="#results" data-tab="results" id="tab-results" hidden><svg class="i" aria-hidden="true"><use href="#i-chart"/></svg>Results</a>
+        <a href="#picks" data-tab="picks" id="tab-picks"><svg class="i" aria-hidden="true"><use href="#i-ballot"/></svg>My ballot <span class="pill" id="picks-count" hidden>0</span></a>
         <a href="#about" data-tab="about"><svg class="i" aria-hidden="true"><use href="#i-info"/></svg>About</a>
       </nav>
       <button type="button" class="scroll-cue cue-right" tabindex="-1" aria-hidden="true">›</button>
@@ -83,16 +87,18 @@
   </header>
 
   <main id="main" tabindex="-1">
+    <p class="election-banner" id="election-banner" hidden></p>
     <!-- Each section is filled in by assets/js/app.js -->
     <section id="view-start" data-view="start"></section>
     <section id="view-candidates" data-view="candidates" hidden></section>
     <section id="view-parties" data-view="parties" hidden></section>
     <section id="view-issues" data-view="issues" hidden></section>
     <section id="view-picks" data-view="picks" hidden></section>
+    <section id="view-results" data-view="results" hidden></section>
+    <section id="view-elections" data-view="elections" hidden></section>
     <section id="view-about" data-view="about" hidden></section>
     <noscript>
-      <p class="card">This guide needs JavaScript to show candidates. You can read every candidate's official profile on the
-        <a href="https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates">City of Burnaby's candidates page</a>.</p>
+      <p class="card">This guide needs JavaScript to show candidates. Official candidate profiles are published by your local election office.</p>
     </noscript>
   </main>
 
@@ -100,17 +106,20 @@
 
   <footer class="foot">
     <div class="foot-inner">
-      <p><strong>Burnaby Votes 2026</strong> is independent and non-partisan. It isn't affiliated with any candidate, party, or the City of Burnaby.</p>
-      <p>Candidate statements are reproduced from the <a href="https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates">City's official profiles</a>. Spotted an error? <a href="#about">Report a correction</a>.</p>
+      <p><strong>Voter Guide</strong> is independent and non-partisan. It isn't affiliated with any candidate, party, or the <span id="foot-authority">local election office</span>.</p>
+      <p>Candidate statements are reproduced from the <a id="foot-profiles" href="#elections">official candidate profiles</a>. Spotted an error? <a href="#about">Report a correction</a>.</p>
+      <p class="foot-links">
+        <a href="#elections"><svg class="i" aria-hidden="true"><use href="#i-calendar"/></svg>All elections</a>
+        <a href="https://github.com/TommyDoesEverything/voting-guide" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-github"/></svg>Source on GitHub</a>
+        <a href="https://github.com/TommyDoesEverything/voting-guide/blob/main/ROADMAP.md" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg>Roadmap</a>
+      </p>
     </div>
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script src="data/profiles.js"></script>
-  <script src="data/guide.js"></script>
-  <script src="data/opinions.js"></script>
-  <script src="data/polls.js"></script>
-  <script src="assets/js/app.js"></script>
+  <!-- The loader picks the election (?election=<id>) and loads its data, then app.js. -->
+  <script src="elections/index.js"></script>
+  <script src="assets/js/loader.js"></script>
 </body>
 </html>

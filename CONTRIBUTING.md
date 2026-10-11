@@ -1,10 +1,10 @@
 # Contributing: content rules
 
-This guide is only useful if people of every political view can trust it. These rules apply to every change in `data/guide.js`.
+This guide is only useful if people of every political view can trust it. These rules apply to every change to an election's data files in `elections/<id>/`.
 
 ## 1. Candidates speak for themselves
 
-- `data/profiles.*` holds candidates' official statements, verbatim from the City of Burnaby. Never hand-edit it. Re-run `scripts/fetch_profiles.py` instead.
+- `profiles.*` holds candidates' official statements, verbatim from the official source. Never hand-edit it. Re-run the election's script in `scripts/<id>/` instead.
 - A candidate's `points` (2-4 short items) must come **only** from their own statement. Paraphrase faithfully, and quote distinctive phrases. Don't add priorities they didn't state, and don't drop the ones they lead with.
 - Keep `points` roughly the same length and number for everyone (2-5 each).
 - Every candidate has exactly two `signature` tags: short phrases naming a specific promise or background fact from their own statement (for example "4-year tax freeze", "Doctor of Medicine"). Use quote marks only for their exact words. No adjectives or labels like "populist" or "anti-density".
@@ -34,7 +34,7 @@ This guide is only useful if people of every political view can trust it. These 
 
 ## 4. Opinions: arguments for and against
 
-- They live only in `data/opinions.js`, never mixed into facts.
+- They live only in `opinions.js`, never mixed into facts.
 - Each item needs a `stance` (`for`, `against` or `reported`), a `voice` (who said it, plus `org` and `role` where relevant) and a `src`.
 - Quote or closely paraphrase the speaker. Never write an argument in the guide's own voice.
 - `reported` is for facts from news coverage that are part of the debate (pay, votes, records). Keep the reporter's wording.
@@ -43,7 +43,7 @@ This guide is only useful if people of every political view can trust it. These 
 
 ## 5. Polls
 
-- `data/polls.js` copies numbers exactly from the pollster's report: no rounding, combining or projecting.
+- `polls.js` copies numbers exactly from the pollster's report: no rounding, combining or projecting.
 - Always show sample size, field dates, undecided share and a caveat.
 
 ## 6. Equal treatment

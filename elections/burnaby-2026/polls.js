@@ -8,7 +8,7 @@ window.POLLS = [
     fieldDates: "September 23-30, 2026",
     released: "2026-10-07",
     method: "Online panel survey of Vancouver-area adults (n=1,207 region-wide). Burnaby results come from 107 Burnaby respondents (123 after weighting).",
-    burnabyN: 107,
+    localN: 107,
     // Our calculation: 1.96 * sqrt(0.25 / 107). Leger notes online panels are not
     // random samples, so this is a rough guide only.
     moeNote: "Leger doesn't publish a margin of error for Burnaby alone. For comparison, a random sample of 107 people would have a margin of error of about +/-9.5 points (our calculation).",

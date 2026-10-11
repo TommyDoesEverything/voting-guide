@@ -1,18 +1,40 @@
-// Sanity checks for the data files. Run: node scripts/check_data.js
+// Sanity checks for every election in elections/index.js.
+// Run: node scripts/check_data.js
 // Fails (exit 1) on unknown candidate ids, unknown source ids, malformed
-// opinion items, or em/en dashes in site content.
+// opinion items, bad results, or em/en dashes in site content.
 const fs = require("fs");
 const path = require("path");
 
 const root = path.join(__dirname, "..");
+const allProblems = [];
+const summary = [];
+
 global.window = {};
-for (const f of ["data/profiles.js", "data/guide.js", "data/opinions.js", "data/polls.js"]) {
-  new Function(fs.readFileSync(path.join(root, f), "utf8"))();
+new Function(fs.readFileSync(path.join(root, "elections/index.js"), "utf8"))();
+const registry = window.ELECTIONS;
+if (!registry.list.some((e) => e.id === registry.default)) allProblems.push(`registry: default "${registry.default}" is not in the list`);
+
+for (const meta of registry.list) {
+  const dir = `elections/${meta.id}`;
+  global.window = { ELECTIONS: registry };
+  for (const f of ["profiles.js", "guide.js", "opinions.js", "polls.js", "results.js"]) {
+    const file = path.join(root, dir, f);
+    if (fs.existsSync(file)) new Function(fs.readFileSync(file, "utf8"))();
+    else if (["profiles.js", "guide.js"].includes(f)) allProblems.push(`${dir}: missing ${f}`);
+  }
+  if (meta.results && !window.RESULTS) allProblems.push(`${dir}: registry says results: true but results.js is missing`);
+  if (!window.GUIDE || !window.PROFILES) continue;
+  const problems = checkElection(meta, window.GUIDE, window.PROFILES, window.OPINIONS || {}, window.POLLS || [], window.RESULTS);
+  problems.forEach((x) => allProblems.push(`${meta.id}: ${x}`));
+  summary.push(`${meta.id}: ${window.PROFILES.candidates.length} candidates, ${Object.keys(window.GUIDE.sources).length} sources, ${Object.values(window.OPINIONS || {}).flat().length} opinion items${window.RESULTS ? ", results" : ""}`);
 }
-const { GUIDE: g, PROFILES: p, OPINIONS: ops, POLLS: polls } = window;
+
+function checkElection(meta, g, p, ops, polls, res) {
 const problems = [];
 const ids = new Set(p.candidates.map((c) => c.id));
-const sources = new Set(Object.keys(g.sources));
+const sources = new Set(Object.keys(g.sources).concat(Object.keys((res && res.sources) || {})));
+const offices = new Set((g.election.offices || []).map((o) => o.id));
+p.candidates.forEach((c) => offices.has(c.office) || problems.push(`candidate "${c.id}": office "${c.office}" not in election.offices`));
 
 function checkSources(list, where) {
   if (!Array.isArray(list) || !list.length) return problems.push(`${where}: missing src`);
@@ -22,7 +44,8 @@ function walk(o, where) {
   if (Array.isArray(o)) return o.forEach((x, i) => walk(x, `${where}[${i}]`));
   if (!o || typeof o !== "object") return;
   for (const [k, v] of Object.entries(o)) {
-    if (["src", "moreSrc", "further"].includes(k)) checkSources(v, `${where}.${k}`);
+    if (k === "src" && typeof v === "string") sources.has(v) || problems.push(`${where}.src: unknown source "${v}"`);
+    else if (["src", "moreSrc", "further"].includes(k)) checkSources(v, `${where}.${k}`);
     else if (k === "signature") continue;
     else if (k === "color") { if (v.src && !sources.has(v.src)) problems.push(`${where}.color: unknown source "${v.src}"`); }
     else if (k === "platform") sources.has(v) || problems.push(`${where}: unknown platform source "${v}"`);
@@ -56,15 +79,31 @@ for (const [k, list] of Object.entries(ops)) {
 }
 polls.forEach((pl, i) => {
   checkSources(pl.src, `polls[${i}]`);
-  pl.mayor.results.forEach((r) => r.id && !ids.has(r.id) && problems.push(`polls[${i}]: unknown candidate "${r.id}"`));
+  (pl.mayor ? pl.mayor.results : []).forEach((r) => r.id && !ids.has(r.id) && problems.push(`polls[${i}]: unknown candidate "${r.id}"`));
 });
 
-for (const f of ["index.html", "assets/js/app.js", "assets/css/style.css", "data/guide.js", "data/opinions.js", "data/polls.js", "data/profiles.js", "README.md", "CONTRIBUTING.md"]) {
-  if (/[–—]/.test(fs.readFileSync(path.join(root, f), "utf8"))) problems.push(`${f}: contains an em or en dash`);
+if (res) {
+  checkSources(res.src, "results");
+  Object.entries(res.races || {}).forEach(([o, rows]) => {
+    offices.has(o) || problems.push(`results: unknown office "${o}"`);
+    rows.forEach((r) => {
+      if (r.id && !ids.has(r.id)) problems.push(`results.${o}: unknown candidate "${r.id}"`);
+      if (typeof r.votes !== "number") problems.push(`results.${o}: "${r.id || r.name}" needs numeric votes`);
+    });
+  });
+}
+return problems;
 }
 
-if (problems.length) {
-  console.error(problems.join("\n"));
+const siteFiles = ["index.html", "assets/js/app.js", "assets/js/loader.js", "assets/css/style.css", "elections/index.js", "README.md", "CONTRIBUTING.md", "ROADMAP.md"];
+registry.list.forEach((m) => ["guide.js", "opinions.js", "polls.js", "profiles.js", "results.js"].forEach((f) => siteFiles.push(`elections/${m.id}/${f}`)));
+for (const f of siteFiles) {
+  const file = path.join(root, f);
+  if (fs.existsSync(file) && /[–—]/.test(fs.readFileSync(file, "utf8"))) allProblems.push(`${f}: contains an em or en dash`);
+}
+
+if (allProblems.length) {
+  console.error(allProblems.join("\n"));
   process.exit(1);
 }
-console.log(`data ok: ${p.candidates.length} candidates, ${sources.size} sources, ${Object.values(ops).flat().length} opinion items`);
+console.log("data ok\n  " + summary.join("\n  "));

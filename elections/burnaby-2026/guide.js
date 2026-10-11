@@ -2,17 +2,74 @@
 // candidate's own statement lives here, and every fact points at a source id
 // in SOURCES. See CONTRIBUTING.md for the rules on what goes in this file.
 //
-// Candidate statements themselves come from data/profiles.js (generated).
+// Candidate statements themselves come from profiles.js in this folder (generated).
 
 window.GUIDE = {
   lastUpdated: "2026-10-10",
 
+  // Everything election-specific the app shows. Text marked `html` is trusted
+  // author content (may contain <strong>/<a>); everything else is escaped.
   election: {
     name: "Burnaby General Local Election 2026",
+    brand: "Burnaby Votes 2026",
+    place: "Burnaby",
+    authority: "City of Burnaby",
+    kind: "Municipal election",
     day: "Saturday, October 17, 2026",
+    dayShort: "Saturday, October 17",
     hours: "8 am to 8 pm",
     advance: "October 3, 7 and 10",
-    seats: { mayor: 1, council: 8, trustee: 7 },
+    termNote: "You'll elect 1 mayor, 8 councillors and 7 school trustees for four-year terms.",
+    profilesUrl: "https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates",
+    resultsNote: "Official results are declared by the City of Burnaby by October 21.",
+
+    // Races on the ballot. `src` is the source id for that race's official profiles.
+    offices: [
+      { id: "mayor", icon: "user", label: "Mayor", plural: "Mayor", seats: 1, src: "city-profiles-mayor" },
+      { id: "council", icon: "users", label: "Council", plural: "City Council", seats: 8, src: "city-profiles-council" },
+      { id: "trustee", icon: "school", label: "Trustee", plural: "School Trustees", seats: 7, src: "city-profiles-trustee" },
+    ],
+
+    // Extra hero stats (candidate and seat counts are computed).
+    stats: [
+      { value: "5", label: "Civic parties", src: ["freshet-council-race"] },
+      { value: "19.3%", label: "Turnout in 2022", src: ["freshet-bca-slate"] },
+    ],
+
+    // Extra "Good to know" items (withdrawn / dual candidates are added automatically).
+    alerts: [
+      { html: "The <strong>provincial election on October 24</strong> is a separate vote, one week later. Some local candidates are on both ballots.", src: ["ebc-candidates"] },
+    ],
+
+    beforeYouGo: [
+      { icon: "clock", html: "<strong>8 am to 8 pm</strong>, Saturday, October 17, 2026. Advance voting: October 3, 7 and 10.", src: ["city-elections"] },
+      { icon: "pin", html: "<strong>Vote at any location.</strong> There are no assigned voting places. <a href=\"https://gis.burnaby.ca/electionvotinglocations/\" target=\"_blank\" rel=\"noopener\">Locations and wait times</a>", src: ["city-voters"] },
+      { icon: "id", html: "<strong>Bring ID.</strong> Not registered? Bring two pieces showing who you are and where you live (one with your signature). You can register on the spot.", src: ["city-voters"] },
+      { icon: "access", html: "<strong>Need help?</strong> Curbside voting at every location; translation and interpreters available.", src: ["city-voters"] },
+    ],
+    whoCanVote: [
+      { html: "<strong>Residents:</strong> Canadian citizen, 18+ by voting day, living in BC for at least 6 months and in Burnaby when you register." },
+      { html: "<strong>Property owners who live elsewhere</strong> may vote as non-resident property electors after owning Burnaby property for 30+ days (one property; individuals only)." },
+      { html: "<strong>ID:</strong> registered with a voter card? Bring the card plus one ID. Accepted ID includes a BC driver's licence, BC CareCard, passport, Social Insurance Card and utility bill. Questions: Election Office, 604-294-7088." },
+      { html: "<strong>Accessibility:</strong> an assisted ballot-marking device is at Edmonds Community Centre on all voting days." },
+      { html: "<span class=\"small muted\">Mail-ballot applications closed October 5.</span>", src: ["city-voters", "city-elections"] },
+    ],
+    ballotRules: [
+      { html: "Mayor: pick 1. Council: up to 8. School trustees: up to 7.", src: ["city-voters"] },
+      { html: "Picking <strong>fewer</strong> is fine. Marking <strong>more</strong> than the limit cancels your votes in that race only.", src: ["bc-lga"] },
+      { html: "The candidates with the most votes win." },
+    ],
+    decides: [
+      { html: "<strong>Mayor and council</strong> pass bylaws, set property taxes and fees, decide zoning and land use, and run local services like parks, recreation, roads and water.", src: ["bc-municipal-powers"] },
+      { html: "<strong>School trustees</strong> sit on the Board of Education, which sets procedures for Burnaby's public schools and oversees the district budget.", src: ["sd41-board"] },
+      { html: "<strong>Mostly provincial:</strong> BC Housing builds and funds shelters and supportive housing, the province decides hospital projects, and provincial law sets minimum housing density on residential lots. Councils can still advocate on these.", src: ["city-homelessness", "freshet-hospital", "bc-ssmuh"] },
+    ],
+
+    // Election-specific notes on the About page.
+    aboutNotes: [
+      { html: "<strong>Polls are snapshots.</strong> The Leger poll had 107 Burnaby respondents and about half were undecided. We show it with that context." },
+      { html: "<strong>A correction from an earlier draft:</strong> an AI-generated prototype presented Metro Vancouver-wide figures from this Leger poll as if they were Burnaby's. This guide shows the Burnaby-specific numbers and labels them." },
+    ],
   },
 
   // ---------------------------------------------------------------------------

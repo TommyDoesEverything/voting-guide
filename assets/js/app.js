@@ -1,5 +1,5 @@
-/* Burnaby Votes 2026 - renders the guide from the files in data/.
-   No frameworks, no build step. */
+/* Voter guide app - renders one election from elections/<id>/ (loaded by
+   assets/js/loader.js). No frameworks, no build step. */
 (function () {
   "use strict";
 
@@ -7,12 +7,16 @@
   var P = window.PROFILES;
   var OPS = window.OPINIONS || {};
   var POLLS = window.POLLS || [];
+  var RES = window.RESULTS || null;
+  var META = window.ELECTION;            // registry entry for this election
+  var REG = window.ELECTIONS;            // all elections
+  var E = G.election;
+  var PAST = META.status === "past";
+  if (RES && RES.sources) Object.keys(RES.sources).forEach(function (k) { G.sources[k] = RES.sources[k]; });
 
-  var OFFICES = {
-    mayor: { icon: "user", label: "Mayor", plural: "Mayor", seats: G.election.seats.mayor, src: "city-profiles-mayor" },
-    council: { icon: "users", label: "Council", plural: "City Council", seats: G.election.seats.council, src: "city-profiles-council" },
-    trustee: { icon: "school", label: "Trustee", plural: "School Trustees", seats: G.election.seats.trustee, src: "city-profiles-trustee" },
-  };
+  var OFFICES = {};
+  E.offices.forEach(function (o) { OFFICES[o.id] = o; });
+  var TOTAL_SEATS = E.offices.reduce(function (n, o) { return n + o.seats; }, 0);
   var FLAGS = {
     incumbent: { text: "Incumbent", cls: "strong" },
     withdrawn: { text: "Says no longer running", cls: "warn" },
@@ -37,8 +41,8 @@
     ["Inclusion", /inclusi|belonging|\bequit/i],
     ["STEM & tech", /\bstem\b|coding|robotics|\bai\b|technology/i],
   ];
-  var ELECTION_DAY = new Date(2026, 9, 17);
-  var POLLS_CLOSE = new Date(2026, 9, 17, 20, 0);
+  var ELECTION_DAY = new Date(META.date + "T00:00:00");
+  var POLLS_CLOSE = new Date(META.date + "T" + (META.close || "23:59") + ":00");
 
   // Merge official profiles with curated content.
   var CANDS = P.candidates.map(function (c) {
@@ -50,7 +54,7 @@
   var BY_ID = {};
   CANDS.forEach(function (c) { BY_ID[c.id] = c; });
 
-  var state = { office: "mayor", org: "all", query: "" };
+  var state = { office: E.offices[0].id, org: "all", query: "" };
 
   // ---------------------------------------------------------------- helpers
   // Inline line icon from the sprite in index.html (decorative).
@@ -143,7 +147,9 @@
     get: function (k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
     set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode: picks just won't persist */ } },
   };
-  var picks = store.get("bv26-picks", { mayor: [], council: [], trustee: [] });
+  var PICKS_KEY = "vg-picks:" + META.id;
+  function emptyPicks() { var o = {}; E.offices.forEach(function (x) { o[x.id] = []; }); return o; }
+  var picks = store.get(PICKS_KEY, null) || (META.id === "burnaby-2026" && store.get("bv26-picks", null)) || emptyPicks();
   Object.keys(OFFICES).forEach(function (o) {
     picks[o] = (picks[o] || []).filter(function (id) { return BY_ID[id]; });
   });
@@ -161,7 +167,7 @@
       list.push(id);
       toast("Added " + plainName(c) + " (" + list.length + " of " + seats + ")");
     }
-    store.set("bv26-picks", picks);
+    store.set(PICKS_KEY, picks);
     updatePickCount();
     syncPickButtons(id);
     return true;
@@ -177,7 +183,7 @@
     if ($("#race-count")) renderRaceCount();
   }
   function updatePickCount() {
-    var n = picks.mayor.length + picks.council.length + picks.trustee.length;
+    var n = Object.keys(picks).reduce(function (t, k) { return t + picks[k].length; }, 0);
     var el = $("#picks-count");
     el.textContent = n;
     el.hidden = n === 0;
@@ -202,8 +208,8 @@
       var order = ["auto", "light", "dark"];
       var cur = document.documentElement.dataset.theme || "auto";
       var next = order[(order.indexOf(cur) + 1) % order.length];
-      if (next === "auto") { delete document.documentElement.dataset.theme; try { localStorage.removeItem("bv26-theme"); } catch (e) {} }
-      else { document.documentElement.dataset.theme = next; try { localStorage.setItem("bv26-theme", next); } catch (e) {} }
+      if (next === "auto") { delete document.documentElement.dataset.theme; try { localStorage.removeItem("vg-theme"); } catch (e) {} }
+      else { document.documentElement.dataset.theme = next; try { localStorage.setItem("vg-theme", next); } catch (e) {} }
       label();
       toast(next === "auto" ? "Theme: matching your device" : "Theme: " + next);
     });
@@ -261,7 +267,7 @@
   // ---------------------------------------------------------------- OVERVIEW
   function countdownText() {
     var now = new Date();
-    if (now > POLLS_CLOSE) return "Voting has closed. Results are posted by the City of Burnaby.";
+    if (now > POLLS_CLOSE) return "Voting has closed." + (RES ? "" : " " + (E.resultsNote || ""));
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     var days = Math.round((ELECTION_DAY - today) / 86400000);
     if (days === 0) return "Today is General Voting Day. Polls are open 8 am to 8 pm.";
@@ -287,79 +293,76 @@
     var snap = p.snapshot.map(function (s) {
       return "<div><b>" + esc(s.value) + "</b><span>" + esc(s.label) + "</span><small>" + esc(s.detail) + (s.src ? srcChips(s.src) : "") + "</small></div>";
     }).join("");
-    return '<div><h2 class="h-ico">' + icon("chart") + 'What Burnaby residents told pollsters</h2><p class="small muted">' + esc(p.pollster) + " · fieldwork " + esc(p.fieldDates) + " · " + p.burnabyN + " Burnaby respondents" + srcChips(p.src) + "</p></div>" +
+    return '<div><h2 class="h-ico">' + icon("chart") + 'What ' + esc(E.place) + ' residents told pollsters</h2><p class="small muted">' + esc(p.pollster) + " · fieldwork " + esc(p.fieldDates) + " · " + p.localN + " " + esc(E.place) + " respondents" + srcChips(p.src) + "</p></div>" +
       '<div class="grid-2">' +
         '<div class="card"><p class="label">Mayoral vote intention</p><p class="small muted">"' + esc(p.mayor.question) + '"</p><div class="bars">' + barRows(p.mayor.results, "mayor") + '</div><p class="small muted">' + esc(p.mayor.note) + "</p></div>" +
-        '<div class="card"><p class="label">Burnaby mood</p><div class="snap">' + snap + '</div><p class="label" style="margin-top:16px">Top local issues</p><div class="bars">' + barRows(p.issues) + '</div><p class="small muted">' + esc(p.issuesNote) + "</p></div>" +
+        '<div class="card"><p class="label">' + esc(E.place) + ' mood</p><div class="snap">' + snap + '</div><p class="label" style="margin-top:16px">Top local issues</p><div class="bars">' + barRows(p.issues) + '</div><p class="small muted">' + esc(p.issuesNote) + "</p></div>" +
       "</div>" +
-      '<div class="caveat"><strong>Read with care:</strong> nearly half of Burnaby respondents were undecided, and this is one online poll with a small local sample. ' + esc(p.moeNote) + " A poll is a snapshot, not a prediction. In local elections, who actually turns out matters most.</div>";
+      '<div class="caveat"><strong>Read with care:</strong> nearly half of ' + esc(E.place) + ' respondents were undecided, and this is one online poll with a small local sample. ' + esc(p.moeNote) + " A poll is a snapshot, not a prediction. In local elections, who actually turns out matters most.</div>";
+  }
+
+  function htmlItems(list, tag) {
+    return (list || []).map(function (x) {
+      return "<" + tag + ">" + (x.icon ? icon(x.icon) + "<span>" : "") + x.html + srcChips(x.src) + (x.icon ? "</span>" : "") + "</" + tag + ">";
+    }).join("");
   }
 
   function renderStart() {
-    var e = G.election;
+    var e = E;
     var tiles = Object.keys(OFFICES).map(function (o) {
       var n = CANDS.filter(function (c) { return c.office === o; }).length;
       return '<a class="tile" href="#candidates/' + o + '"><span class="tile-ico">' + icon(OFFICES[o].icon) + '</span><span class="tile-text"><span class="label">' + esc(OFFICES[o].plural) + "</span>" +
-        "<strong>Vote for " + (OFFICES[o].seats === 1 ? "1" : "up to " + OFFICES[o].seats) + "</strong>" +
+        "<strong>" + (PAST ? (OFFICES[o].seats === 1 ? "1 seat" : OFFICES[o].seats + " seats") : "Vote for " + (OFFICES[o].seats === 1 ? "1" : "up to " + OFFICES[o].seats)) + "</strong>" +
         '<span class="small muted">' + n + ' candidates</span></span><span class="arrow">' + icon("arrow") + '</span></a>';
     }).join("");
 
-    var flagged = CANDS.filter(function (c) { return c.flags.indexOf("withdrawn") > -1 || c.flags.indexOf("provincial") > -1; });
-    var notices = flagged.map(function (c) {
+    var flagged = PAST ? [] : CANDS.filter(function (c) { return c.flags.indexOf("withdrawn") > -1 || c.flags.indexOf("provincial") > -1; });
+    var notices = (PAST ? "" : htmlItems(e.alerts, "li")) + flagged.map(function (c) {
       return '<li><a href="#candidates/' + c.office + "/" + c.id + '">' + esc(plainName(c)) + "</a> (" + esc(OFFICES[c.office].label) + "): " +
         c.notes.map(function (n) { return esc(n.text) + srcChips(n.src); }).join(" ") + "</li>";
     }).join("");
 
-    $("#view-start").innerHTML =
-      '<div class="hero">' +
-        '<div class="hero-text">' +
-          '<span class="eyebrow">Municipal election · ' + esc(e.day) + "</span>" +
-          "<h1>Burnaby votes on " + esc(e.day.replace(", 2026", "")) + "</h1>" +
-          '<p><span class="countdown">' + esc(countdownText()) + "</span> You'll elect 1 mayor, 8 councillors and 7 school trustees for four-year terms. Every candidate is here in their own words, with sources for everything else.</p>" +
-        "</div>" +
-        '<div class="stats">' +
-          '<div class="stat"><b>64</b><span>Candidates</span></div>' +
-          '<div class="stat"><b>16</b><span>Seats</span></div>' +
-          '<div class="stat"><b>5</b><span>Civic parties ' + srcChips(["freshet-council-race"]) + "</span></div>" +
-          '<div class="stat"><b>19.3%</b><span>Turnout in 2022 ' + srcChips(["freshet-bca-slate"]) + "</span></div>" +
-        "</div>" +
+    var stats = '<div class="stat"><b>' + CANDS.length + "</b><span>Candidates</span></div>" +
+      '<div class="stat"><b>' + TOTAL_SEATS + "</b><span>Seats</span></div>" +
+      (e.stats || []).slice(0, 2).map(function (st) {
+        return '<div class="stat"><b>' + esc(st.value) + "</b><span>" + esc(st.label) + " " + srcChips(st.src) + "</span></div>";
+      }).join("");
+    if (PAST && RES && RES.turnout) {
+      stats = stats.replace(/<div class="stat"><b>[^<]*<\/b><span>Turnout[\s\S]*?<\/div>/, "") +
+        '<div class="stat"><b>' + esc(RES.turnout.pct) + "</b><span>Turnout " + srcChips(RES.src) + "</span></div>";
+    }
+
+    var hero = '<div class="hero">' +
+      '<div class="hero-text">' +
+        '<span class="eyebrow">' + esc(e.kind) + " · " + esc(e.day) + "</span>" +
+        "<h1>" + esc(e.place) + (PAST ? " voted on " : " votes on ") + esc(e.dayShort) + "</h1>" +
+        '<p><span class="countdown">' + esc(countdownText()) + "</span> " +
+          (PAST ? (RES ? "See who won, with official vote counts, on the Results tab. " : "") + "The candidates, parties and issues are kept here as they stood during the campaign."
+                : esc(e.termNote) + " Every candidate is here in their own words, with sources for everything else.") + "</p>" +
+        (PAST && RES ? '<p><a class="btn hero-btn" href="#results">' + icon("chart") + "See the results</a></p>" : "") +
       "</div>" +
+      '<div class="stats">' + stats + "</div>" +
+    "</div>";
 
-      (notices ? '<div class="notice"><h2 class="h-ico">' + icon("alert") + 'Good to know</h2><ul>' +
-        "<li>The <strong>provincial election on October 24</strong> is a separate vote, one week later. Some local candidates are on both ballots." + srcChips(["ebc-candidates"]) + "</li>" +
-        notices + "</ul></div>" : "") +
-
+    var voting = PAST ? "" :
       '<div class="grid-2">' +
-        '<div class="card"><h2 class="h-ico">' + icon("pin") + 'Before you go</h2><ul class="facts">' +
-          '<li>' + icon("clock") + '<span><strong>' + esc(e.hours) + "</strong>, " + esc(e.day) + ". Advance voting: " + esc(e.advance) + "." + srcChips(["city-elections"]) + "</span></li>" +
-          '<li>' + icon("pin") + '<span><strong>Vote at any location.</strong> There are no assigned voting places. ' + ext(G.sources["city-map"].url, "Locations and wait times") + srcChips(["city-voters"]) + "</span></li>" +
-          '<li>' + icon("id") + '<span><strong>Bring ID.</strong> Not registered? Bring two pieces showing who you are and where you live (one with your signature). You can register on the spot.' + srcChips(["city-voters"]) + "</span></li>" +
-          '<li>' + icon("access") + '<span><strong>Need help?</strong> Curbside voting at every location; translation and interpreters available.' + srcChips(["city-voters"]) + "</span></li>" +
-        "</ul>" +
-        more("Who can vote, accepted ID and accessibility",
-          "<p><strong>Residents:</strong> Canadian citizen, 18+ by voting day, living in BC for at least 6 months and in Burnaby when you register.</p>" +
-          "<p><strong>Property owners who live elsewhere</strong> may vote as non-resident property electors after owning Burnaby property for 30+ days (one property; individuals only).</p>" +
-          "<p><strong>ID:</strong> registered with a voter card? Bring the card plus one ID. Accepted ID includes a BC driver's licence, BC CareCard, passport, Social Insurance Card and utility bill. Questions: Election Office, 604-294-7088.</p>" +
-          "<p><strong>Accessibility:</strong> an assisted ballot-marking device is at Edmonds Community Centre on all voting days.</p>" +
-          '<p class="small muted">Mail-ballot applications closed October 5.' + srcChips(["city-voters", "city-elections"]) + "</p>") +
+        '<div class="card"><h2 class="h-ico">' + icon("pin") + 'Before you go</h2><ul class="facts">' + htmlItems(e.beforeYouGo, "li") + "</ul>" +
+          (e.whoCanVote ? more("Who can vote, accepted ID and accessibility", htmlItems(e.whoCanVote, "p")) : "") +
         "</div>" +
         '<div class="card"><h2 class="h-ico">' + icon("ballot") + 'How your ballot works</h2>' +
           "<p>You vote for <strong>individual people</strong>, not a party list. People in the same party run as a team, but you can mix and match.</p>" +
-          "<ul><li>Mayor: pick 1. Council: up to 8. School trustees: up to 7." + srcChips(["city-voters"]) + "</li>" +
-          "<li>Picking <strong>fewer</strong> is fine. Marking <strong>more</strong> than the limit cancels your votes in that race only." + srcChips(["bc-lga"]) + "</li>" +
-          "<li>The candidates with the most votes win.</li></ul>" +
-          more("What do they actually decide?",
-            "<p><strong>Mayor and council</strong> pass bylaws, set property taxes and fees, decide zoning and land use, and run local services like parks, recreation, roads and water." + srcChips(["bc-municipal-powers"]) + "</p>" +
-            "<p><strong>School trustees</strong> sit on the Board of Education, which sets procedures for Burnaby's public schools and oversees the district budget." + srcChips(["sd41-board"]) + "</p>" +
-            "<p><strong>Mostly provincial:</strong> BC Housing builds and funds shelters and supportive housing," + srcChips(["city-homelessness"]) + " the province decides hospital projects," + srcChips(["freshet-hospital"]) + " and provincial law sets minimum housing density on residential lots." + srcChips(["bc-ssmuh"]) + " Councils can still advocate on these.</p>") +
+          "<ul>" + htmlItems(e.ballotRules, "li") + "</ul>" +
+          (e.decides ? more("What do they actually decide?", htmlItems(e.decides, "p")) : "") +
         "</div>" +
-      "</div>" +
+      "</div>";
 
-      "<div><h2 class=\"h-ico\">" + icon("ballot") + "What's on your ballot</h2></div>" +
+    $("#view-start").innerHTML = hero +
+      (PAST && RES ? resultsSummary() : "") +
+      (notices ? '<div class="notice"><h2 class="h-ico">' + icon("alert") + "Good to know</h2><ul>" + notices + "</ul></div>" : "") +
+      voting +
+      "<div><h2 class=\"h-ico\">" + icon("ballot") + (PAST ? "What was on the ballot" : "What's on your ballot") + "</h2></div>" +
       '<div class="tiles">' + tiles + "</div>" +
-
       keyIssues() +
-
       pollSection();
   }
 
@@ -381,7 +384,7 @@
       return '<button type="button" data-office="' + o + '">' + esc(OFFICES[o].plural) + "<span>" + n + " running</span></button>";
     }).join("");
     $("#view-candidates").innerHTML =
-      intro("Candidates", "All 64 candidates, listed alphabetically by surname as the City lists them. Each card's focus comes only from the candidate's own statement. Tap <strong>View full profile</strong> for their full statement, sourced context, and arguments for and against.") +
+      intro("Candidates", "All " + CANDS.length + " candidates, listed alphabetically by surname as the " + esc(E.authority) + " lists them. Each card's focus comes only from the candidate's own statement. Tap <strong>View full profile</strong> for their full statement, sourced context, and arguments for and against.") +
       '<div class="card filters-card">' +
         '<div class="seg" role="group" aria-label="Choose a race">' + seg + "</div>" +
         '<div class="filter-row">' +
@@ -533,7 +536,7 @@
     if (c.disclosure) docs.push(ext(c.disclosure, "Financial disclosure"));
 
     var statement = '<div class="statement">' + c.statement.map(function (p) { return "<p>" + esc(p).replace(/\n/g, "<br>") + "</p>"; }).join("") +
-      '<p class="small muted">Written by the candidate, as published by the City of Burnaby.' + srcChips([o.src]) + "</p></div>";
+      '<p class="small muted">Written by the candidate, as published by the ' + esc(E.authority) + '.' + srcChips([o.src]) + "</p></div>";
 
     dlg.innerHTML = '<div class="pf party-edge' + pc(c.org) + '">' +
       '<div class="pf-head"><div><div class="badges">' + badges + '</div><h2 class="pf-name" id="pf-name">' + esc(c.name) + '</h2><div class="pf-aff"><span class="party-dot' + pc(c.org) + '"></span>' + esc(orgName(c)) + '</div><div class="cc-tags pf-tags">' +
@@ -744,6 +747,74 @@
       }).join("");
   }
 
+  // ----------------------------------------------------------------- RESULTS
+  // Ranked candidates for one race. Elected = explicit flag, else top `seats`.
+  function raceRows(officeId) {
+    var rows = ((RES && RES.races && RES.races[officeId]) || []).slice().sort(function (a, b) { return b.votes - a.votes; });
+    var seats = OFFICES[officeId].seats;
+    rows.forEach(function (r, i) { if (r.elected === undefined) r.elected = i < seats; });
+    return rows;
+  }
+
+  function resultsSummary() {
+    return '<div class="card"><h2 class="h-ico">' + icon("check") + "Who was elected</h2>" +
+      '<div class="elected-grid">' + Object.keys(OFFICES).map(function (o) {
+        var won = raceRows(o).filter(function (r) { return r.elected && BY_ID[r.id]; });
+        return '<div><p class="label">' + esc(OFFICES[o].plural) + '</p><ul class="elected-list">' + won.map(function (r) {
+          var c = BY_ID[r.id];
+          return '<li class="' + pc(c.org).trim() + '"><span class="party-dot"></span><a href="#candidates/' + o + "/" + c.id + '">' + esc(plainName(c)) + '</a> <span class="muted small">' + esc(orgShort(c)) + "</span></li>";
+        }).join("") + "</ul></div>";
+      }).join("") + '</div><p class="small"><a href="#results">Full results with vote counts' + icon("arrow") + "</a></p></div>";
+  }
+
+  function renderResults() {
+    if (!RES) {
+      $("#view-results").innerHTML = intro("Results", PAST
+        ? "Voting has closed. " + esc(E.resultsNote || "Results will be added once they are officially declared.")
+        : "Results will appear here after voting day, once they are officially declared.");
+      return;
+    }
+    var races = Object.keys(OFFICES).map(function (o) {
+      var rows = raceRows(o);
+      var max = Math.max.apply(null, rows.map(function (r) { return r.votes; }).concat([1]));
+      return '<div class="card"><div class="race-bar"><h2 class="h-ico">' + icon(OFFICES[o].icon) + esc(OFFICES[o].plural) + '</h2><span class="count">' + OFFICES[o].seats + (OFFICES[o].seats === 1 ? " seat" : " seats") + "</span></div>" +
+        '<ol class="results">' + rows.map(function (r) {
+          var c = BY_ID[r.id];
+          var name = c ? '<a href="#candidates/' + o + "/" + c.id + '">' + esc(plainName(c)) + "</a>" : esc(r.name || r.id);
+          return '<li class="' + (c ? pc(c.org).trim() : "pc-independent") + (r.elected ? " won" : "") + '">' +
+            '<div class="res-name"><span class="party-dot"></span>' + name + (c ? ' <span class="muted small">' + esc(orgShort(c)) + "</span>" : "") + (r.elected ? ' <span class="badge solid">' + icon("check") + "Elected</span>" : "") + "</div>" +
+            '<div class="res-bar"><div class="bar-track"><div class="bar-fill" style="width:' + (r.votes / max * 100) + '%"></div></div><span class="pct">' + r.votes.toLocaleString("en-CA") + "</span></div></li>";
+        }).join("") + "</ol></div>";
+    }).join("");
+    $("#view-results").innerHTML =
+      intro("Results", esc(RES.status === "official" ? "Official results" : "Unofficial results") + (RES.declared ? ", declared " + esc(RES.declared) : "") + ". Vote counts as published by the " + esc(E.authority) + "." + srcChips(RES.src)) +
+      (RES.turnout ? '<div class="card"><p class="label">Turnout</p><p><strong>' + esc(RES.turnout.pct) + "</strong>" + (RES.turnout.ballots ? " · " + Number(RES.turnout.ballots).toLocaleString("en-CA") + " ballots" : "") + "</p></div>" : "") +
+      races;
+  }
+
+  // --------------------------------------------------------------- ELECTIONS
+  function renderElections() {
+    function card(m) {
+      var d = new Date(m.date + "T12:00:00").toLocaleDateString("en-CA", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      var href = m.id === REG.default ? "./#start" : "?election=" + encodeURIComponent(m.id) + "#start";
+      var status = m.id === META.id ? META.status : (Date.now() > new Date(m.date + "T" + (m.close || "23:59") + ":00").getTime() ? "past" : "upcoming");
+      return '<a class="card election-card' + (m.id === META.id ? " current" : "") + '" href="' + href + '">' +
+        '<div class="party-top"><span class="badge' + (status === "past" ? "" : " solid") + '">' + (status === "past" ? (m.results ? "Results available" : "Past") : "Upcoming") + "</span>" +
+          (m.id === META.id ? '<span class="small muted">You are viewing this</span>' : "") + "</div>" +
+        "<h2>" + esc(m.name) + "</h2>" +
+        '<p class="small muted">' + esc(m.type) + " · " + esc(m.place) + " · " + esc(d) + "</p>" +
+        '<span class="more-link">' + (status === "past" ? "View guide and results" : "Open the guide") + icon("arrow") + "</span></a>";
+    }
+    var all = REG.list.map(function (m) { return m; });
+    var upcoming = all.filter(function (m) { return Date.now() <= new Date(m.date + "T" + (m.close || "23:59") + ":00").getTime(); });
+    var past = all.filter(function (m) { return upcoming.indexOf(m) < 0; }).reverse();
+    $("#view-elections").innerHTML =
+      intro("Elections", "Every election this guide covers. Upcoming elections have the full voter guide; past ones keep the guide as it stood during the campaign, plus official results once declared.") +
+      (upcoming.length ? '<h2 class="h-ico">' + icon("calendar") + 'Upcoming</h2><div class="grid-2">' + upcoming.map(card).join("") + "</div>" : "") +
+      (past.length ? '<h2 class="h-ico">' + icon("chart") + 'Past elections</h2><div class="grid-2">' + past.map(card).join("") + "</div>" : "") +
+      '<p class="small muted">Want to add an election? See <a href="https://github.com/TommyDoesEverything/voting-guide/blob/main/docs/adding-an-election.md" target="_blank" rel="noopener">adding an election</a>.</p>';
+  }
+
   // ------------------------------------------------------------------- PICKS
   function sortByBallot(ids) {
     return ids.slice().sort(function (a, b) { return CANDS.indexOf(BY_ID[a]) - CANDS.indexOf(BY_ID[b]); });
@@ -760,7 +831,7 @@
   }
 
   function renderPicks() {
-    var total = picks.mayor.length + picks.council.length + picks.trustee.length;
+    var total = Object.keys(picks).reduce(function (t, k) { return t + picks[k].length; }, 0);
     var races = Object.keys(OFFICES).map(function (o) {
       var seats = OFFICES[o].seats, ids = sortByBallot(picks[o]);
       return '<div class="ballot-race"><div class="race-bar"><strong>' + esc(OFFICES[o].plural) + "</strong>" +
@@ -775,7 +846,7 @@
 
     $("#view-picks").innerHTML =
       intro("My ballot", "A personal checklist for voting day. Tap <strong>Pick</strong> on any candidate to add them. Your list is saved only in this browser on this device. Nothing is sent anywhere.") +
-      '<div class="ballot"><h2 class="h-ico">' + icon("ballot") + 'Your ballot</h2><div class="total">' + total + ' <span class="muted" style="font-size:1rem;font-weight:600">/ 16 votes</span></div>' +
+      '<div class="ballot"><h2 class="h-ico">' + icon("ballot") + 'Your ballot</h2><div class="total">' + total + ' <span class="muted" style="font-size:1rem;font-weight:600">/ ' + TOTAL_SEATS + ' votes</span></div>' +
         '<p class="muted small">You don\'t have to use every vote.</p>' + races + "</div>" +
       (total ? '<div class="btn-row no-print"><button class="btn" type="button" id="copy-picks">' + icon("copy") + 'Copy list</button>' +
         '<button class="btn ghost" type="button" id="print-picks">' + icon("print") + 'Print</button>' +
@@ -796,8 +867,8 @@
     var clr = $("#clear-picks");
     if (clr) clr.addEventListener("click", function () {
       if (!confirm("Clear all your picks?")) return;
-      picks = { mayor: [], council: [], trustee: [] };
-      store.set("bv26-picks", picks);
+      picks = emptyPicks();
+      store.set(PICKS_KEY, picks);
       updatePickCount();
       renderPicks();
     });
@@ -822,7 +893,7 @@
     }).join("");
 
     $("#view-about").innerHTML =
-      intro("About this guide", "An independent, non-partisan guide. It isn't affiliated with any candidate, party, or the City of Burnaby, and it doesn't endorse anyone.") +
+      intro("About this guide", "An independent, non-partisan guide. It isn't affiliated with any candidate, party, or the ' + esc(E.authority) + ', and it doesn\'t endorse anyone.") +
       '<div class="grid-2">' +
       '<div class="card"><h2>How it stays neutral</h2><ul>' +
         "<li><strong>Candidates speak for themselves.</strong> Full statements are reproduced from the City's official profiles (punctuation lightly normalized). Card focus points come only from those statements.</li>" +
@@ -834,8 +905,7 @@
       "</ul></div>" +
       '<div class="card"><h2>Things to keep in mind</h2><ul>' +
         "<li><strong>Criticism isn't evenly spread.</strong> Incumbents have a record, so they attract more of it. A candidate with nothing listed hasn't been endorsed; we just haven't found published arguments about them.</li>" +
-        "<li><strong>Polls are snapshots.</strong> The Leger poll had 107 Burnaby respondents and about half were undecided. We show it with that context.</li>" +
-        "<li><strong>A correction from an earlier draft:</strong> an AI-generated prototype presented Metro Vancouver-wide figures from this Leger poll as if they were Burnaby's. This guide shows the Burnaby-specific numbers and labels them.</li>" +
+        htmlItems(E.aboutNotes, "li") +
       "</ul></div>" +
       "</div>" +
       '<div class="card"><h2>Corrections</h2>' +
@@ -889,14 +959,30 @@
       }
     }
     if (view === "picks") renderPicks();
+    if (view === "results" && !rendered.results) { renderResults(); rendered.results = true; }
+    if (view === "elections" && !rendered.elections) { renderElections(); rendered.elections = true; }
     if (view === "about" && !rendered.about) { renderAbout(); rendered.about = true; }
 
     if (!keepScroll) window.scrollTo(0, 0);
     var tabName = activeTab ? activeTab.textContent.replace(/[^\w\s]/g, "").replace(/\d+$/, "").trim() : "";
-    document.title = (view === "start" ? "" : tabName + " · ") + "Burnaby Votes 2026 - Voter Guide";
+    document.title = (view === "start" ? "" : tabName + " · ") + E.brand + " - Voter Guide";
   }
 
+  // Election-specific page chrome.
+  function initChrome() {
+    $("#brand-name").textContent = E.brand;
+    $("#brand-sub").textContent = "Independent voter guide · " + E.kind + " · " + E.dayShort;
+    $("#tab-results").hidden = !(PAST || RES);
+    $("#tab-picks").hidden = PAST;
+    $("#foot-authority").textContent = E.authority;
+    $("#foot-profiles").href = E.profilesUrl;
+    if (!META.isDefault) {
+      $("#election-banner").hidden = false;
+      $("#election-banner").innerHTML = icon("calendar") + "You're viewing <strong>" + esc(META.name) + "</strong>. " + '<a href="#elections">All elections</a>';
+    }
+  }
   injectPartyColors();
+  initChrome();
   initTheme();
   initDialog();
   updatePickCount();

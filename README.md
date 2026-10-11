@@ -1,72 +1,68 @@
-# Burnaby Votes 2026 - voter guide
+# Voter Guide
 
-A plain-language, non-partisan guide to Burnaby's **October 17, 2026** general local election. It covers all 64 candidates for mayor (6), city council (42) and school trustee (16). Every candidate's statement is shown in their own words, and every added fact links to a source.
+An independent, non-partisan, sourced voter guide. Every candidate appears in their own words, party platforms are shown side by side, every added fact links to a source, and results are posted after voting day.
+
+**Live site:** https://tommydoeseverything.github.io/voting-guide/
+
+The first election covered is Burnaby's **October 17, 2026** general local election: all 64 candidates for mayor, council and school trustee. The site is built so more elections can be added as data, without changing code.
 
 It's a static site with no build step, frameworks or tracking. It's designed for phones first.
 
 ## Run it
 
-Open `index.html` in a browser. That's it.
+Open `index.html` in a browser, or serve the folder with `python -m http.server` and visit <http://localhost:8000>.
 
-To serve it locally, run `python -m http.server` and visit <http://localhost:8000>.
-
-To publish it, host the folder on any static host. For GitHub Pages: Settings → Pages → deploy from the `main` branch, root folder.
+To view a specific election, add `?election=<id>` to the URL, for example `index.html?election=burnaby-2026`.
 
 ## What's in it
 
 | Section | What it shows |
 | --- | --- |
-| **Overview** | Voting day facts (when, where, ID, accessibility), how the ballot works, anything voters should know first (for example, a candidate who has withdrawn but is still on the ballot), and Burnaby results from the October 2026 Leger poll with caveats. |
-| **Candidates** | Every candidate by race, in the City's alphabetical order, as cards with tags. "View full profile" opens a popup with their focus, sourced context, labelled arguments for and against, their full official statement, and links to nomination papers and financial disclosures. |
-| **Parties** | Each civic party's promises in its own words, its political lean (only where a source states one), arguments for and against, and its roster. |
-| **Issues** | For each debate: sourced background facts, where every party stands (the same data as the Parties comparison table, stored once in `GUIDE.orgs[...].stances`), and examples of candidates who have spoken to it. |
-| **My ballot** | A personal checklist (limited to 1 / 8 / 7). It's stored only in the browser and can be copied or printed. |
-| **About** | Neutrality rules, what was left out and why, how to request corrections, and every source. |
+| **Overview** | Voting-day facts, how the ballot works, alerts, key issues and polling. After voting day: who was elected. |
+| **Candidates** | Every candidate as a card. The full profile shows their statement, sourced notes, and labelled arguments for and against. |
+| **Parties** | Each party's platform in its own words, a side-by-side comparison, and its candidates. |
+| **Issues** | Background facts, where each party stands, and what candidates have said. |
+| **Results** | Official vote counts once declared (past elections). |
+| **My ballot** | A personal checklist, stored only in your browser (upcoming elections only). |
+| **Elections** | Every election the guide covers, upcoming and past. |
+| **About** | Neutrality rules, corrections and all sources. |
 
 ## Project layout
 
 ```
-index.html              page shell
-assets/css/style.css    styles (mobile-first, light/dark)
-assets/js/app.js        renders everything from the data files
-data/profiles.js        GENERATED: official candidate statements (do not hand-edit)
-data/profiles.json      same data, for diffs and reuse
-data/guide.js           curated facts: key points, notes, parties, issues, sources
-data/opinions.js        OPINION content: arguments for/against, each with who said it
-data/polls.js           published polling, copied exactly from the source
-scripts/fetch_profiles.py  regenerates data/profiles.*
-archive/                the original Gemini-generated prototype, kept for reference
+index.html                    page shell and icon set
+assets/css/style.css          styles (mobile-first, light/dark)
+assets/js/loader.js           picks the election and loads its data
+assets/js/app.js              renders everything from the election's data
+elections/index.js            registry of all elections (dates, status, default)
+elections/<id>/               one folder per election:
+  profiles.js / .json           official candidate statements (generated)
+  guide.js                      election details, sources, parties, notes, issues
+  opinions.js                   attributed arguments for and against
+  polls.js                      published polling
+  results.js                    official results (after voting day)
+elections/_template/          templates for new data files
+scripts/check_data.js         validates every election's data
+scripts/<id>/                 election-specific data scripts
+docs/                         how-to guides
+archive/                      the original AI-generated prototype (reference only)
 ```
 
-## Updating the data
+## Updating and adding elections
 
-Candidate statements come straight from the City of Burnaby's official profile pages. To refresh them, run:
-
-```sh
-python scripts/fetch_profiles.py
-```
-
-If Python can't verify the City's TLS certificate on your machine, download the three profile pages with curl into a folder as `mayor.html`, `council.html` and `trustee.html`, then run `python scripts/fetch_profiles.py --html-dir <folder>`. The script docstring has the URLs.
-
-After refreshing, check the diff. If a candidate changed their statement, check that their `points` in `data/guide.js` still match it.
+- **Refresh Burnaby candidate statements:** run `python scripts/burnaby-2026/fetch_profiles.py`. If Python can't verify the City's certificate, see the script's docstring for the curl workaround. Afterwards, check the diff to make sure each candidate's key points still match their statement.
+- **Add an election or post results:** see [docs/adding-an-election.md](docs/adding-an-election.md).
+- **Before committing:** run `node scripts/check_data.js`.
 
 ## Neutrality and sourcing
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before editing content. In short:
 
 - Candidates speak for themselves. Key points come only from their own statements.
-- Every fact we add needs a source in `GUIDE.sources`.
-- Arguments for and against are allowed only as attributed opinion: each names who said it and links where. The guide never writes its own.
-- There are no ratings, predictions or endorsements.
-- Every candidate and party gets the same treatment and layout.
+- Every fact we add has a source.
+- Arguments for and against are labelled opinion, each naming who said it. The guide never writes its own.
+- There are no ratings, predictions or endorsements. Every candidate and party gets the same treatment.
 
-## How this differs from the original prototype
+## Roadmap
 
-The first version (`archive/gemini-prototype.html`) was generated by an AI chat and was not reliable enough to publish. Problems found during fact-checking:
-
-- **Mislabelled polling.** Its "Leger poll" chart used Metro Vancouver-wide figures from Leger's October 2026 poll as if they were Burnaby's. (An earlier version of this README wrongly said those numbers were invented; the poll is real; see [Leger's report](https://leger360.com/metro-vancouver-municipal-election-2026-poll/).) The guide now shows the Burnaby-specific results with their small sample size.
-- **Wrong or invented candidate details.** A duplicate "Allen Chen (Ind)" appeared, platforms were swapped between people (for example, Hsu's and ABCROBINHOOD's), and Martin Kendell was described as a provincial candidate, which Elections BC's list doesn't support.
-- **Missing key facts.** David Xie has withdrawn from the council race but is still on the ballot, and two municipal candidates are also on the October 24 provincial ballot.
-- **Loaded language.** Phrases like "boondoggle", "fiscal illusion", "right-wing populist" and "mathematically unviable" appeared, along with unsourced "strategic insights" predicting outcomes.
-
-All candidate data now comes from the City's official profiles. Party positions come from party platforms, and context comes from linked official and news sources.
+See [ROADMAP.md](ROADMAP.md) for what's next, including ideas for saving your ballot across devices.
