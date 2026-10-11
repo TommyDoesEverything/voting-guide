@@ -4,7 +4,7 @@ What's done, what's next, and ideas under consideration. Open an issue to sugges
 
 ## Now (before October 17, 2026)
 
-- [ ] Re-run `scripts/burnaby-2026/fetch_profiles.py` before voting day to catch any changes to candidate statements.
+- [x] Re-run `scripts/burnaby-2026/fetch_profiles.py` (October 10: no candidate changes). Run once more before voting day.
 - [ ] Check for late withdrawals, new polls or major news, and update notes, opinions and polls with sources.
 - [ ] Ask a few people of different political views to review the guide for fairness before sharing it widely.
 
@@ -12,9 +12,7 @@ What's done, what's next, and ideas under consideration. Open an issue to sugges
 
 - [ ] Add Burnaby 2026 results (`elections/burnaby-2026/results.js`) once the City declares them (by October 21), then set `results: true`.
 - [ ] Decide whether to keep this site, or move to its own domain, once more elections are added.
-- [ ] Add a share image (Open Graph) so links preview nicely in messages and social posts.
-- [ ] Accessibility pass: screen reader walkthrough, colour contrast check on party colours, keyboard-only use.
-- [ ] Automated checks on GitHub: run `node scripts/check_data.js` on every pull request.
+- [ ] Accessibility pass: screen reader walkthrough and keyboard-only use. (Party colour contrast checked October 10: all pass WCAG AA in both themes.)
 
 ## Later
 
@@ -60,3 +58,6 @@ Three options, from least to most risky:
 - [x] Party colours from each party's own branding; neutral line icons
 - [x] Published on GitHub Pages
 - [x] Multi-election support, a Results view for past elections, and an Elections page
+- [x] Share preview image and link tags (Open Graph)
+- [x] Automated data checks on every push and pull request (GitHub Actions)
+- [x] Party colour contrast check (WCAG AA)

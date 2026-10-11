@@ -1,0 +1,26 @@
+name: Check data
+
+# Validates every election's data (sources, candidate ids, opinions, results,
+# no em dashes) on each push and pull request.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax check
+        run: |
+          node --check assets/js/app.js
+          node --check assets/js/loader.js
+      - name: Validate election data
+        run: node scripts/check_data.js

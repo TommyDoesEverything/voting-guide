@@ -52,9 +52,9 @@ OUT = ROOT / "elections" / "burnaby-2026"
 def clean(fragment):
     text = re.sub(r"<br\s*/?>", "\n", fragment)
     text = re.sub(r"<[^>]+>", "", text)
-    text = html.unescape(text).replace("\xa0", " ").replace(" ", " ")
+    text = html.unescape(text).replace("\xa0", " ").replace("\u202f", " ")
     # House style: plain hyphens instead of em/en dashes.
-    text = re.sub(r"\s* - \s*", " - ", text).replace("-", "-")
+    text = re.sub(r"\s*\u2014\s*", " - ", text).replace("\u2013", "-")
     return re.sub(r"[ \t]+", " ", text).strip()
 
 
