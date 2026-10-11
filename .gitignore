@@ -14,3 +14,6 @@ __pycache__/
 # Local scratch downloads
 /tmp/
 *.log
+
+# Local research notes and source files (not published)
+/research/
