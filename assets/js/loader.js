@@ -5,6 +5,17 @@
   "use strict";
 
   var reg = window.ELECTIONS;
+  // The default is worked out from the dates: the earliest election whose voting
+  // day hasn't ended yet (it switches at midnight after voting day), or the
+  // most recent one once they're all over.
+  var byDate = reg.list.slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+  var next = byDate.filter(function (e) {
+    var end = new Date(e.date + "T00:00:00");
+    end.setDate(end.getDate() + 1);
+    return Date.now() < end.getTime();
+  })[0];
+  reg.default = (next || byDate[byDate.length - 1]).id;
+
   var params = new URLSearchParams(location.search);
   var wanted = params.get("election");
   var meta = reg.list.filter(function (e) { return e.id === wanted; })[0] ||

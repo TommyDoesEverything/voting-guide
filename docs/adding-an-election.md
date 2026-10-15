@@ -19,7 +19,7 @@ Add an entry to `elections/index.js`:
 }
 ```
 
-Set `default` to the election people should land on when they open the site with no `?election=`. That's usually the next upcoming one.
+There's no default to set. The site opens on the earliest election whose voting day hasn't ended yet, switching at midnight after voting day, and on the most recent one once all are over.
 
 ## 2. Create the data folder
 
@@ -47,7 +47,6 @@ The check validates every registered election: candidate IDs, source IDs, office
 
 1. Add `results.js` with the official counts, copied exactly from the official declaration.
 2. Set `results: true` in `elections/index.js`.
-3. Move `default` to the next upcoming election if there is one.
 
 Once polls close, the guide switches to past tense automatically. It hides voting instructions and My ballot, and shows a Results tab and a "Who was elected" summary. The campaign content stays as it was, as a record.
 

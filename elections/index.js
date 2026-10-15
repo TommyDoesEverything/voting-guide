@@ -7,8 +7,11 @@
 //   close    when polls close on voting day (HH:MM); the election is shown as
 //            "past" after this, with results if results.js exists
 //   results  true once elections/<id>/results.js has official results
+//
+// The site opens on the earliest election whose voting day hasn't ended yet
+// (switching at midnight after voting day), or the most recent one once all
+// are over. assets/js/loader.js works this out; there's nothing to update.
 window.ELECTIONS = {
-  default: "burnaby-2026",
   list: [
     {
       id: "burnaby-2026",

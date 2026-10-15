@@ -169,16 +169,64 @@
     picks[o] = (picks[o] || []).filter(function (id) { return BY_ID[id]; });
   });
 
+  // Some elections list several races but each voter votes in only one (their
+  // riding). Those ask which one, remember it in this browser, and show only
+  // that race on the Overview and My ballot.
+  var CHOOSE = E.chooseOffice || null;
+  var MINE_KEY = "vg-office:" + META.id;
+  var myOffice = CHOOSE ? store.get(MINE_KEY, null) : null;
+  if (!OFFICES[myOffice]) myOffice = null;
+  if (myOffice) {
+    state.office = myOffice;
+    Object.keys(picks).forEach(function (k) { if (k !== myOffice) picks[k] = []; });
+  }
+  function ballotOffices() { return CHOOSE ? (myOffice ? [myOffice] : []) : Object.keys(OFFICES); }
+  function officePicker(id) {
+    return '<select class="office-pick" id="' + id + '"><option value="">Choose your ' + esc(CHOOSE.noun) + "</option>" +
+      Object.keys(OFFICES).map(function (o) {
+        return '<option value="' + o + '"' + (o === myOffice ? " selected" : "") + ">" + esc(OFFICES[o].label) + "</option>";
+      }).join("") + "</select>";
+  }
+  function officeCard(id) {
+    return '<div class="card office-card"><label class="office-q" for="' + id + '">' + icon("pin") + esc(CHOOSE.question) + "</label>" + officePicker(id) +
+      '<p class="small"><a href="' + esc(CHOOSE.lookupUrl) + '" target="_blank" rel="noopener">' + esc(CHOOSE.lookupText) + "</a></p></div>";
+  }
+  function setMyOffice(o) {
+    o = OFFICES[o] ? o : null;
+    if (o === myOffice) return;
+    var dropped = 0;
+    if (o) Object.keys(picks).forEach(function (k) {
+      if (k !== o && picks[k].length) { dropped += picks[k].length; picks[k] = []; }
+    });
+    myOffice = o;
+    store.set(MINE_KEY, myOffice);
+    store.set(PICKS_KEY, picks);
+    updatePickCount();
+    if (o) { state.office = o; state.org = "all"; }
+    rendered.candidates = false;
+    toast(o ? "Your " + CHOOSE.noun + ": " + OFFICES[o].label + "." + (dropped ? " Picks in other " + CHOOSE.noun + "s were cleared." : "")
+      : "Showing every " + CHOOSE.noun + ".");
+    if (route.view === "start") renderStart();
+    if (route.view === "picks") renderPicks();
+  }
+  document.addEventListener("change", function (ev) {
+    if (ev.target.classList && ev.target.classList.contains("office-pick")) setMyOffice(ev.target.value);
+  });
+
   function isPicked(id) { var c = BY_ID[id]; return picks[c.office].indexOf(id) > -1; }
   function togglePick(id) {
     var c = BY_ID[id], list = picks[c.office], seats = OFFICES[c.office].seats, i = list.indexOf(id);
     if (i > -1) {
       list.splice(i, 1);
       toast("Removed " + plainName(c));
+    } else if (CHOOSE && myOffice && c.office !== myOffice) {
+      toast("Your " + CHOOSE.noun + " is set to " + OFFICES[myOffice].label + ". Change it on My ballot to pick here.");
+      return false;
     } else if (list.length >= seats) {
       toast("You've already picked " + seats + " for " + OFFICES[c.office].plural + ". Remove one first.");
       return false;
     } else {
+      if (CHOOSE && !myOffice) { myOffice = c.office; store.set(MINE_KEY, myOffice); }
       list.push(id);
       toast("Added " + plainName(c) + " (" + list.length + " of " + seats + ")");
     }
@@ -324,12 +372,17 @@
 
   function renderStart() {
     var e = E;
-    var tiles = Object.keys(OFFICES).map(function (o) {
+    function tile(o) {
       var n = CANDS.filter(function (c) { return c.office === o; }).length;
-      return '<a class="tile" href="#candidates/' + o + '"><span class="tile-ico">' + icon(OFFICES[o].icon) + '</span><span class="tile-text"><span class="label">' + esc(OFFICES[o].plural) + "</span>" +
+      return '<a class="tile" href="#candidates/' + o + '"><span class="tile-ico">' + icon(OFFICES[o].icon) + '</span><span class="tile-text"><span class="label">' + (o === myOffice ? "Your " + esc(CHOOSE.noun) + ": " : "") + esc(OFFICES[o].plural) + "</span>" +
         "<strong>" + (PAST ? (OFFICES[o].seats === 1 ? "1 seat" : OFFICES[o].seats + " seats") : "Vote for " + (OFFICES[o].seats === 1 ? "1" : "up to " + OFFICES[o].seats)) + "</strong>" +
         '<span class="small muted">' + n + ' candidates</span></span><span class="arrow">' + icon("arrow") + '</span></a>';
-    }).join("");
+    }
+    var others = Object.keys(OFFICES).filter(function (o) { return o !== myOffice; });
+    var tiles = (CHOOSE && !PAST ? officeCard("office-start") : "") +
+      (myOffice
+        ? '<div class="tiles">' + tile(myOffice) + "</div>" + more("Other " + CHOOSE.noun + "s in this guide", '<div class="tiles">' + others.map(tile).join("") + "</div>", false, "pin")
+        : '<div class="tiles">' + others.map(tile).join("") + "</div>");
 
     var flagged = PAST ? [] : CANDS.filter(function (c) { return c.flags.some(function (f) { return CROSS_FLAGS.indexOf(f) > -1; }); });
     var notices = (PAST ? "" : htmlItems(e.alerts, "li")) + flagged.map(function (c) {
@@ -376,7 +429,7 @@
       (notices ? '<div class="notice"><h2 class="h-ico">' + icon("alert") + "Good to know</h2><ul>" + notices + "</ul></div>" : "") +
       voting +
       "<div><h2 class=\"h-ico\">" + icon("ballot") + (PAST ? "What was on the ballot" : "What's on your ballot") + "</h2></div>" +
-      '<div class="tiles">' + tiles + "</div>" +
+      tiles +
       keyIssues() +
       pollSection();
   }
@@ -397,7 +450,7 @@
   function renderCandidatesShell() {
     var seg = Object.keys(OFFICES).map(function (o) {
       var n = CANDS.filter(function (c) { return c.office === o; }).length;
-      return '<button type="button" data-office="' + o + '">' + esc(OFFICES[o].plural) + "<span>" + n + " running</span></button>";
+      return '<button type="button" data-office="' + o + '">' + esc(OFFICES[o].plural) + "<span>" + n + " running" + (o === myOffice ? " · yours" : "") + "</span></button>";
     }).join("");
     $("#view-candidates").innerHTML =
       intro("Candidates", "All " + CANDS.length + " candidates, listed alphabetically by surname " + esc(COPY.listedAs) + ". Each card's focus comes only from the candidate's own statement. Tap <strong>View full profile</strong> for their full statement, sourced context, and arguments for and against.") +
@@ -850,7 +903,7 @@
   }
   function picksAsText() {
     var lines = ["My picks - " + G.election.name, G.election.day + ", " + G.election.hours, ""];
-    Object.keys(OFFICES).forEach(function (o) {
+    ballotOffices().forEach(function (o) {
       lines.push(OFFICES[o].plural + " (" + picks[o].length + " of " + OFFICES[o].seats + "):");
       if (!picks[o].length) lines.push("  (none)");
       sortByBallot(picks[o]).forEach(function (id) { lines.push("  - " + plainName(BY_ID[id])); });
@@ -860,8 +913,10 @@
   }
 
   function renderPicks() {
-    var total = Object.keys(picks).reduce(function (t, k) { return t + picks[k].length; }, 0);
-    var races = Object.keys(OFFICES).map(function (o) {
+    var offs = ballotOffices();
+    var total = offs.reduce(function (t, k) { return t + picks[k].length; }, 0);
+    var votes = offs.reduce(function (t, k) { return t + OFFICES[k].seats; }, 0);
+    var races = offs.map(function (o) {
       var seats = OFFICES[o].seats, ids = sortByBallot(picks[o]);
       return '<div class="ballot-race"><div class="race-bar"><strong>' + esc(OFFICES[o].plural) + "</strong>" +
         '<span class="count' + (ids.length >= seats ? " full" : "") + '">' + ids.length + " / " + seats + "</span></div>" +
@@ -871,12 +926,13 @@
             '<button type="button" class="no-print" data-remove="' + esc(id) + '" aria-label="Remove ' + esc(plainName(c)) + '">Remove</button></li>';
         }).join("") + "</ul>" : '<p class="none">None picked yet. <a href="#candidates/' + o + '">Browse ' + esc(OFFICES[o].plural) + " →</a></p>") +
         "</div>";
-    }).join("");
+    }).join("") || '<p class="none">Choose your ' + esc(CHOOSE.noun) + " above to start your ballot.</p>";
 
     $("#view-picks").innerHTML =
       intro("My ballot", "A personal checklist for voting day. Tap <strong>Pick</strong> on any candidate to add them. Your list is saved only in this browser on this device. Nothing is sent anywhere.") +
-      '<div class="ballot"><h2 class="h-ico">' + icon("ballot") + 'Your ballot</h2><div class="total">' + total + ' <span class="muted" style="font-size:1rem;font-weight:600">/ ' + TOTAL_SEATS + ' votes</span></div>' +
-        '<p class="muted small">You don\'t have to use every vote.</p>' + races + "</div>" +
+      (CHOOSE ? officeCard("office-picks") : "") +
+      '<div class="ballot"><h2 class="h-ico">' + icon("ballot") + 'Your ballot</h2><div class="total">' + total + ' <span class="muted" style="font-size:1rem;font-weight:600">/ ' + votes + (votes === 1 ? " vote" : " votes") + "</span></div>" +
+        (votes > 1 ? '<p class="muted small">You don\'t have to use every vote.</p>' : "") + races + "</div>" +
       (total ? '<div class="btn-row no-print"><button class="btn" type="button" id="copy-picks">' + icon("copy") + 'Copy list</button>' +
         '<button class="btn ghost" type="button" id="print-picks">' + icon("print") + 'Print</button>' +
         '<button class="btn ghost" type="button" id="clear-picks">' + icon("trash") + 'Clear all</button></div>' : "");

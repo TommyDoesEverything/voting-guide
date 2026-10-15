@@ -12,7 +12,8 @@ const summary = [];
 global.window = {};
 new Function(fs.readFileSync(path.join(root, "elections/index.js"), "utf8"))();
 const registry = window.ELECTIONS;
-if (!registry.list.some((e) => e.id === registry.default)) allProblems.push(`registry: default "${registry.default}" is not in the list`);
+registry.list.forEach((e) => /^\d{4}-\d{2}-\d{2}$/.test(e.date) && !isNaN(new Date(e.date)) || allProblems.push(`registry: "${e.id}" has a bad date "${e.date}"`));
+if (new Set(registry.list.map((e) => e.id)).size !== registry.list.length) allProblems.push("registry: duplicate election ids");
 
 for (const meta of registry.list) {
   const dir = `elections/${meta.id}`;

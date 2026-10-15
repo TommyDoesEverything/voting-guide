@@ -46,6 +46,15 @@ window.GUIDE = {
       incumbentLabel: "MLA",
     },
 
+    // Each voter votes in only one of the races below (their riding), so the
+    // guide asks which one and shows just that race on the Overview and My ballot.
+    chooseOffice: {
+      noun: "riding",
+      question: "Which riding do you live in?",
+      lookupUrl: "https://wheretovote.elections.bc.ca/",
+      lookupText: "Not sure? Look up your address on Elections BC's Where to Vote",
+    },
+
     // Races on the ballot: one MLA per riding. `src` is the official candidate list.
     offices: [
       { id: "burnaby-centre", icon: "pin", label: "Burnaby Centre", plural: "Burnaby Centre", seats: 1, src: "ebc-candidates" },
@@ -128,7 +137,7 @@ window.GUIDE = {
     "leg-chouhan": { title: "MLA: Raj Chouhan", publisher: "Legislative Assembly of BC", url: "https://www.leg.bc.ca/members/43rd-Parliament/Chouhan-Raj", type: "official" },
 
     "party-ndp-plan": { title: "Build BC Strong (platform)", publisher: "BC NDP", url: "https://www.bcndp.ca/plan", type: "party" },
-    "party-ndp-team": { title: "Our Team (candidate bios)", publisher: "BC NDP", url: "https://www.bcndp.ca/team", type: "party" },
+    "party-ndp-team": { title: "Our Team (candidate bios)", publisher: "BC NDP", url: "https://www.bcndp.ca/team", type: "candidate" },
     "party-conservative-plan": { title: "Our Plan", publisher: "Conservative Party of BC", url: "https://conservativebc.ca/plan/", type: "party" },
     "party-conservative-tax": { title: "$1000 Tax Cut", publisher: "Conservative Party of BC", date: "2026-10-08", url: "https://conservativebc.ca/plan/conservatives-will-cut-your-taxes-by-1000/", type: "party" },
     "party-conservative-safety": { title: "Safe Streets for BC", publisher: "Conservative Party of BC", date: "2026-10-06", url: "https://conservativebc.ca/plan/safe-streets-for-bc/", type: "party" },
@@ -148,6 +157,18 @@ window.GUIDE = {
     "wiki-conservative": { title: "Conservative Party of British Columbia", publisher: "Wikipedia", url: "https://en.wikipedia.org/wiki/Conservative_Party_of_British_Columbia", type: "reference" },
     "wiki-onebc": { title: "OneBC (political party)", publisher: "Wikipedia", url: "https://en.wikipedia.org/wiki/OneBC_(political_party)", type: "reference" },
     "wiki-centrebc": { title: "CentreBC", publisher: "Wikipedia", url: "https://en.wikipedia.org/wiki/CentreBC", type: "reference" },
+
+    "bc-budget-tax": { title: "B.C. Provincial budget tax changes", publisher: "Province of British Columbia", url: "https://www2.gov.bc.ca/gov/content/taxes/tax-updates/budget-changes", type: "official" },
+    "bc-rent-2026": { title: "Annual rent increase falls for second straight year capped at inflation", publisher: "Province of British Columbia", date: "2025-08-26", url: "https://news.gov.bc.ca/releases/2025HMA0067-000786", type: "official" },
+    "bc-ssmuh": { title: "Small-scale, multi-unit housing (Bill 44)", publisher: "Province of British Columbia", url: "https://www2.gov.bc.ca/gov/content/housing-tenancy/local-governments-and-housing/housing-initiatives/smale-scale-multi-unit-housing", type: "official" },
+    "bc-primary-care": { title: "One million people connected to primary care in B.C. since 2018", publisher: "Province of British Columbia", date: "2026-09-16", url: "https://news.gov.bc.ca/releases/2026HLTH0034-001074", type: "official" },
+    "bc-coroners-2025": { title: "BC Coroners Service shares 2025 data into unregulated drug-toxicity deaths", publisher: "Province of British Columbia", date: "2026-02-19", url: "https://news.gov.bc.ca/releases/2026PSSG0011-000138", type: "official" },
+    "bc-coroners-may": { title: "May 2026 saw 109 lives lost due to unregulated drug toxicity", publisher: "Province of British Columbia", url: "https://news.gov.bc.ca/releases/2026PSSG0056-000801", type: "official" },
+    "bc-decrim-end": { title: "Minister's statement on status of the decriminalization pilot program", publisher: "Province of British Columbia", date: "2026-01-14", url: "https://news.gov.bc.ca/releases/2026HLTH0003-000031", type: "official" },
+
+    "party-conservative-candidates": { title: "Meet Your Conservative Team (candidate bios)", publisher: "Conservative Party of BC", url: "https://conservativebc.ca/our-team/", type: "candidate" },
+    "party-green-candidates": { title: "Candidates 2026 (candidate bios)", publisher: "BC Green Party", url: "https://bcgreens.ca/candidates-2026/", type: "candidate" },
+    "party-onebc-candidates": { title: "Candidates (candidate bios)", publisher: "OneBC", url: "https://1bc.ca/candidates", type: "candidate" },
 
     "dailyhive-xie": { title: "David Xie says he is no longer pursuing a seat on Burnaby City Council", publisher: "Daily Hive", date: "2026-10-02", url: "https://dailyhive.com/vancouver/david-xie-bc-conservative-burnaby-south-metrotown", type: "news" },
   },
@@ -331,13 +352,12 @@ window.GUIDE = {
   // Neutral colour for independents (no party branding).
   independentColor: { brand: "#64748b", ink: "#475569", inkDark: "#cbd5e1" },
 
-  // Topics for the party comparison table on the Parties page. No Issues pages
-  // yet, so `issue` is left out and the topics don't link anywhere.
+  // Topics for the party comparison table on the Parties page.
   compareTopics: [
-    { id: "costs", label: "Cost of living & taxes" },
-    { id: "housing", label: "Housing" },
-    { id: "health", label: "Health care" },
-    { id: "safety", label: "Public safety & drugs" },
+    { id: "costs", label: "Cost of living & taxes", issue: "costs" },
+    { id: "housing", label: "Housing", issue: "housing" },
+    { id: "health", label: "Health care", issue: "health" },
+    { id: "safety", label: "Public safety & drugs", issue: "safety" },
   ],
 
   // ---------------------------------------------------------------------------
@@ -426,6 +446,74 @@ window.GUIDE = {
     "burnaby-new-westminster-joe-latam": ["Métis Nation BC member", "Legislative Assembly staff"],
   },
 
-  // Issues: add with sourced facts once there's material to compare.
-  issues: [],
+  // ---------------------------------------------------------------------------
+  // Issues. `facts` are sourced background. Party positions come from
+  // orgs[...].stances (shared with the Parties comparison table).
+  // `candidates` are examples of candidates who speak to the issue in their own
+  // bio; not a complete list.
+  // ---------------------------------------------------------------------------
+  issues: [
+    {
+      id: "costs",
+      icon: "receipt",
+      title: "Cost of living & taxes",
+      summary: "Parties disagree about whether to cut income taxes, cap prices on essentials, or ask the wealthiest to pay more.",
+      facts: [
+        { text: "BC's lowest income tax rate rose from 5.06% to 5.60% for 2026. Tax brackets and credits stop rising with inflation from 2027 to 2030.", src: ["bc-budget-tax"] },
+        { text: "BC's consumer carbon tax has ended.", src: ["bc-budget-tax"] },
+      ],
+      candidates: [
+        { id: "burnaby-new-westminster-raj-chouhan", text: "Wants to bring down “the costs people face” and support workers and businesses facing tariffs.", src: ["party-ndp-team"] },
+        { id: "burnaby-north-simon-chandler", text: "An accountant who says he will advocate for “common-sense tax policy”.", src: ["party-conservative-candidates"] },
+        { id: "burnaby-south-metrotown-bryan-fockler", text: "Says delivery work gives him “a firsthand understanding of the cost-of-living crisis”.", src: ["party-green-candidates"] },
+      ],
+    },
+    {
+      id: "housing",
+      icon: "home",
+      title: "Housing & rent",
+      summary: "BC caps yearly rent increases and taxes empty homes. Parties propose higher taxes on empty units, faster permits, more public building, or fewer rules for builders.",
+      facts: [
+        { text: "Rent increases for existing tenants are capped at 2.3% in 2026, tied to inflation.", src: ["bc-rent-2026"] },
+        { text: "Provincial law requires municipalities of more than 5,000 people to allow 3 to 6 homes on most single-family lots, depending on lot size and nearby transit.", src: ["bc-ssmuh"] },
+        { text: "The Speculation and Vacancy Tax rate for foreign owners rises from 3% to 4% starting with the 2027 tax year.", src: ["bc-budget-tax"] },
+      ],
+      candidates: [
+        { id: "burnaby-north-maddy-kennedy-parrott", text: "A renter raising two children who says she knows “the pressures families face around housing”.", src: ["party-green-candidates"] },
+        { id: "burnaby-east-javad-shushtarian", text: "Running to advocate for affordable housing.", src: ["party-green-candidates"] },
+        { id: "burnaby-centre-shila-taheri", text: "Lists affordability and housing among her priorities.", src: ["party-green-candidates"] },
+      ],
+    },
+    {
+      id: "health",
+      icon: "hospital",
+      title: "Health care & family doctors",
+      summary: "The province says about 80% of British Columbians have a family doctor or nurse practitioner. Parties differ on how to add more, and on whether private care should have a role.",
+      facts: [
+        { text: "The province says about 80% of people in BC have a family doctor or nurse practitioner, and one million have been connected to one since 2018.", src: ["bc-primary-care"] },
+        { text: "323,000 people were on the Health Connect Registry waiting list in September 2026, with more than 4,000 matched each week.", src: ["bc-primary-care"] },
+      ],
+      candidates: [
+        { id: "burnaby-north-jenny-yamagata", text: "Says securing Phase 2 of Burnaby Hospital “will be a top priority”.", src: ["party-onebc-candidates"] },
+        { id: "burnaby-east-javad-shushtarian", text: "A nursing graduate who cites primary care shortages and long ER waits.", src: ["party-green-candidates"] },
+        { id: "burnaby-new-westminster-raj-chouhan", text: "Wants to hire more health care workers.", src: ["party-ndp-team"] },
+        { id: "burnaby-centre-anne-kang", text: "Says she has worked to strengthen public health care.", src: ["party-ndp-team"] },
+      ],
+    },
+    {
+      id: "safety",
+      icon: "shield",
+      title: "Public safety & drugs",
+      summary: "Drug deaths fell in 2025 and BC's decriminalization pilot has ended. Parties disagree about safe supply, involuntary treatment and policing.",
+      facts: [
+        { text: "1,826 people died from unregulated drugs in BC in 2025 (preliminary), about 21% fewer than in 2024.", src: ["bc-coroners-2025"] },
+        { text: "May 2026 had 109 deaths, the lowest monthly count since February 2020.", src: ["bc-coroners-may"] },
+        { text: "The province chose not to renew the drug decriminalization pilot, which ended in January 2026.", src: ["bc-decrim-end"] },
+      ],
+      candidates: [
+        { id: "burnaby-north-simon-chandler", text: "A former Community Police Volunteer who says police “need the right tools to tackle crime”.", src: ["party-conservative-candidates"] },
+        { id: "burnaby-centre-shila-taheri", text: "Lists safe communities among her priorities.", src: ["party-green-candidates"] },
+      ],
+    },
+  ],
 };

@@ -15,10 +15,8 @@ The guide covers the five ridings that include Burnaby (`?election=bc-2026`).
 - [ ] Re-run `scripts/bc-2026/fetch_candidates.py` before Final Voting Day and check each candidate's focus points still match their bio.
 - [ ] Re-check the party platforms for new announcements. The Conservatives' plan had no housing commitment as of October 14, and the NDP plan page says it will keep adding items.
 - [ ] Review OneBC's lean label ("Right-wing to far-right", from Wikipedia) against Wikipedia's own sources, and keep or drop it.
-- [ ] Add Issues pages with sourced background facts for the four comparison topics (cost of living, housing, health care, public safety). The comparison table works without them for now.
 - [ ] Add attributed arguments for and against (`elections/bc-2026/opinions.js`).
-- [ ] "Pick your riding" so the Overview and My ballot show only the voter's race instead of all five.
-- [ ] On October 18, move `default` in `elections/index.js` from `burnaby-2026` to `bc-2026`.
+- [ ] Re-check the Issues facts (family doctor and drug-death figures) for newer official releases before voting day.
 
 ## Next (after October 17, 2026)
 
@@ -75,3 +73,5 @@ Three options, from least to most risky:
 - [x] Automated data checks on every push and pull request (GitHub Actions)
 - [x] Party colour contrast check (WCAG AA)
 - [x] 2026 BC provincial election, Burnaby ridings: voting info from Elections BC's mailed Voter's Guide, all 18 candidates with bios from their party pages, incumbents, and five party platforms side by side (October 14)
+- [x] BC Issues pages (cost of living, housing, health care, public safety) with official background facts, and "pick your riding" for the Overview, Candidates and My ballot (October 14)
+- [x] The site now opens on the next election automatically, switching at midnight after voting day; no manual default to change
