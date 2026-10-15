@@ -54,13 +54,16 @@ function walk(o, where) {
 }
 
 for (const k of Object.keys(g.candidates)) ids.has(k) || problems.push(`guide: unknown candidate "${k}"`);
-for (const c of p.candidates) {
+// Points and signature tags come from a candidate's own statement, so they're
+// only required once there is one (Elections BC, for example, publishes none).
+const withStatement = p.candidates.filter((c) => c.statement && c.statement.length);
+for (const c of withStatement) {
   const sig = (g.signature || {})[c.id];
   if (!Array.isArray(sig) || sig.length !== 2) problems.push(`signature: "${c.id}" needs exactly 2 tags`);
   else sig.forEach((t) => t.length > 40 && problems.push(`signature: "${c.id}" tag too long: "${t}"`));
 }
 for (const k of Object.keys(g.signature || {})) ids.has(k) || problems.push(`signature: unknown candidate "${k}"`);
-for (const c of p.candidates) g.candidates[c.id] || problems.push(`guide: no curation for "${c.id}"`);
+for (const c of withStatement) g.candidates[c.id] || problems.push(`guide: no curation for "${c.id}"`);
 walk(g, "guide");
 for (const iss of g.issues) {
   (iss.candidates || []).forEach((c) => ids.has(c.id) || problems.push(`issues.${iss.id}: unknown candidate "${c.id}"`));

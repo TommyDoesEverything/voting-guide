@@ -8,15 +8,28 @@ What's done, what's next, and ideas under consideration. Open an issue to sugges
 - [ ] Check for late withdrawals, new polls or major news, and update notes, opinions and polls with sources.
 - [ ] Ask a few people of different political views to review the guide for fairness before sharing it widely.
 
+## Now: BC provincial election (before October 24, 2026)
+
+The guide covers the five ridings that include Burnaby (`?election=bc-2026`).
+
+- [ ] Re-run `scripts/bc-2026/fetch_candidates.py` before Final Voting Day and check each candidate's focus points still match their bio.
+- [ ] Re-check the party platforms for new announcements. The Conservatives' plan had no housing commitment as of October 14, and the NDP plan page says it will keep adding items.
+- [ ] Review OneBC's lean label ("Right-wing to far-right", from Wikipedia) against Wikipedia's own sources, and keep or drop it.
+- [ ] Add Issues pages with sourced background facts for the four comparison topics (cost of living, housing, health care, public safety). The comparison table works without them for now.
+- [ ] Add attributed arguments for and against (`elections/bc-2026/opinions.js`).
+- [ ] "Pick your riding" so the Overview and My ballot show only the voter's race instead of all five.
+- [ ] On October 18, move `default` in `elections/index.js` from `burnaby-2026` to `bc-2026`.
+
 ## Next (after October 17, 2026)
 
 - [ ] Add Burnaby 2026 results (`elections/burnaby-2026/results.js`) once the City declares them (by October 21), then set `results: true`.
 - [ ] Decide whether to keep this site, or move to its own domain, once more elections are added.
+- [ ] Add BC 2026 results for the Burnaby ridings after final count (planned November 6 to 10), then set `results: true`.
 - [ ] Accessibility pass: screen reader walkthrough and keyboard-only use. (Party colour contrast checked October 10: all pass WCAG AA in both themes.)
 
 ## Later
 
-- [ ] **More elections.** The site already supports multiple elections (see [docs/adding-an-election.md](docs/adding-an-election.md)). Candidates: the 2028 BC provincial election, other Metro Vancouver municipalities, by-elections.
+- [ ] **More elections.** The site already supports multiple elections (see [docs/adding-an-election.md](docs/adding-an-election.md)). Candidates: other Metro Vancouver municipalities, more BC ridings, by-elections.
 - [ ] **Results history.** Add past Burnaby elections (2022, 2018) as results-only records for comparison.
 - [ ] **Translations.** Burnaby has large Chinese-, Korean-, Punjabi- and Tagalog-speaking communities. Candidate statements would stay in their original language, with a note that they weren't translated by the candidate.
 - [ ] **Candidate questionnaire.** Send every candidate the same short set of questions so answers can be compared directly, published unedited.
@@ -61,3 +74,4 @@ Three options, from least to most risky:
 - [x] Share preview image and link tags (Open Graph)
 - [x] Automated data checks on every push and pull request (GitHub Actions)
 - [x] Party colour contrast check (WCAG AA)
+- [x] 2026 BC provincial election, Burnaby ridings: voting info from Elections BC's mailed Voter's Guide, all 18 candidates with bios from their party pages, incumbents, and five party platforms side by side (October 14)

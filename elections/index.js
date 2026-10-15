@@ -20,5 +20,15 @@ window.ELECTIONS = {
       close: "20:00",
       results: false,
     },
+    {
+      id: "bc-2026",
+      name: "2026 BC Provincial General Election (Burnaby ridings)",
+      short: "BC 2026",
+      place: "Burnaby ridings, BC",
+      type: "Provincial",
+      date: "2026-10-24",
+      close: "20:00",
+      results: false,
+    },
   ],
 };

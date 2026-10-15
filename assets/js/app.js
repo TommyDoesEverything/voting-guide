@@ -12,6 +12,19 @@
   var REG = window.ELECTIONS;            // all elections
   var E = G.election;
   var PAST = META.status === "past";
+  // Wording that differs between kinds of election; defaults fit a local election.
+  var COPY = Object.assign({
+    votingDay: "General Voting Day",
+    ballotIntro: "You vote for <strong>individual people</strong>, not a party list. People in the same party run as a team, but you can mix and match.",
+    partiesIntro: "Candidates can run with a civic party (officially an \"elector organization\") or on their own. These are local groups, separate from provincial and federal parties. Listed alphabetically. Promises are quoted or closely paraphrased from each party's platform. A political lean is shown only where an independent source states one.",
+    independentsNote: "candidates have no party listed on their City profile. Each sets out their own priorities on their candidate card.",
+    profileLink: "Official City profile",
+    noStatement: "No statement published.",
+    aboutStatements: "<strong>Candidates speak for themselves.</strong> Full statements are reproduced from the City's official profiles (punctuation lightly normalized). Card focus points come only from those statements.",
+    aboutOrder: "<strong>Same treatment for everyone.</strong> Same card layout, the City's alphabetical order, and topic tags assigned by the same keyword rules for every candidate.",
+    candidateSources: "Candidate statements (via the City)",
+    listedAs: "as the " + E.authority + " lists them",
+  }, E.copy || {});
   if (RES && RES.sources) Object.keys(RES.sources).forEach(function (k) { G.sources[k] = RES.sources[k]; });
 
   var OFFICES = {};
@@ -21,7 +34,9 @@
     incumbent: { text: "Incumbent", cls: "strong" },
     withdrawn: { text: "Says no longer running", cls: "warn" },
     provincial: { text: "Also on provincial ballot", cls: "warn" },
+    local: { text: "Also on local ballot", cls: "warn" },
   };
+  var CROSS_FLAGS = ["withdrawn", "provincial", "local"];   // listed under "Good to know"
   // Topic tags are derived from each candidate's key points (which come from
   // their own statement) using the same whole-word keyword rules for everyone.
   var TOPICS = [
@@ -270,9 +285,9 @@
     if (now > POLLS_CLOSE) return "Voting has closed." + (RES ? "" : " " + (E.resultsNote || ""));
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     var days = Math.round((ELECTION_DAY - today) / 86400000);
-    if (days === 0) return "Today is General Voting Day. Polls are open 8 am to 8 pm.";
-    if (days === 1) return "General Voting Day is tomorrow.";
-    return days + " days until General Voting Day.";
+    if (days === 0) return "Today is " + COPY.votingDay + ". Polls are open " + E.hours + ".";
+    if (days === 1) return COPY.votingDay + " is tomorrow.";
+    return days + " days until " + COPY.votingDay + ".";
   }
 
   function barRows(rows, linkOffice) {
@@ -316,7 +331,7 @@
         '<span class="small muted">' + n + ' candidates</span></span><span class="arrow">' + icon("arrow") + '</span></a>';
     }).join("");
 
-    var flagged = PAST ? [] : CANDS.filter(function (c) { return c.flags.indexOf("withdrawn") > -1 || c.flags.indexOf("provincial") > -1; });
+    var flagged = PAST ? [] : CANDS.filter(function (c) { return c.flags.some(function (f) { return CROSS_FLAGS.indexOf(f) > -1; }); });
     var notices = (PAST ? "" : htmlItems(e.alerts, "li")) + flagged.map(function (c) {
       return '<li><a href="#candidates/' + c.office + "/" + c.id + '">' + esc(plainName(c)) + "</a> (" + esc(OFFICES[c.office].label) + "): " +
         c.notes.map(function (n) { return esc(n.text) + srcChips(n.src); }).join(" ") + "</li>";
@@ -350,7 +365,7 @@
           (e.whoCanVote ? more("Who can vote, accepted ID and accessibility", htmlItems(e.whoCanVote, "p")) : "") +
         "</div>" +
         '<div class="card"><h2 class="h-ico">' + icon("ballot") + 'How your ballot works</h2>' +
-          "<p>You vote for <strong>individual people</strong>, not a party list. People in the same party run as a team, but you can mix and match.</p>" +
+          "<p>" + COPY.ballotIntro + "</p>" +
           "<ul>" + htmlItems(e.ballotRules, "li") + "</ul>" +
           (e.decides ? more("What do they actually decide?", htmlItems(e.decides, "p")) : "") +
         "</div>" +
@@ -368,6 +383,7 @@
 
   // Compact preview of the Issues tab; each card links to the full, sourced issue.
   function keyIssues() {
+    if (!G.issues.length) return "";
     return '<div><h2 class="h-ico">' + icon("message") + 'Key issues in this election</h2><p class="small muted">The debates candidates and parties return to most. Each links to sourced background and what each side has said.</p></div>' +
       '<div class="grid-3 issue-previews">' + G.issues.map(function (iss, i) {
         return '<a class="card issue-preview" href="#issues/' + iss.id + '">' +
@@ -384,7 +400,7 @@
       return '<button type="button" data-office="' + o + '">' + esc(OFFICES[o].plural) + "<span>" + n + " running</span></button>";
     }).join("");
     $("#view-candidates").innerHTML =
-      intro("Candidates", "All " + CANDS.length + " candidates, listed alphabetically by surname as the " + esc(E.authority) + " lists them. Each card's focus comes only from the candidate's own statement. Tap <strong>View full profile</strong> for their full statement, sourced context, and arguments for and against.") +
+      intro("Candidates", "All " + CANDS.length + " candidates, listed alphabetically by surname " + esc(COPY.listedAs) + ". Each card's focus comes only from the candidate's own statement. Tap <strong>View full profile</strong> for their full statement, sourced context, and arguments for and against.") +
       '<div class="card filters-card">' +
         '<div class="seg" role="group" aria-label="Choose a race">' + seg + "</div>" +
         '<div class="filter-row">' +
@@ -452,9 +468,10 @@
         '<div class="cc-top"><span class="badge' + (c.office === "mayor" ? " solid" : "") + '">' + esc(OFFICES[c.office].label) + '</span>' + orgBadge(c) + "</div>" +
         '<h3 class="cc-name">' + esc(c.name) + "</h3>" +
         (tags ? '<div class="cc-tags">' + tags + "</div>" : "") +
-        '<div class="cc-focus-wrap"><p class="cc-focus-label">Focus</p>' +
+        (c.points.length ? '<div class="cc-focus-wrap"><p class="cc-focus-label">Focus</p>' +
           '<ul class="cc-focus clamped">' + c.points.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ul>" +
-          '<button type="button" class="focus-toggle" aria-expanded="false" hidden>Show all</button></div>' +
+          '<button type="button" class="focus-toggle" aria-expanded="false" hidden>Show all</button></div>'
+          : '<p class="small muted">No statement added yet.</p>') +
       "</div>" +
       '<div class="cc-foot">' + pickButton(c) +
         (debate ? '<span class="cc-debate" title="Arguments for, against, and news reports in the full profile">' + debate + "</span>" : "") +
@@ -499,7 +516,7 @@
   });
 
   function showCandidates(office) {
-    if (!OFFICES[office]) office = "mayor";
+    if (!OFFICES[office]) office = E.offices[0].id;
     var changed = office !== state.office;
     if (changed) state.org = "all";
     state.office = office;
@@ -531,12 +548,15 @@
     c.website.forEach(function (u) { links.push(ext(u, "Website")); });
     c.social.forEach(function (s) { links.push(ext(s.url, socialName(s.url))); });
     if (c.phone) links.push('<a href="tel:' + esc(c.phone.replace(/[^\d+]/g, "")) + '">' + esc(c.phone) + "</a>");
-    var docs = [ext(c.profileUrl, "Official City profile")];
+    var docs = [ext(c.profileUrl, COPY.profileLink)];
+    if (c.statementUrl) docs.push(ext(c.statementUrl, "Candidate page (" + c.statementBy + ")"));
     if (c.nomination) docs.push(ext(c.nomination, "Nomination papers"));
     if (c.disclosure) docs.push(ext(c.disclosure, "Financial disclosure"));
 
     var statement = '<div class="statement">' + c.statement.map(function (p) { return "<p>" + esc(p).replace(/\n/g, "<br>") + "</p>"; }).join("") +
-      '<p class="small muted">Written by the candidate, as published by the ' + esc(E.authority) + '.' + srcChips([o.src]) + "</p></div>";
+      (c.statementUrl
+        ? '<p class="small muted">' + esc(COPY.statementNote) + " " + ext(c.statementUrl, c.statementBy) + ".</p></div>"
+        : '<p class="small muted">Written by the candidate, as published by the ' + esc(E.authority) + '.' + srcChips([o.src]) + "</p></div>");
 
     dlg.innerHTML = '<div class="pf party-edge' + pc(c.org) + '">' +
       '<div class="pf-head"><div><div class="badges">' + badges + '</div><h2 class="pf-name" id="pf-name">' + esc(c.name) + '</h2><div class="pf-aff"><span class="party-dot' + pc(c.org) + '"></span>' + esc(orgName(c)) + '</div><div class="cc-tags pf-tags">' +
@@ -544,11 +564,12 @@
         c.topics.map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div></div>" +
         '<button type="button" class="x-btn" data-close aria-label="Close profile">✕</button></div>' +
       '<div class="pf-body">' +
-        '<div class="pf-sec"><p class="label">' + icon("target") + 'Campaign focus <span class="muted">(from their statement)</span></p><ul class="pf-focus">' +
-          c.points.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ul></div>" +
+        '<div class="pf-sec"><p class="label">' + icon("target") + 'Campaign focus <span class="muted">(from their statement)</span></p>' +
+          (c.points.length ? '<ul class="pf-focus">' + c.points.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ul>"
+            : '<p class="small muted">' + esc(COPY.noStatement) + "</p>") + "</div>" +
         notes +
         '<div class="pf-sec"><p class="label">' + icon("scale") + 'Arguments for & against</p>' + opinionsBox(c.ops, plainName(c)) + "</div>" +
-        '<div class="pf-sec">' + more("Read their full statement", statement, false, "file") +
+        '<div class="pf-sec">' + (c.statement.length ? more("Read their full statement", statement, false, "file") : "") +
           more("Links & official documents", (links.length ? '<ul class="linkrow">' + links.map(function (l) { return "<li>" + l + "</li>"; }).join("") + "</ul>" : '<p class="small muted">No website or phone listed.</p>') +
             '<ul class="linkrow">' + docs.map(function (l) { return "<li>" + l + "</li>"; }).join("") + "</ul>" +
             (c.org ? '<p class="small"><a href="#parties/' + c.org + '">About ' + esc(G.orgs[c.org].name) + " →</a></p>" : "")) +
@@ -638,6 +659,12 @@
     }).join("") + "</div>";
   }
 
+  // "incumbent councillor" locally; "MLA, Burnaby North" where the office is a riding.
+  function incumbentText(c) {
+    var label = OFFICES[c.office].label;
+    return COPY.incumbentLabel ? COPY.incumbentLabel + ", " + label : "incumbent " + label.toLowerCase();
+  }
+
   function rosterBlock(people) {
     return Object.keys(OFFICES).map(function (off) {
       var list = people.filter(function (c) { return c.office === off; });
@@ -647,19 +674,20 @@
 
   // Side-by-side table of what each party's platform says on the same topics.
   function compareTable() {
+    if (!G.compareTopics.length) return "";
     var keys = Object.keys(G.orgs);
     var head = "<tr><th scope=\"col\">Topic</th>" + keys.map(function (k) {
       return '<th scope="col" class="' + pc(k).trim() + '"><a class="party-text" href="#parties/' + k + '"><span class="party-dot"></span>' + esc(G.orgs[k].short) + "</a></th>";
     }).join("") + "</tr>";
     var rows = G.compareTopics.map(function (t) {
-      return '<tr><th scope="row"><a href="#issues/' + t.issue + '">' + esc(t.label) + "</a></th>" + keys.map(function (k) {
+      return '<tr><th scope="row">' + (t.issue ? '<a href="#issues/' + t.issue + '">' + esc(t.label) + "</a>" : esc(t.label)) + "</th>" + keys.map(function (k) {
         var st = (G.orgs[k].stances || {})[t.id];
         return '<td class="' + pc(k).trim() + '" data-label="' + esc(G.orgs[k].short) + '">' +
           "<div>" + (st ? esc(st.text) + srcChips(st.src) : '<span class="na">Not in their platform</span>') + "</div></td>";
       }).join("") + "</tr>";
     }).join("");
     return '<div class="card compare-card"><h2 class="h-ico">' + icon("scale") + 'Compare their platforms</h2>' +
-      '<p class="small muted">What each party\'s published platform says on the same five topics, quoted or closely paraphrased. "Not in their platform" means we didn\'t find it there, not that they oppose it. Tap a topic for background facts.</p>' +
+      '<p class="small muted">What each party\'s published platform says on the same ' + G.compareTopics.length + ' topics, quoted or closely paraphrased. "Not in their platform" means we didn\'t find it there, not that they oppose it.' + (G.issues.length ? " Tap a topic for background facts." : "") + "</p>" +
       '<div class="compare-scroll"><table class="compare"><thead>' + head + "</thead><tbody>" + rows + "</tbody></table></div></div>";
   }
 
@@ -671,22 +699,23 @@
       var notable = mine.filter(function (c) { return c.office === "mayor" || c.flags.indexOf("incumbent") > -1; });
       return '<article class="card party party-top-edge' + pc(k) + '" id="org-' + k + '">' +
         '<div class="party-top"><span class="badge' + (o.role === "Governing party" ? " solid" : "") + '">' + esc(o.role) + "</span>" +
-          '<a class="site-link" href="' + esc(o.website) + '" target="_blank" rel="noopener">' + icon("globe") + "Website</a></div>" +
+          (o.website ? '<a class="site-link" href="' + esc(o.website) + '" target="_blank" rel="noopener">' + icon("globe") + "Website</a>" : "") + "</div>" +
         '<h2><span class="party-dot"></span>' + esc(o.name) + "</h2>" +
         (o.tagline ? '<p class="tagline">“' + esc(o.tagline.text) + "”" + srcChips(o.tagline.src) + "</p>" : "") +
         countTiles(mine) +
         '<dl class="kv"><div><dt>Political lean</dt><dd>' + leanText(o) + "</dd></div>" +
           (notable.length ? "<div><dt>Notable</dt><dd>" + notable.map(function (c) {
-            return candLink(c) + ' <span class="muted small">(' + (c.office === "mayor" ? "for mayor" : "incumbent " + OFFICES[c.office].label.toLowerCase()) + ")</span>";
+            return candLink(c) + ' <span class="muted small">(' + (c.office === "mayor" ? "for mayor" : incumbentText(c)) + ")</span>";
           }).join("<br>") + "</dd></div>" : "") +
         "</dl>" +
         (o.context && o.context.length ? '<ul class="party-context">' + o.context.map(function (x) { return "<li>" + esc(x.text) + srcChips(x.src) + "</li>"; }).join("") + "</ul>" : "") +
-        '<p class="label">Key promises, in their words</p>' +
-        '<ul class="says">' + o.says.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" +
-        '<p class="small">' + srcChips(o.moreSrc || [o.platform]) + "</p>" +
+        (o.says && o.says.length ? '<p class="label">Key promises, in their words</p>' +
+          '<ul class="says">' + o.says.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" +
+          '<p class="small">' + srcChips(o.moreSrc || [o.platform]) + "</p>"
+          : "<p class=\"small muted\">We haven't added this party's platform yet.</p>") +
         '<p class="label">' + icon("scale") + 'Arguments for & against</p>' + opinionsBox(OPS[k] || [], o.name) +
-        more("More of their platform", '<ul class="says">' + o.more.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" +
-          "<p>" + ext(G.sources[o.platform].url, "Read the full platform") + "</p>") +
+        (o.more && o.more.length ? more("More of their platform", '<ul class="says">' + o.more.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" +
+          "<p>" + ext(G.sources[o.platform].url, "Read the full platform") + "</p>") : "") +
         more("All " + mine.length + " candidates", rosterBlock(mine)) +
         "</article>";
     }).join("");
@@ -694,14 +723,14 @@
     var indep = CANDS.filter(function (c) { return !c.org; });
     var indepNotable = indep.filter(function (c) { return c.flags.indexOf("incumbent") > -1; });
     $("#view-parties").innerHTML =
-      intro("Parties", "Candidates can run with a civic party (officially an \"elector organization\") or on their own. These are local groups, separate from provincial and federal parties. Listed alphabetically. Promises are quoted or closely paraphrased from each party's platform. A political lean is shown only where an independent source states one.") +
+      intro("Parties", esc(COPY.partiesIntro)) +
       compareTable() +
       '<div class="grid-2 party-grid">' + cards +
       '<article class="card party party-top-edge' + pc(null) + '" id="org-independent"><div class="party-top"><span class="badge">No party</span></div><h2><span class="party-dot"></span>Independents</h2>' +
-        '<p class="tagline">' + indep.length + " candidates have no party listed on their City profile. Each sets out their own priorities on their candidate card.</p>" +
+        '<p class="tagline">' + indep.length + " " + esc(COPY.independentsNote) + "</p>" +
         countTiles(indep) +
         (indepNotable.length ? '<dl class="kv"><div><dt>Notable</dt><dd>' + indepNotable.map(function (c) {
-          return candLink(c) + ' <span class="muted small">(incumbent ' + OFFICES[c.office].label.toLowerCase() + ")</span>";
+          return candLink(c) + ' <span class="muted small">(' + incumbentText(c) + ")</span>";
         }).join("<br>") + "</dd></div></dl>" : "") +
         '<div class="indep-roster">' + rosterBlock(indep) + "</div>" +
       "</article></div>";
@@ -883,7 +912,7 @@
 
   // ------------------------------------------------------------------- ABOUT
   function renderAbout() {
-    var groups = { official: "Official sources", candidate: "Candidate statements (via the City)", party: "Party platforms", poll: "Polling", news: "News coverage", reference: "Reference", "third-party": "Other guides & analysis" };
+    var groups = { official: "Official sources", candidate: COPY.candidateSources, party: "Party platforms", poll: "Polling", news: "News coverage", reference: "Reference", "third-party": "Other guides & analysis" };
     var srcList = Object.keys(groups).map(function (type) {
       var items = Object.keys(G.sources).filter(function (id) { return G.sources[id].type === type; }).map(function (id) {
         var s = G.sources[id];
@@ -893,11 +922,11 @@
     }).join("");
 
     $("#view-about").innerHTML =
-      intro("About this guide", "An independent, non-partisan guide. It isn't affiliated with any candidate, party, or the ' + esc(E.authority) + ', and it doesn\'t endorse anyone.") +
+      intro("About this guide", "An independent, non-partisan guide. It isn't affiliated with any candidate, party, or " + esc(E.authority) + ", and it doesn't endorse anyone.") +
       '<div class="grid-2">' +
       '<div class="card"><h2>How it stays neutral</h2><ul>' +
-        "<li><strong>Candidates speak for themselves.</strong> Full statements are reproduced from the City's official profiles (punctuation lightly normalized). Card focus points come only from those statements.</li>" +
-        "<li><strong>Same treatment for everyone.</strong> Same card layout, the City's alphabetical order, and topic tags assigned by the same keyword rules for every candidate.</li>" +
+        "<li>" + COPY.aboutStatements + "</li>" +
+        "<li>" + COPY.aboutOrder + "</li>" +
         '<li><strong>Opinions are labelled.</strong> Arguments for and against sit in a box marked <span class="badge opinion">Opinion</span>, and each one names who is speaking. A party\'s political lean is shown only when an independent source states it.</li>' +
         "<li><strong>Who decides this?</strong> When a candidate promises to directly do something another government controls (like setting tuition), a sourced note says who controls it. Promises to advocate don't get one. The same test applies to everyone.</li>" +
         "<li><strong>Facts carry a source.</strong> Tap the small ↗ tags to see where anything came from.</li>" +
@@ -974,6 +1003,7 @@
     $("#brand-sub").textContent = "Independent voter guide · " + E.kind + " · " + E.dayShort;
     $("#tab-results").hidden = !(PAST || RES);
     $("#tab-picks").hidden = PAST;
+    $('.tabs a[data-tab="issues"]').hidden = !G.issues.length;
     $("#foot-authority").textContent = E.authority;
     $("#foot-profiles").href = E.profilesUrl;
     if (!META.isDefault) {

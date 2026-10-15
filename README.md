@@ -51,6 +51,7 @@ archive/                      the original AI-generated prototype (reference onl
 ## Updating and adding elections
 
 - **Refresh Burnaby candidate statements:** run `python scripts/burnaby-2026/fetch_profiles.py`. If Python can't verify the City's certificate, see the script's docstring for the curl workaround. Afterwards, check the diff to make sure each candidate's key points still match their statement.
+- **Refresh BC 2026 provincial candidates (Burnaby ridings):** run `python scripts/bc-2026/fetch_candidates.py`. It keeps only names, ridings and parties from Elections BC's list.
 - **Add an election or post results:** see [docs/adding-an-election.md](docs/adding-an-election.md).
 - **Before committing:** run `node scripts/check_data.js`.
 
