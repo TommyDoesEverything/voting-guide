@@ -188,8 +188,96 @@
       }).join("") + "</select>";
   }
   function officeCard(id) {
-    return '<div class="card office-card"><label class="office-q" for="' + id + '">' + icon("pin") + esc(CHOOSE.question) + "</label>" + officePicker(id) +
-      '<p class="small"><a href="' + esc(CHOOSE.lookupUrl) + '" target="_blank" rel="noopener">' + esc(CHOOSE.lookupText) + "</a></p></div>";
+    var lookup = '<p class="small"><a href="' + esc(CHOOSE.lookupUrl) + '" target="_blank" rel="noopener">' + esc(CHOOSE.lookupText) + "</a></p>";
+    if (!FINDER) {
+      return '<div class="card office-card"><label class="office-q" for="' + id + '">' + icon("pin") + esc(CHOOSE.question) + "</label>" + officePicker(id) + lookup + "</div>";
+    }
+    return '<div class="card office-card"><h2 class="office-q">' + icon("pin") + esc(CHOOSE.question) + "</h2>" +
+      '<form class="finder" novalidate><label class="label" for="' + id + '-addr">' + esc(FINDER.label) + "</label>" +
+      '<div class="finder-row"><input type="text" id="' + id + '-addr" name="addr" autocomplete="street-address" placeholder="' + esc(FINDER.placeholder) + '" value="' + esc(finderAddr) + '">' +
+      '<button class="btn" type="submit">' + icon("search") + "Find</button></div>" +
+      ("geolocation" in navigator ? '<button class="btn ghost sm finder-locate" type="button">' + icon("target") + "Use my location</button>" : "") +
+      '<p class="finder-out small" role="status" aria-live="polite">' + finderMsg + "</p>" +
+      '<p class="small muted">' + esc(FINDER.privacy) + "</p></form>" +
+      '<label class="label" for="' + id + '">Or choose your ' + esc(CHOOSE.noun) + "</label>" + officePicker(id) + lookup + "</div>";
+  }
+
+  // "Find my riding": geocode an address (or use the device's location), then
+  // test the point against the boundary shapes in the browser. Shapes load
+  // only when someone uses the finder.
+  var FINDER = CHOOSE && CHOOSE.finder || null;
+  var finderMsg = "", finderAddr = "";
+  var shapesReady = null;
+  function loadShapes() {
+    if (!shapesReady) shapesReady = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = "elections/" + META.id + "/" + FINDER.shapes;
+      s.onload = function () { window.RIDING_SHAPES ? resolve(window.RIDING_SHAPES.ridings) : reject(); };
+      s.onerror = function () { shapesReady = null; reject(); };
+      document.body.appendChild(s);
+    });
+    return shapesReady;
+  }
+  function inRings(rings, x, y) {
+    var inside = false;   // even-odd, so holes count too
+    rings.forEach(function (r) {
+      for (var i = 0, j = r.length - 1; i < r.length; j = i++) {
+        if ((r[i][1] > y) !== (r[j][1] > y) && x < (r[j][0] - r[i][0]) * (y - r[i][1]) / (r[j][1] - r[i][1]) + r[i][0]) inside = !inside;
+      }
+    });
+    return inside;
+  }
+  function showFinder(html) {
+    finderMsg = html;
+    document.querySelectorAll(".finder-out").forEach(function (el) { el.innerHTML = html; });
+  }
+  var LOOKUP_LINK = function (text) { return '<a href="' + esc(CHOOSE.lookupUrl) + '" target="_blank" rel="noopener">' + esc(text) + "</a>"; };
+  function placePoint(lon, lat, what) {
+    return loadShapes().then(function (shapes) {
+      var o = Object.keys(shapes).filter(function (k) { return OFFICES[k] && inRings(shapes[k].rings, lon, lat); })[0];
+      if (!o) {
+        showFinder(esc(what) + " isn't in a " + esc(CHOOSE.noun) + " this guide covers. " + LOOKUP_LINK("Find it on Elections BC's Where to Vote") + ".");
+        return;
+      }
+      var msg = icon("check") + " " + esc(what) + " is in <strong>" + esc(OFFICES[o].label) + "</strong>. Near a boundary? " + LOOKUP_LINK("Confirm with Elections BC") + ".";
+      finderMsg = msg;
+      setMyOffice(o);
+      showFinder(msg);
+    }, function () { showFinder("Couldn't load the " + esc(CHOOSE.noun) + " maps. Check your connection, or choose below."); });
+  }
+  function findAddress(text) {
+    text = finderAddr = text.trim();
+    if (!text) { showFinder("Type your street address, including the house number."); return; }
+    showFinder("Looking up that address…");
+    var url = FINDER.geocoder + "?" + new URLSearchParams({ addressString: text, maxResults: "1", outputSRS: "4326", echo: "false", provinceCode: "BC" });
+    fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (data) {
+      var f = data.features && data.features[0], p = f && f.properties;
+      // Only a match to a house number (or its block) is precise enough: a
+      // street can cross several ridings, and postal codes aren't supported.
+      if (!p || ["CIVIC_NUMBER", "BLOCK"].indexOf(p.matchPrecision) < 0 || p.score < 70) {
+        showFinder("Couldn't find that address. Try the house number, street and city, for example “" + esc(FINDER.placeholder.replace(/^e\.g\. /, "")) + "”. Postal codes don't work here.");
+        return;
+      }
+      return placePoint(f.geometry.coordinates[0], f.geometry.coordinates[1], p.fullAddress);
+    }).catch(function () { showFinder("The address lookup isn't responding. Try again, or choose below."); });
+  }
+  function findMe() {
+    showFinder("Finding your location…");
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      placePoint(pos.coords.longitude, pos.coords.latitude, pos.coords.accuracy > 250 ? "Your approximate location" : "Your location");
+    }, function (err) {
+      showFinder(err.code === 1 ? "Location access was blocked. Type your address instead." : "Couldn't get your location. Type your address instead.");
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+  }
+  if (FINDER) {
+    document.addEventListener("submit", function (ev) {
+      if (!ev.target.classList.contains("finder")) return;
+      ev.preventDefault();
+      findAddress(ev.target.elements.addr.value);
+    });
+    document.addEventListener("click", function (ev) {
+      if (ev.target.closest && ev.target.closest(".finder-locate")) findMe();
+    });
   }
   function setMyOffice(o) {
     o = OFFICES[o] ? o : null;
@@ -210,7 +298,7 @@
     if (route.view === "picks") renderPicks();
   }
   document.addEventListener("change", function (ev) {
-    if (ev.target.classList && ev.target.classList.contains("office-pick")) setMyOffice(ev.target.value);
+    if (ev.target.classList && ev.target.classList.contains("office-pick")) { finderMsg = ""; setMyOffice(ev.target.value); }
   });
 
   function isPicked(id) { var c = BY_ID[id]; return picks[c.office].indexOf(id) > -1; }
@@ -455,7 +543,7 @@
     $("#view-candidates").innerHTML =
       intro("Candidates", "All " + CANDS.length + " candidates, listed alphabetically by surname " + esc(COPY.listedAs) + ". Each card's focus comes only from the candidate's own statement. Tap <strong>View full profile</strong> for their full statement, sourced context, and arguments for and against.") +
       '<div class="card filters-card">' +
-        '<div class="seg" role="group" aria-label="Choose a race">' + seg + "</div>" +
+        '<div class="seg' + (Object.keys(OFFICES).length > 6 ? " many" : "") + '" role="group" aria-label="Choose a race">' + seg + "</div>" +
         '<div class="filter-row">' +
           '<label class="input">' + icon("search") + '<span class="visually-hidden">Search</span><input type="search" id="cand-q" placeholder="Search names or topics, e.g. transit" autocomplete="off"></label>' +
           '<label><span class="visually-hidden">Party</span><select id="cand-org"></select></label>' +
@@ -706,6 +794,14 @@
 
   // Mayor / Council / Trustee count tiles for a group of candidates.
   function countTiles(people) {
+    var offs = Object.keys(OFFICES);
+    // Many races (ridings): one line instead of a wall of tiles.
+    if (offs.length > 6) {
+      var where = offs.filter(function (off) { return people.some(function (c) { return c.office === off; }); });
+      var noun = CHOOSE ? CHOOSE.noun + "s" : "races";
+      return '<p class="party-where">' + icon("pin") + (where.length === offs.length ? "Running in all " + offs.length + " " + noun + " in this guide"
+        : "Running in " + where.length + " of " + offs.length + " " + noun + " in this guide: " + where.map(function (off) { return esc(OFFICES[off].label); }).join(", ")) + "</p>";
+    }
     return '<div class="party-counts">' + Object.keys(OFFICES).map(function (off) {
       var n = people.filter(function (c) { return c.office === off; }).length;
       return '<div class="' + (n ? "" : "none") + '"><b>' + (n || "-") + "</b><span>" + esc(OFFICES[off].label) + "</span></div>";
@@ -765,7 +861,7 @@
         (o.says && o.says.length ? '<p class="label">Key promises, in their words</p>' +
           '<ul class="says">' + o.says.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" +
           '<p class="small">' + srcChips(o.moreSrc || [o.platform]) + "</p>"
-          : "<p class=\"small muted\">We haven't added this party's platform yet.</p>") +
+          : '<p class="small muted">' + (o.platform ? "We haven't added this party's platform yet." : "We found no published platform.") + "</p>") +
         '<p class="label">' + icon("scale") + 'Arguments for & against</p>' + opinionsBox(OPS[k] || [], o.name) +
         (o.more && o.more.length ? more("More of their platform", '<ul class="says">' + o.more.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" +
           "<p>" + ext(G.sources[o.platform].url, "Read the full platform") + "</p>") : "") +
@@ -780,7 +876,9 @@
       compareTable() +
       '<div class="grid-2 party-grid">' + cards +
       '<article class="card party party-top-edge' + pc(null) + '" id="org-independent"><div class="party-top"><span class="badge">No party</span></div><h2><span class="party-dot"></span>Independents</h2>' +
-        '<p class="tagline">' + indep.length + " " + esc(COPY.independentsNote) + "</p>" +
+        '<p class="tagline">' + indep.length + " " + esc(indep.length === 1
+          ? COPY.independentsNote.replace(/^candidates (are|have)\b/, function (m, v) { return "candidate " + (v === "are" ? "is" : "has"); })
+          : COPY.independentsNote) + "</p>" +
         countTiles(indep) +
         (indepNotable.length ? '<dl class="kv"><div><dt>Notable</dt><dd>' + indepNotable.map(function (c) {
           return candLink(c) + ' <span class="muted small">(' + incumbentText(c) + ")</span>";

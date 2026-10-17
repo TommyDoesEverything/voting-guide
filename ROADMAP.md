@@ -4,25 +4,30 @@ What's done, what's next, and ideas under consideration. Open an issue to sugges
 
 ## Now (before October 17, 2026)
 
-- [x] Re-run `scripts/burnaby-2026/fetch_profiles.py` (October 10: no candidate changes). Run once more before voting day.
-- [ ] Check for late withdrawals, new polls or major news, and update notes, opinions and polls with sources.
+- [x] Re-run `scripts/burnaby-2026/fetch_profiles.py` (October 10 and 17: no candidate changes).
+- [x] Check for late withdrawals, new polls or major news (October 17: the withdrawal deadline passed September 18; no new Burnaby polls found).
 - [ ] Ask a few people of different political views to review the guide for fairness before sharing it widely.
 
 ## Now: BC provincial election (before October 24, 2026)
 
-The guide covers the five ridings that include Burnaby (`?election=bc-2026`).
+The guide covers the nine ridings that include Burnaby or Richmond (`?election=bc-2026`).
 
-- [ ] Re-run `scripts/bc-2026/fetch_candidates.py` before Final Voting Day and check each candidate's focus points still match their bio.
-- [ ] Re-check the party platforms for new announcements. The Conservatives' plan had no housing commitment as of October 14, and the NDP plan page says it will keep adding items.
-- [ ] Review OneBC's lean label ("Right-wing to far-right", from Wikipedia) against Wikipedia's own sources, and keep or drop it.
-- [ ] Add attributed arguments for and against (`elections/bc-2026/opinions.js`).
-- [ ] Re-check the Issues facts (family doctor and drug-death figures) for newer official releases before voting day.
+- [x] Re-run `scripts/bc-2026/fetch_candidates.py` and check focus points against bios (October 17: bios unchanged; added Green candidate Greg DePaco, who withdrew October 9 but is still on the Burnaby-New Westminster ballot).
+- [ ] Re-check the party platforms for new announcements. October 17: added the NDP costed plan's Burnaby Hospital Phase 2 funding. The Conservatives' plan still has no housing commitment, and their costed platform is described as imminent.
+- [x] Review OneBC's lean label ("Right-wing to far-right"): kept, now also citing Wikipedia's sources directly (The Tyee: "right-wing"; CFJC Today: "far-right").
+- [x] Add attributed arguments for and against (`elections/bc-2026/opinions.js`), from the October 14 leaders' debate coverage.
+- [x] Re-check the Issues facts (October 17: added the July and August drug-death figures; the September 16 family doctor figure is still the latest).
+- [ ] Re-run `scripts/bc-2026/fetch_candidates.py` once more before Final Voting Day, now that it covers the Richmond ridings, and check the Richmond focus points against any bio changes.
+- [ ] Find bios for the candidates who have none: Lawrence Chen and Keenan Yang (CanWest Party) and Robert Evans (independent, Richmond-Steveston). If one turns up, add it to `BIOS` in the fetch script. Also look for a CanWest Party website or platform.
+- [ ] Check whether Lawrence Chen and Calvin Dang, both Richmond MLA candidates, are the same people as the school trustee candidates of those names on Richmond's October 17 ballot (City of Richmond declaration). If confirmed, add a sourced note and the `local` flag, as for Jenny Yamagata.
+- [ ] Add Richmond candidates to the Issues pages (`issues[].candidates`), where their own bios speak to an issue. Today these pages quote only Burnaby candidates.
+- [ ] Ask someone to try "Find my riding" on a phone with a few real addresses, including one near a riding boundary.
 
 ## Next (after October 17, 2026)
 
 - [ ] Add Burnaby 2026 results (`elections/burnaby-2026/results.js`) once the City declares them (by October 21), then set `results: true`.
 - [ ] Decide whether to keep this site, or move to its own domain, once more elections are added.
-- [ ] Add BC 2026 results for the Burnaby ridings after final count (planned November 6 to 10), then set `results: true`.
+- [ ] Add BC 2026 results for the Burnaby and Richmond ridings after final count (planned November 6 to 10), then set `results: true`.
 - [ ] Accessibility pass: screen reader walkthrough and keyboard-only use. (Party colour contrast checked October 10: all pass WCAG AA in both themes.)
 
 ## Later
@@ -75,3 +80,4 @@ Three options, from least to most risky:
 - [x] 2026 BC provincial election, Burnaby ridings: voting info from Elections BC's mailed Voter's Guide, all 18 candidates with bios from their party pages, incumbents, and five party platforms side by side (October 14)
 - [x] BC Issues pages (cost of living, housing, health care, public safety) with official background facts, and "pick your riding" for the Overview, Candidates and My ballot (October 14)
 - [x] The site now opens on the next election automatically, switching at midnight after voting day; no manual default to change
+- [x] BC 2026: added the four Richmond ridings (14 candidates, incumbents, and the CanWest Party), and "Find my riding" from an address or your location, checked in the browser against Elections BC's boundaries (October 17)

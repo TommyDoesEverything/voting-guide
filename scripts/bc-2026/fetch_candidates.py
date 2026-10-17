@@ -1,7 +1,7 @@
-"""Fetch the 2026 BC provincial candidates for the Burnaby ridings, with bios.
+"""Fetch the 2026 BC provincial candidates for the Burnaby and Richmond ridings, with bios.
 
 Elections BC publishes every confirmed candidate as a CSV. This script keeps
-the five ridings that cover Burnaby, then adds each candidate's bio from the
+the nine ridings that cover Burnaby and Richmond, then adds each candidate's bio from the
 candidate page their party publishes, and writes:
 
     elections/bc-2026/profiles.json  - for humans / diffing
@@ -49,6 +49,10 @@ RIDINGS = {
     "BNO": "burnaby-north",
     "BNS": "burnaby-south-metrotown",
     "BNN": "burnaby-new-westminster",
+    "RCB": "richmond-bridgeport",
+    "RCC": "richmond-centre",
+    "RCQ": "richmond-queensborough",
+    "RCS": "richmond-steveston",
 }
 
 # Affiliation as Elections BC prints it -> party id in guide.js.
@@ -58,6 +62,8 @@ ORGS = {
     "CentreBC": "centrebc",
     "Conservative Party": "bc-conservative",
     "OneBC": "onebc",
+    "CWP": "canwest",
+    "Independent": None,
 }
 
 # The BC NDP's team page loads its candidates from this feed.
@@ -84,17 +90,37 @@ BIOS = {
     "burnaby-south-metrotown-david-xie": "https://conservativebc.ca/candidate/david-xie/",
     "burnaby-new-westminster-raj-chouhan": "ndp",
     "burnaby-new-westminster-joe-latam": "https://conservativebc.ca/candidate/joe-latam/",
+    "richmond-bridgeport-linda-li": "ndp",
+    "richmond-bridgeport-teresa-wat": "https://conservativebc.ca/candidate/teresa-wat/",
+    "richmond-centre-calvin-dang": "https://bcgreens.ca/candidates-2026/calvin-dang/",
+    "richmond-centre-sacha-peter": "https://conservativebc.ca/candidate/sacha-peter/",
+    "richmond-centre-henry-yao": "ndp",
+    "richmond-queensborough-luc-burns": "https://bcgreens.ca/candidates-2026/luc-burns/",
+    "richmond-queensborough-dhar-grewal": "ndp",
+    "richmond-queensborough-steve-kooner": "https://conservativebc.ca/candidate/steve-kooner/",
+    "richmond-steveston-bruce-kong": "ndp",
+    "richmond-steveston-barry-wosk": "https://www.centrebc.ca/candidates/barry-wosk/",
+    "richmond-steveston-gordon-zhang": "https://conservativebc.ca/candidate/gordon-zhang/",
 }
 
 # Where the bio starts and ends on each party's page, as regexes matched
 # against whole lines of the page text. The start line itself is skipped
-# unless `keep_start` is set.
+# unless `keep_start` is set. Leading lines matching `skip` are dropped.
 LAYOUTS = {
     "bcgreens.ca": {"start": r"^[“\"]", "keep_start": True, "end": r"^Events$"},
     "1bc.ca": {"start": r"^Candidate\s+[—-]", "end": r"^Keep up with$"},
-    "conservativebc.ca": {"start": r"^VOLUNTEER$", "after": r"^DONATE TO ", "end": r"^Latest News and Updates$"},
+    "conservativebc.ca": {"start": r"^VOLUNTEER$", "after": r"^DONATE TO ", "end": r"^Latest News and Updates$",
+                          # MLAs' pages add their email and an "About <name>" heading.
+                          "skip": r"^(\S+@\S+|About .+)$"},
     "www.centrebc.ca": {"start": r"^Volunteer$", "after": r"^Donate to ", "end": r"^(\[email|Request a sign)"},
 }
+
+# Candidates who withdrew after ballots were printed. Elections BC drops them
+# from the CSV, but their names are still on the ballot, so keep listing them
+# (guide.js flags them "withdrawn").
+ON_BALLOT = [
+    {"ED Code": "BNN", "Candidate Ballot Name": "Greg DePaco", "Affiliation": "BC Green Party"},
+]
 
 PARTY_NAMES = {
     "bc-ndp": "BC NDP",
@@ -102,6 +128,7 @@ PARTY_NAMES = {
     "centrebc": "CentreBC",
     "bc-conservative": "Conservative Party of BC",
     "onebc": "OneBC",
+    "canwest": "CanWest Party",
 }
 
 OUT = Path(__file__).resolve().parents[2] / "elections" / "bc-2026"
@@ -173,6 +200,8 @@ def party_bio(url):
     start = next(n for n, l in enumerate(lines) if n >= i and re.search(layout["start"], l))
     end = next(n for n, l in enumerate(lines) if n > start and re.search(layout["end"], l))
     body = lines[start if layout.get("keep_start") else start + 1:end]
+    while body and "skip" in layout and re.search(layout["skip"], body[0]):
+        body = body[1:]
     if not body:
         sys.exit(f"no bio found on {url}; check LAYOUTS")
     return paragraphs(body)
@@ -193,7 +222,10 @@ def main():
         raw = decode(fetch(CSV_URL))
 
     found = []
-    for row in csv.DictReader(io.StringIO(raw)):
+    rows = list(csv.DictReader(io.StringIO(raw)))
+    names = {" ".join(r["Candidate Ballot Name"].split()) for r in rows}
+    rows += [r for r in ON_BALLOT if r["Candidate Ballot Name"] not in names]
+    for row in rows:
         office = RIDINGS.get(row["ED Code"].strip())
         if not office:
             continue

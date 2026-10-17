@@ -302,6 +302,9 @@ details.more > .more-body { padding: 2px 0 8px; font-size: .92rem; }
 .filters-card { display: grid; gap: 12px; }
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--surface-2); border-radius: 12px; padding: 4px; }
 .seg button { min-height: var(--tap); border: 0; border-radius: 9px; background: transparent; cursor: pointer; font-weight: 700; font-size: .86rem; line-height: 1.15; padding: 4px; color: var(--text-2); }
+/* Many races (ridings): two columns on phones, so long names aren't split mid-word. */
+.seg.many { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.seg.many button { overflow-wrap: normal; padding: 6px 4px; }
 .seg button span { display: block; font-size: .7rem; font-weight: 600; color: var(--muted); }
 .seg button[aria-pressed="true"] { background: var(--btn); color: var(--btn-text); }
 .seg button[aria-pressed="true"] span { color: inherit; opacity: .75; }
@@ -319,6 +322,17 @@ details.more > .more-body { padding: 2px 0 8px; font-size: .92rem; }
   background: var(--surface-2); font-size: .95rem;
 }
 .office-card p { margin: 0; }
+.office-card h2.office-q { margin: 0; font-size: 1rem; }
+.finder { display: grid; gap: 8px; justify-items: start; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.finder .label { margin: 0; }
+.finder-row { display: flex; gap: 8px; width: 100%; }
+.finder-row input {
+  flex: 1; min-width: 0; min-height: var(--tap); padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px;
+  background: var(--surface-2); color: var(--text); font-size: 1rem;
+}
+.finder-row .btn { min-height: var(--tap); }
+.finder-out:empty { display: none; }
+.finder-out .i { width: 15px; height: 15px; vertical-align: -2px; }
 .race-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .88rem; }
 .count { font-size: .75rem; font-weight: 700; padding: 3px 10px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--line); color: var(--text-2); }
 .count.full { background: var(--pick-soft); color: var(--pick-text); border-color: var(--pick); }
@@ -516,6 +530,8 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
 .party-counts b { display: block; font-size: 1.35rem; font-weight: 900; line-height: 1.1; }
 .party-counts span { display: block; font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-top: 2px; }
 .party-counts .none b { color: var(--muted); font-weight: 600; }
+.party-where { display: flex; gap: 6px; align-items: baseline; margin: 4px 0 8px; font-size: .85rem; color: var(--text-2); }
+.party-where .i { flex: none; width: 14px; height: 14px; position: relative; top: 2px; }
 .party-context { list-style: none; padding: 0; margin: 0 0 14px; font-size: .8rem; color: var(--muted); }
 .party-context li { margin: 0 0 4px; padding-left: 10px; border-left: 2px solid var(--line-strong); }
 .party .says { font-size: .86rem; }

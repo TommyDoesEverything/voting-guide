@@ -31,9 +31,10 @@ Copy `elections/burnaby-2026/` as a starting point and replace its contents.
 | `guide.js` | Everything else: the `election` block (offices, dates, voting-day facts), sources, parties, per-candidate key points and notes, signature tags, issues. | Yes |
 | `opinions.js` | Attributed arguments for and against. | No |
 | `polls.js` | Published polling, copied exactly. | No |
+| `ridings.js` | Boundary shapes for "Find my riding" (see `scripts/bc-2026/fetch_boundaries.py`). Only for elections with `chooseOffice.finder`. | No |
 | `results.js` | Official results (template: `elections/_template/results.example.js`). | After voting day |
 
-The `election` block in `guide.js` drives the Overview page and labels across the site, so nothing is hard-coded. `offices` defines the races and how many people each voter can pick.
+The `election` block in `guide.js` drives the Overview page and labels across the site, so nothing is hard-coded. `offices` defines the races and how many people each voter can pick. If each voter is in just one race (a riding), add `chooseOffice` so the guide asks which one; give it a `finder` block (see `elections/bc-2026/guide.js`) to let people find it from an address or their location.
 
 ## 3. Check it
 

@@ -2,7 +2,7 @@
 // candidate list and each party's candidate pages. Do not edit by hand - re-run
 // the script instead.
 window.PROFILES = {
-  "fetched": "2026-10-14",
+  "fetched": "2026-10-17",
   "source": "https://elections.bc.ca/2026-provincial-election/candidate-list/",
   "candidates": [
     {
@@ -444,6 +444,22 @@ window.PROFILES = {
       "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
     },
     {
+      "id": "burnaby-new-westminster-greg-depaco",
+      "name": "Greg DePaco",
+      "surname": "DEPACO",
+      "office": "burnaby-new-westminster",
+      "org": "bc-green",
+      "statement": [],
+      "statementUrl": null,
+      "statementBy": null,
+      "website": [],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
       "id": "burnaby-new-westminster-joe-latam",
       "name": "Joe Latam",
       "surname": "LATAM",
@@ -458,6 +474,307 @@ window.PROFILES = {
         "Joe is seeking office to bring his experience in British Columbia’s private sector and provincial government to the Legislature, with a focus on practical solutions and ensuring government works effectively for the people it serves."
       ],
       "statementUrl": "https://conservativebc.ca/candidate/joe-latam/",
+      "statementBy": "Conservative Party of BC",
+      "website": [],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-bridgeport-linda-li",
+      "name": "Linda Li",
+      "surname": "LI",
+      "office": "richmond-bridgeport",
+      "org": "bc-ndp",
+      "statement": [
+        "Standing up for Richmond-Bridgeport",
+        "Since 1996, Linda Li has been a pillar of the community in Richmond. She has been actively involved with the Richmond Chinese Community Society, the Richmond Hospital Foundation, and the managing broker at Selmak Realty Ltd. A devoted mother of three, she understands that Richmond families need a government that is in their corner, working to make life better.",
+        "As a member of David Eby’s BC NDP team, Linda will fight to build a stronger province, bring down costs, strengthen healthcare and create good jobs, so that everyone can build a good life in the place they love.",
+        "You can count on Linda Li and David Eby to build BC strong."
+      ],
+      "statementUrl": "https://www.bcndp.ca/team",
+      "statementBy": "BC NDP",
+      "website": [
+        "https://richmondbridgeport.bcndp.ca"
+      ],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-bridgeport-teresa-wat",
+      "name": "Teresa Wat",
+      "surname": "WAT",
+      "office": "richmond-bridgeport",
+      "org": "bc-conservative",
+      "statement": [
+        "Teresa Wat has served as the Member of the Legislative Assembly (MLA) for Richmond Centre since 2013, winning re-election in 2017 and 2020. She ran and won re-election in the Richmond-Bridgeport district in 2024.",
+        "Wat has held several key roles, including Shadow Minister for Tourism, Arts and Culture, and Multiculturalism. Since 2017, she has been the Shadow Minister for Multiculturalism and a member of the Select Standing Committee on Children and Youth.",
+        "Between 2013 and 2017, Wat was the Minister of International Trade and the Minister Responsible for the Asia Pacific Strategy and Multiculturalism. She also contributed to the Cabinet Committee on Strong Economy and the Priorities and Planning Committee.",
+        "Before entering politics, Wat was the News Director at Channel M Television (now OMNI TV), where she helped launch the first live Cantonese, Mandarin, and Punjabi daily news programs in British Columbia. She also served as the News Editor for Ming Pao Daily News and as President and CEO of Mainstream Broadcasting Corporation, a multicultural broadcasting station. Prior to immigrating to Canada in 1989, she had a distinguished career in the communications industry in Hong Kong and Singapore.",
+        "Wat’s achievements have been recognized with the Grand Officer of the Order of the Crown, one of the highest honours from the Kingdom of Belgium, and the Queen’s Diamond Jubilee Award for her community service. She has also been named one of BC’s top 100 most influential women by the Vancouver Sun and one of Greater Vancouver’s top 33 most outstanding Chinese Canadians by Sing Tao Daily Vancouver."
+      ],
+      "statementUrl": "https://conservativebc.ca/candidate/teresa-wat/",
+      "statementBy": "Conservative Party of BC",
+      "website": [],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-centre-lawrence-chen",
+      "name": "Lawrence Chen",
+      "surname": "CHEN",
+      "office": "richmond-centre",
+      "org": "canwest",
+      "statement": [],
+      "statementUrl": null,
+      "statementBy": null,
+      "website": [],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-centre-calvin-dang",
+      "name": "Calvin Dang",
+      "surname": "DANG",
+      "office": "richmond-centre",
+      "org": "bc-green",
+      "statement": [
+        "“I believe good representation starts with listening, understanding local concerns, and working together.”",
+        "Calvin Dang is a long-time Richmond business owner, entrepreneur, community leader, and youth sports advocate. Since 2014, he has operated federally registered food-processing businesses specializing in fresh seafood and meat.",
+        "Through his business career, Calvin has built long-standing relationships with restaurants, supermarkets, food-service businesses, families, consumers, commercial fishers, fishing communities, and Indigenous communities. His experience managing operations, employees, suppliers, customers, and logistics has given him practical knowledge of small business, local industry, and the food and seafood sectors.",
+        "For more than five years, Calvin has helped lead a non-profit Asian Canadian basketball organization in Richmond serving approximately 1,000 members. Working with youth, parents, families, coaches, and volunteers, he supports programs that promote physical activity, teamwork, healthy lifestyles, and positive opportunities for young people.",
+        "Calvin is also a Board Member of the Canadian Community Service Association and has developed extensive relationships across Richmond’s Chinese and Asian communities and with people from diverse backgrounds. He holds a Bachelor’s Degree in Economics from the University of Manitoba.",
+        "Calvin believes good representation starts with listening, understanding local concerns, and working together. He is seeking to bring his business leadership, community service, and commitment to families and youth into provincial public service through practical, collaborative, and community-focused representation."
+      ],
+      "statementUrl": "https://bcgreens.ca/candidates-2026/calvin-dang/",
+      "statementBy": "BC Green Party",
+      "website": [],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-centre-sacha-peter",
+      "name": "Sacha Peter",
+      "surname": "PETER",
+      "office": "richmond-centre",
+      "org": "bc-conservative",
+      "statement": [
+        "Sacha is a Chartered Professional Accountant specializing in corporate taxation. Born and raised in Richmond, where he still lives, he graduated from the University of British Columbia with a Bachelor of Science in Physics and is the father of two teenage sons. Sacha will be a strong advocate for Richmond.",
+        "Since 2009, Sacha has written about Canadian finance, economics, politics and the ups and downs of investing in the capital markets at Divestor.com. He also hosts the Late Night Finance show.",
+        "Sacha’s record of public service reflects a deep commitment to accountability. He has served on many boards and committees, most notably the Cultus Lake Park Board. Elected twice, he served for six years, including three as Chair, and led the board in eliminating its budget deficit.",
+        "As the MLA for Richmond Centre, Sacha will scrutinize the provincial budget the way he has scrutinized publicly traded companies for nearly two decades: following the numbers, demanding accountability and exposing waste wherever he finds it."
+      ],
+      "statementUrl": "https://conservativebc.ca/candidate/sacha-peter/",
+      "statementBy": "Conservative Party of BC",
+      "website": [],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-centre-henry-yao",
+      "name": "Henry Yao",
+      "surname": "YAO",
+      "office": "richmond-centre",
+      "org": "bc-ndp",
+      "statement": [
+        "Building a stronger Richmond Centre.",
+        "Henry Yao is happy to call Richmond home and he is standing up for your community on the issues that matter. Born in Taiwan, he moved to Richmond when he was young and is fluent in both English and Mandarin. Henry served as the MLA for Richmond South Centre from 2020-2024.",
+        "A dedicated community volunteer, Henry has been active with multiple community organizations, with an eye to always promoting safe, respectful and constructive dialogue, building bridges across cultural divides, and inclusivity.",
+        "Henry Yao is ready to stand up for young families in Richmond, fight to protect the services that they count on, create good jobs, strengthen healthcare, and build a prosperous economy for the future.",
+        "Henry Yao, David Eby and the BC NDP are building BC strong."
+      ],
+      "statementUrl": "https://www.bcndp.ca/team",
+      "statementBy": "BC NDP",
+      "website": [
+        "https://richmondcentre.bcndp.ca"
+      ],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-queensborough-luc-burns",
+      "name": "Luc Burns",
+      "surname": "BURNS",
+      "office": "richmond-queensborough",
+      "org": "bc-green",
+      "statement": [
+        "“I believe in government that listens to its constituents, builds sustainable policy, and improves the well-being of the overall community.”",
+        "Luc Burns is a materials engineer, union job steward, and quality assurance professional who works in Richmond. He holds a Bachelor of Applied Science in Materials Engineering from the University of British Columbia, and he has built a career on finding the root cause of a problem, addressing it, and reusing as much material as possible in the process. He has five years of experience in quality assurance and manufacturing.",
+        "As a Union Job Steward, Luc represents his coworkers in collective bargaining and in resolving workplace concerns. He has also sat on his workplace’s Joint Health and Safety Committee, helping keep colleagues safe, and holds an Occupational First Aid certificate.",
+        "Invested in the wellbeing of the community he lives in, Luc is Secretary of his Strata Council, where he helps with planning, financial decisions, and the ongoing maintenance that keeps a multi-household community running smoothly.",
+        "Ecologically conscious, Luc typically transits to work and recycles as much as possible. He and his fiancée share an electric vehicle and are owners of two adorable pets, a cat and a dog.",
+        "Luc believes in government that listens to its constituents, builds sustainable policy, and improves the well-being of the overall community. He brings a strong head for numbers, a passion for uplifting his community, and the drive to help shape policy that makes everyday life more affordable for the people of Richmond-Queensborough."
+      ],
+      "statementUrl": "https://bcgreens.ca/candidates-2026/luc-burns/",
+      "statementBy": "BC Green Party",
+      "website": [],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-queensborough-dhar-grewal",
+      "name": "Dhar Grewal",
+      "surname": "GREWAL",
+      "office": "richmond-queensborough",
+      "org": "bc-ndp",
+      "statement": [
+        "Standing up for Richmond-Queensborough.",
+        "Dhar Grewal is a champion of small business who is dedicated to bringing people together and building stronger communities. Born in Campbell River, Dhar has called Richmond home for three decades where he met his wife, a lifelong resident, and raised two daughters.",
+        "As a Senior Manager at Vancity, Dhar has worked closely with families, entrepreneurs, and small businesses, helping clients achieve important milestones like establishing a business and purchasing their first homes. He demonstrated corporate leadership grounded in a People, Planet, Profit focus. Dhar has a long history of giving back. He has coached thousands of kids in local youth soccer, supported organizations such as the ALS Society, and worked to strengthen this community.",
+        "With deep roots in Richmond-Queensborough, Dhar is ready to bring his experience, community focus, and commitment to public service to the legislature.",
+        "Dhar Grewal, David Eby and the BC NDP have a plan to build BC strong."
+      ],
+      "statementUrl": "https://www.bcndp.ca/team",
+      "statementBy": "BC NDP",
+      "website": [
+        "https://richmondqueensborough.bcndp.ca"
+      ],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-queensborough-steve-kooner",
+      "name": "Steve Kooner",
+      "surname": "KOONER",
+      "office": "richmond-queensborough",
+      "org": "bc-conservative",
+      "statement": [
+        "Professional Background:",
+        "Steve Kooner is a well known successful lawyer who has owned his own law firm, Steve Kooner Law Corporation, for over 17 years. Steve prides himself with being a solution oriented problem solving lawyer in the litigation area. Steve has a Bachelor of Arts degree with a Major in Political Science from Simon Fraser University and a Juris Doctor law degree from the University of Calgary. Steve and his law firm have received legal service awards such as Three Best Rated Award and Consumer Choice Award in recent years. Steve has also given back to the legal profession by providing mentorship to countless number of aspiring lawyers in the community and by formally taking on many articled students through the Law Society of British Columbia Admissions Program.",
+        "Community Involvement:",
+        "In addition to being a practicing lawyer, Steve is known for his significant community involvement. Steve has helped countless community organizations with community connecting and spreading awareness. Steve regularly engages in public speaking at events held by community organizations. Steve has spoken at community events of various sizes, which includes anywhere from a few people in a conference room to massive crowds in an arena. In 2023, Steve was awarded the Queen’s Platinum Jubilee Award by the Government of Canada for his significant community contribution. Also in 2023, Steve was named an Ambassador to a BCHL Junior Hockey Club.",
+        "Personal Background:",
+        "Steve was born in Vancouver and grew up in the lower mainland of British Columbia. Steve was born into an iconic music family, as Steve’s father is a former superstar Punjabi recording artist, who recorded with EMI and who had many hit songs in the 1980s. As a child, Steve’s parents taught him the value of hard work and generous giving. In line with this thinking, Steve was enrolled in the martial art of Taekwondo as a young child and he achieved a black belt at the age of 11. Steve was also always seen with his dad as a child learning about the music industry within the community.",
+        "Passion to Serve:",
+        "Steve has a passion to continue serving the community to make a difference."
+      ],
+      "statementUrl": "https://conservativebc.ca/candidate/steve-kooner/",
+      "statementBy": "Conservative Party of BC",
+      "website": [],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-steveston-robert-evans",
+      "name": "Robert Evans",
+      "surname": "EVANS",
+      "office": "richmond-steveston",
+      "org": null,
+      "statement": [],
+      "statementUrl": null,
+      "statementBy": null,
+      "website": [],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-steveston-bruce-kong",
+      "name": "Bruce Kong",
+      "surname": "KONG",
+      "office": "richmond-steveston",
+      "org": "bc-ndp",
+      "statement": [
+        "Building BC strong in Richmond-Steveston",
+        "Bruce Kong is a small business owner, employer, father, and son who understands the everyday pressures facing families and working people in Richmond because he lives them himself. As the owner of an auto body shop in Richmond, Bruce knows firsthand what it takes to build a business, support employees and keep the doors open in an increasingly uncertain economy. He understands the challenges local business owners face, from rising operating costs to economic uncertainty. But above all, Bruce is a family man. As a father of two children and the son of aging parents, he understands the responsibility of raising the next generation while ensuring the people who raised you are cared for. These experiences shape Bruce's perspective and the kind of representative he wants to be. He knows that behind every small business is a family making sacrifices, employees counting on a steady paycheque and a community that depends on local businesses to thrive. He also understands that families need access to reliable health care, opportunities for their children and the peace of mind that comes from knowing they can support their loved ones. Bruce is running for the BC NDP in Richmond-Steveston because he wants to help build a province where families can get ahead, local businesses can succeed and people of every generation can look forward to a better future."
+      ],
+      "statementUrl": "https://www.bcndp.ca/team",
+      "statementBy": "BC NDP",
+      "website": [
+        "https://brucekong.bcndp.ca"
+      ],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-steveston-barry-wosk",
+      "name": "Barry Wosk",
+      "surname": "WOSK",
+      "office": "richmond-steveston",
+      "org": "centrebc",
+      "statement": [
+        "Barry Wosk is a lifelong Richmond resident who calls the Steveston area home.",
+        "Raised in Westwind, he is a proud Steveston High School graduate - GO PACKERS! His mother still lives in his childhood home after more than 50 years and his roots in the community continue today, living and working in the riding with his wife and two teenage children.",
+        "A graduate of the University of British Columbia with a Bachelor of Commerce degree, Barry has spent more than three decades building and operating a successful Richmond-based small business. As an entrepreneur, he has developed expertise in strategic planning, finance, sales, marketing, operations, and manufacturing. He has also provided consulting for foreign organizations looking to grow their footprint in Canada.",
+        "Barry’s commitment to community is clear in his volunteer efforts with the Steveston High School Alumni Association, Big Brothers, and RCM-SAR. Most recently, he served as a Director of the Richmond Chamber of Commerce, where he worked alongside local business and community leaders to support economic growth and strengthen Richmond’s future.",
+        "Having travelled extensively throughout Canada, the United States, and internationally, Barry has gained a broad appreciation for different perspectives, cultures, and communities. Those experiences have reinforced his belief that Richmond is the best place in the world to live, work, and to raise a family. He values the city’s diversity, natural beauty, enterprising spirit, and unique role as Canada’s gateway to the Pacific.",
+        "Barry is seeking public office because he believes British Columbians deserve better governance that focuses on results rather than division. He believes government should be financially responsible, socially inclusive, and environmentally sustainable. He is committed to strengthening the economy, improving access to healthcare, building safer communities, addressing housing affordability, and working collaboratively with local governments to deliver better outcomes for residents and is committed to building a stronger future for Richmond and British Columbia.",
+        "The political status quo is over. It’s time for civility, strong leadership, and practical solutions to complex problems. It’s time for something new."
+      ],
+      "statementUrl": "https://www.centrebc.ca/candidates/barry-wosk/",
+      "statementBy": "CentreBC",
+      "website": [],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-steveston-keenan-yang",
+      "name": "Keenan Yang",
+      "surname": "YANG",
+      "office": "richmond-steveston",
+      "org": "canwest",
+      "statement": [],
+      "statementUrl": null,
+      "statementBy": null,
+      "website": [],
+      "social": [],
+      "phone": null,
+      "nomination": null,
+      "disclosure": null,
+      "profileUrl": "https://elections.bc.ca/2026-provincial-election/candidate-list/"
+    },
+    {
+      "id": "richmond-steveston-gordon-zhang",
+      "name": "Gordon Zhang",
+      "surname": "ZHANG",
+      "office": "richmond-steveston",
+      "org": "bc-conservative",
+      "statement": [
+        "Gordon Zhang is the Conservative Party of BC candidate for Richmond-Steveston.",
+        "Zhang is a community leader with deep roots in Richmond and across the Lower Mainland’s Chinese-Canadian community. For more than seventeen years, he has taught business at Kwantlen Polytechnic University’s Richmond campus, helping prepare students for careers in B.C.’s economy.",
+        "Alongside his teaching, Gordon is an entrepreneur who has co-founded several Canadian companies. When the COVID-19 pandemic exposed Canada’s dependence on imported protective equipment, he helped establish one of the country’s first domestic N95 respirator production lines in Richmond, supplying certified respiratory protection to the Canadian Olympic Team at the 2022 Tokyo Games. He also built one of only three laboratories in Canada accredited to test respirators and medical masks, strengthening the country’s ability to verify the safety of equipment frontline workers rely on.",
+        "That experience gave Gordon a firsthand understanding of what it takes to build in British Columbia: the value of domestic manufacturing, the importance of secure supply chains, and the challenges businesses face in getting new ventures off the ground.",
+        "Gordon has given back to the community he calls home. Through the local Lions Club, he has raised funds for the Richmond Hospital Foundation and other local causes, and he has lent his organizing experience to community and technology events across Metro Vancouver.",
+        "Gordon will bring an educator’s perspective, an entrepreneur’s drive and a deep commitment to community service to Victoria. He will be a strong voice for Richmond families and businesses, and for an economy that makes things here at home."
+      ],
+      "statementUrl": "https://conservativebc.ca/candidate/gordon-zhang/",
       "statementBy": "Conservative Party of BC",
       "website": [],
       "social": [],
