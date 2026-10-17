@@ -2,33 +2,32 @@
 
 What's done, what's next, and ideas under consideration. Open an issue to suggest something.
 
-## Now (before October 17, 2026)
-
-- [x] Re-run `scripts/burnaby-2026/fetch_profiles.py` (October 10 and 17: no candidate changes).
-- [x] Check for late withdrawals, new polls or major news (October 17: the withdrawal deadline passed September 18; no new Burnaby polls found).
-- [ ] Ask a few people of different political views to review the guide for fairness before sharing it widely.
-
 ## Now: BC provincial election (before October 24, 2026)
 
-The guide covers the nine ridings that include Burnaby or Richmond (`?election=bc-2026`).
+The guide covers the nine ridings that include Burnaby or Richmond (`?election=bc-2026`). Burnaby's local election was October 17.
 
-- [x] Re-run `scripts/bc-2026/fetch_candidates.py` and check focus points against bios (October 17: bios unchanged; added Green candidate Greg DePaco, who withdrew October 9 but is still on the Burnaby-New Westminster ballot).
+Before voting day:
+
 - [ ] Re-check the party platforms for new announcements. October 17: added the NDP costed plan's Burnaby Hospital Phase 2 funding. The Conservatives' plan still has no housing commitment, and their costed platform is described as imminent.
-- [x] Review OneBC's lean label ("Right-wing to far-right"): kept, now also citing Wikipedia's sources directly (The Tyee: "right-wing"; CFJC Today: "far-right").
-- [x] Add attributed arguments for and against (`elections/bc-2026/opinions.js`), from the October 14 leaders' debate coverage.
-- [x] Re-check the Issues facts (October 17: added the July and August drug-death figures; the September 16 family doctor figure is still the latest).
 - [ ] Re-run `scripts/bc-2026/fetch_candidates.py` once more before Final Voting Day, now that it covers the Richmond ridings, and check the Richmond focus points against any bio changes.
+- [ ] Ask a few people of different political views to review the BC guide for fairness before sharing it widely.
+- [ ] Ask someone to try "Find my riding" and the riding switcher on a phone with a few real addresses, including one near a riding boundary.
+
+Richmond gaps:
+
 - [ ] Find bios for the candidates who have none: Lawrence Chen and Keenan Yang (CanWest Party) and Robert Evans (independent, Richmond-Steveston). If one turns up, add it to `BIOS` in the fetch script. Also look for a CanWest Party website or platform.
 - [ ] Check whether Lawrence Chen and Calvin Dang, both Richmond MLA candidates, are the same people as the school trustee candidates of those names on Richmond's October 17 ballot (City of Richmond declaration). If confirmed, add a sourced note and the `local` flag, as for Jenny Yamagata.
 - [ ] Add Richmond candidates to the Issues pages (`issues[].candidates`), where their own bios speak to an issue. Today these pages quote only Burnaby candidates.
-- [ ] Ask someone to try "Find my riding" on a phone with a few real addresses, including one near a riding boundary.
 
-## Next (after October 17, 2026)
+## Next: results
 
 - [ ] Add Burnaby 2026 results (`elections/burnaby-2026/results.js`) once the City declares them (by October 21), then set `results: true`.
-- [ ] Decide whether to keep this site, or move to its own domain, once more elections are added.
 - [ ] Add BC 2026 results for the Burnaby and Richmond ridings after final count (planned November 6 to 10), then set `results: true`.
-- [ ] Accessibility pass: screen reader walkthrough and keyboard-only use. (Party colour contrast checked October 10: all pass WCAG AA in both themes.)
+
+## After the elections
+
+- [ ] Accessibility pass: screen reader walkthrough and keyboard-only use, including the riding switcher and the sideways-scrolling platform table. (Party colour contrast checked October 10: all pass WCAG AA in both themes.)
+- [ ] Decide whether to keep this site, or move to its own domain, once more elections are added.
 
 ## Later
 
@@ -82,3 +81,9 @@ Three options, from least to most risky:
 - [x] The site now opens on the next election automatically, switching at midnight after voting day; no manual default to change
 - [x] BC 2026: added the four Richmond ridings (14 candidates, incumbents, and the CanWest Party), and "Find my riding" from an address or your location, checked in the browser against Elections BC's boundaries (October 17)
 - [x] Riding switcher in the header: Candidates, Parties, Issues, the Overview's notices and Results show just your riding, with one tap to show all. The platform comparison scrolls sideways with the topic column pinned (October 17)
+- [x] Burnaby: re-ran `scripts/burnaby-2026/fetch_profiles.py` before voting day (October 10 and 17: no candidate changes)
+- [x] Burnaby: checked for late withdrawals, new polls and major news (October 17: the withdrawal deadline passed September 18; no new polls found)
+- [x] BC 2026: re-ran `scripts/bc-2026/fetch_candidates.py` and checked focus points against bios (October 17: bios unchanged; added Green candidate Greg DePaco, who withdrew October 9 but is still on the Burnaby-New Westminster ballot)
+- [x] BC 2026: reviewed OneBC's lean label ("Right-wing to far-right"): kept, now also citing Wikipedia's sources directly (The Tyee: "right-wing"; CFJC Today: "far-right") (October 17)
+- [x] BC 2026: attributed arguments for and against (`elections/bc-2026/opinions.js`), from the October 14 leaders' debate coverage (October 17)
+- [x] BC 2026: re-checked the Issues facts (October 17: added the July and August drug-death figures; the September 16 family doctor figure is still the latest)
