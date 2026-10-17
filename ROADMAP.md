@@ -81,3 +81,4 @@ Three options, from least to most risky:
 - [x] BC Issues pages (cost of living, housing, health care, public safety) with official background facts, and "pick your riding" for the Overview, Candidates and My ballot (October 14)
 - [x] The site now opens on the next election automatically, switching at midnight after voting day; no manual default to change
 - [x] BC 2026: added the four Richmond ridings (14 candidates, incumbents, and the CanWest Party), and "Find my riding" from an address or your location, checked in the browser against Elections BC's boundaries (October 17)
+- [x] Riding switcher in the header: Candidates, Parties, Issues, the Overview's notices and Results show just your riding, with one tap to show all. The platform comparison scrolls sideways with the topic column pinned (October 17)

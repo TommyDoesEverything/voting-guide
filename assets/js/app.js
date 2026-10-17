@@ -181,6 +181,59 @@
     Object.keys(picks).forEach(function (k) { if (k !== myOffice) picks[k] = []; });
   }
   function ballotOffices() { return CHOOSE ? (myOffice ? [myOffice] : []) : Object.keys(OFFICES); }
+
+  // What the other pages show: just your riding, or all of them. "Show all"
+  // keeps your riding (and ballot); it only widens what's listed.
+  var SCOPE_KEY = "vg-scope-all:" + META.id;
+  var scopeAll = CHOOSE ? store.get(SCOPE_KEY, false) === true : true;
+  function scope() { return CHOOSE && myOffice && !scopeAll ? myOffice : null; }
+  function inScope(c) { var s = scope(); return !s || c.office === s; }
+  function scopedOffices() { var s = scope(); return s ? [s] : Object.keys(OFFICES); }
+  function orgsInScope() {
+    return Object.keys(G.orgs).filter(function (k) { return !scope() || CANDS.some(function (c) { return c.org === k && inScope(c); }); });
+  }
+  function setScopeAll(all) {
+    if (all === scopeAll) return;
+    scopeAll = all;
+    store.set(SCOPE_KEY, all);
+    if (scope()) { state.office = scope(); state.org = "all"; }
+    refreshScope();
+  }
+  // Re-draw everything that depends on the scope.
+  function refreshScope() {
+    rendered.candidates = rendered.parties = rendered.issues = rendered.results = false;
+    renderScopeBar();
+    if (["candidates", "parties", "issues", "results"].indexOf(route.view) > -1) {
+      var want = "#candidates/" + state.office;
+      if (route.view === "candidates" && location.hash !== want) location.hash = want; else route();
+    }
+    if (route.view === "start") renderStart();
+    if (route.view === "picks") renderPicks();
+  }
+  var SCOPED_VIEWS = ["start", "candidates", "parties", "issues", "results"];
+  function renderScopeBar() {
+    var bar = $("#scope-bar");
+    if (!CHOOSE) return;
+    var all = Object.keys(OFFICES);
+    bar.innerHTML = '<label class="scope-label" for="scope-pick">' + icon("pin") + '<span class="scope-word">' + esc(CHOOSE.noun.charAt(0).toUpperCase() + CHOOSE.noun.slice(1)) + "</span></label>" +
+      '<select id="scope-pick"><option value="all"' + (scope() ? "" : " selected") + ">All " + all.length + " " + esc(CHOOSE.noun) + "s</option>" +
+      all.map(function (o) {
+        return '<option value="' + o + '"' + (o === scope() ? " selected" : "") + ">" + esc(OFFICES[o].label) + (o === myOffice ? " (yours)" : "") + "</option>";
+      }).join("") + "</select>" +
+      (myOffice ? '<button type="button" class="scope-toggle" id="scope-toggle">' + (scope() ? "Show all" : "Just mine") + "</button>" : "");
+    var show = SCOPED_VIEWS.indexOf(route.view || "start") > -1;
+    bar.hidden = !show;
+    document.documentElement.classList.toggle("has-scope", show);
+  }
+  if (CHOOSE) {
+    document.addEventListener("change", function (ev) {
+      if (ev.target.id !== "scope-pick") return;
+      if (ev.target.value === "all") setScopeAll(true); else setMyOffice(ev.target.value);
+    });
+    document.addEventListener("click", function (ev) {
+      if (ev.target.id === "scope-toggle") setScopeAll(!!scope());
+    });
+  }
   function officePicker(id) {
     return '<select class="office-pick" id="' + id + '"><option value="">Choose your ' + esc(CHOOSE.noun) + "</option>" +
       Object.keys(OFFICES).map(function (o) {
@@ -281,6 +334,7 @@
   }
   function setMyOffice(o) {
     o = OFFICES[o] ? o : null;
+    if (o && scopeAll) { scopeAll = false; store.set(SCOPE_KEY, false); if (o === myOffice) { state.office = o; refreshScope(); } }
     if (o === myOffice) return;
     var dropped = 0;
     if (o) Object.keys(picks).forEach(function (k) {
@@ -291,11 +345,9 @@
     store.set(PICKS_KEY, picks);
     updatePickCount();
     if (o) { state.office = o; state.org = "all"; }
-    rendered.candidates = false;
     toast(o ? "Your " + CHOOSE.noun + ": " + OFFICES[o].label + "." + (dropped ? " Picks in other " + CHOOSE.noun + "s were cleared." : "")
       : "Showing every " + CHOOSE.noun + ".");
-    if (route.view === "start") renderStart();
-    if (route.view === "picks") renderPicks();
+    refreshScope();
   }
   document.addEventListener("change", function (ev) {
     if (ev.target.classList && ev.target.classList.contains("office-pick")) { finderMsg = ""; setMyOffice(ev.target.value); }
@@ -314,7 +366,11 @@
       toast("You've already picked " + seats + " for " + OFFICES[c.office].plural + ". Remove one first.");
       return false;
     } else {
-      if (CHOOSE && !myOffice) { myOffice = c.office; store.set(MINE_KEY, myOffice); }
+      if (CHOOSE && !myOffice) {
+        myOffice = c.office; store.set(MINE_KEY, myOffice);
+        rendered.parties = rendered.issues = rendered.results = false;
+        renderScopeBar();
+      }
       list.push(id);
       toast("Added " + plainName(c) + " (" + list.length + " of " + seats + ")");
     }
@@ -472,7 +528,7 @@
         ? '<div class="tiles">' + tile(myOffice) + "</div>" + more("Other " + CHOOSE.noun + "s in this guide", '<div class="tiles">' + others.map(tile).join("") + "</div>", false, "pin")
         : '<div class="tiles">' + others.map(tile).join("") + "</div>");
 
-    var flagged = PAST ? [] : CANDS.filter(function (c) { return c.flags.some(function (f) { return CROSS_FLAGS.indexOf(f) > -1; }); });
+    var flagged = PAST ? [] : CANDS.filter(function (c) { return inScope(c) && c.flags.some(function (f) { return CROSS_FLAGS.indexOf(f) > -1; }); });
     var notices = (PAST ? "" : htmlItems(e.alerts, "li")) + flagged.map(function (c) {
       return '<li><a href="#candidates/' + c.office + "/" + c.id + '">' + esc(plainName(c)) + "</a> (" + esc(OFFICES[c.office].label) + "): " +
         c.notes.map(function (n) { return esc(n.text) + srcChips(n.src); }).join(" ") + "</li>";
@@ -491,7 +547,7 @@
     var hero = '<div class="hero">' +
       '<div class="hero-text">' +
         '<span class="eyebrow">' + esc(e.kind) + " · " + esc(e.day) + "</span>" +
-        "<h1>" + esc(e.place) + (PAST ? " voted on " : " votes on ") + esc(e.dayShort) + "</h1>" +
+        "<h1>" + esc(e.place) + (PAST ? " voted on " : / and /.test(e.place) ? " vote on " : " votes on ") + esc(e.dayShort) + "</h1>" +
         '<p><span class="countdown">' + esc(countdownText()) + "</span> " +
           (PAST ? (RES ? "See who won, with official vote counts, on the Results tab. " : "") + "The candidates, parties and issues are kept here as they stood during the campaign."
                 : esc(e.termNote) + " Every candidate is here in their own words, with sources for everything else.") + "</p>" +
@@ -536,14 +592,19 @@
 
   // -------------------------------------------------------------- CANDIDATES
   function renderCandidatesShell() {
-    var seg = Object.keys(OFFICES).map(function (o) {
+    var offs = scopedOffices();
+    var seg = offs.map(function (o) {
       var n = CANDS.filter(function (c) { return c.office === o; }).length;
       return '<button type="button" data-office="' + o + '">' + esc(OFFICES[o].plural) + "<span>" + n + " running" + (o === myOffice ? " · yours" : "") + "</span></button>";
     }).join("");
     $("#view-candidates").innerHTML =
-      intro("Candidates", "All " + CANDS.length + " candidates, listed alphabetically by surname " + esc(COPY.listedAs) + ". Each card's focus comes only from the candidate's own statement. Tap <strong>View full profile</strong> for their full statement, sourced context, and arguments for and against.") +
+      intro("Candidates", (scope()
+          ? "The " + CANDS.filter(inScope).length + " candidates in " + esc(OFFICES[scope()].label) + ", your " + esc(CHOOSE.noun) + ","
+          : "All " + CANDS.length + " candidates,") +
+        " listed alphabetically by surname " + esc(COPY.listedAs) + ". Each card's focus comes only from the candidate's own statement. Tap <strong>View full profile</strong> for their full statement, sourced context, and arguments for and against." +
+        (scope() ? " To see other " + esc(CHOOSE.noun) + "s, tap <strong>Show all</strong> at the top." : "")) +
       '<div class="card filters-card">' +
-        '<div class="seg' + (Object.keys(OFFICES).length > 6 ? " many" : "") + '" role="group" aria-label="Choose a race">' + seg + "</div>" +
+        (offs.length > 1 ? '<div class="seg' + (offs.length > 6 ? " many" : "") + '" role="group" aria-label="Choose a race">' + seg + "</div>" : "") +
         '<div class="filter-row">' +
           '<label class="input">' + icon("search") + '<span class="visually-hidden">Search</span><input type="search" id="cand-q" placeholder="Search names or topics, e.g. transit" autocomplete="off"></label>' +
           '<label><span class="visually-hidden">Party</span><select id="cand-org"></select></label>' +
@@ -795,12 +856,16 @@
   // Mayor / Council / Trustee count tiles for a group of candidates.
   function countTiles(people) {
     var offs = Object.keys(OFFICES);
+    if (scope()) {
+      var here = people.filter(inScope);
+      return '<p class="party-where">' + icon("pin") + "<span>In " + esc(OFFICES[scope()].label) + ": " + (here.length ? here.map(candLink).join(", ") : "no candidate") + "</span></p>";
+    }
     // Many races (ridings): one line instead of a wall of tiles.
     if (offs.length > 6) {
       var where = offs.filter(function (off) { return people.some(function (c) { return c.office === off; }); });
       var noun = CHOOSE ? CHOOSE.noun + "s" : "races";
-      return '<p class="party-where">' + icon("pin") + (where.length === offs.length ? "Running in all " + offs.length + " " + noun + " in this guide"
-        : "Running in " + where.length + " of " + offs.length + " " + noun + " in this guide: " + where.map(function (off) { return esc(OFFICES[off].label); }).join(", ")) + "</p>";
+      return '<p class="party-where">' + icon("pin") + "<span>" + (where.length === offs.length ? "Running in all " + offs.length + " " + noun + " in this guide"
+        : "Running in " + where.length + " of " + offs.length + " " + noun + " in this guide: " + where.map(function (off) { return esc(OFFICES[off].label); }).join(", ")) + "</span></p>";
     }
     return '<div class="party-counts">' + Object.keys(OFFICES).map(function (off) {
       var n = people.filter(function (c) { return c.office === off; }).length;
@@ -822,9 +887,8 @@
   }
 
   // Side-by-side table of what each party's platform says on the same topics.
-  function compareTable() {
-    if (!G.compareTopics.length) return "";
-    var keys = Object.keys(G.orgs);
+  function compareTable(keys) {
+    if (!G.compareTopics.length || !keys.length) return "";
     var head = "<tr><th scope=\"col\">Topic</th>" + keys.map(function (k) {
       return '<th scope="col" class="' + pc(k).trim() + '"><a class="party-text" href="#parties/' + k + '"><span class="party-dot"></span>' + esc(G.orgs[k].short) + "</a></th>";
     }).join("") + "</tr>";
@@ -837,15 +901,19 @@
     }).join("");
     return '<div class="card compare-card"><h2 class="h-ico">' + icon("scale") + 'Compare their platforms</h2>' +
       '<p class="small muted">What each party\'s published platform says on the same ' + G.compareTopics.length + ' topics, quoted or closely paraphrased. "Not in their platform" means we didn\'t find it there, not that they oppose it.' + (G.issues.length ? " Tap a topic for background facts." : "") + "</p>" +
-      '<div class="compare-scroll"><table class="compare"><thead>' + head + "</thead><tbody>" + rows + "</tbody></table></div></div>";
+      '<div class="compare-wrap"><div class="compare-scroll"><table class="compare" style="--cols:' + keys.length + '"><thead>' + head + "</thead><tbody>" + rows + "</tbody></table></div>" +
+      '<button type="button" class="scroll-cue cue-side" tabindex="-1" aria-hidden="true">›</button></div></div>';
   }
 
   function renderParties() {
-    var cards = Object.keys(G.orgs).map(function (k) {
+    var keys = orgsInScope();
+    var cards = keys.map(function (k) {
       var o = G.orgs[k];
-      var mine = CANDS.filter(function (c) { return c.org === k; });
-      // Their mayoral candidate and anyone currently in office.
-      var notable = mine.filter(function (c) { return c.office === "mayor" || c.flags.indexOf("incumbent") > -1; });
+      var all = CANDS.filter(function (c) { return c.org === k; });
+      var mine = all.filter(inScope);
+      // Their mayoral candidate and anyone currently in office (in scope; with
+      // one riding in scope, its candidate is already named above).
+      var notable = scope() ? [] : mine.filter(function (c) { return c.office === "mayor" || c.flags.indexOf("incumbent") > -1; });
       return '<article class="card party party-top-edge' + pc(k) + '" id="org-' + k + '">' +
         '<div class="party-top"><span class="badge' + (o.role === "Governing party" ? " solid" : "") + '">' + esc(o.role) + "</span>" +
           (o.website ? '<a class="site-link" href="' + esc(o.website) + '" target="_blank" rel="noopener">' + icon("globe") + "Website</a>" : "") + "</div>" +
@@ -865,17 +933,19 @@
         '<p class="label">' + icon("scale") + 'Arguments for & against</p>' + opinionsBox(OPS[k] || [], o.name) +
         (o.more && o.more.length ? more("More of their platform", '<ul class="says">' + o.more.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" +
           "<p>" + ext(G.sources[o.platform].url, "Read the full platform") + "</p>") : "") +
-        more("All " + mine.length + " candidates", rosterBlock(mine)) +
+        (scope() ? "" : more("All " + mine.length + " candidates", rosterBlock(mine))) +
         "</article>";
     }).join("");
 
-    var indep = CANDS.filter(function (c) { return !c.org; });
-    var indepNotable = indep.filter(function (c) { return c.flags.indexOf("incumbent") > -1; });
+    var indep = CANDS.filter(function (c) { return !c.org && inScope(c); });
+    var indepNotable = scope() ? [] : indep.filter(function (c) { return c.flags.indexOf("incumbent") > -1; });
     $("#view-parties").innerHTML =
-      intro("Parties", esc(COPY.partiesIntro)) +
-      compareTable() +
+      intro("Parties", esc(COPY.partiesIntro) + (scope()
+        ? " <strong>Showing the " + keys.length + (keys.length === 1 ? " party" : " parties") + (indep.length ? " and independents" : "") + " running in " + esc(OFFICES[scope()].label) + ".</strong> Tap <strong>Show all</strong> at the top for every party in this guide."
+        : "")) +
+      compareTable(keys) +
       '<div class="grid-2 party-grid">' + cards +
-      '<article class="card party party-top-edge' + pc(null) + '" id="org-independent"><div class="party-top"><span class="badge">No party</span></div><h2><span class="party-dot"></span>Independents</h2>' +
+      (indep.length ? '<article class="card party party-top-edge' + pc(null) + '" id="org-independent"><div class="party-top"><span class="badge">No party</span></div><h2><span class="party-dot"></span>Independents</h2>' +
         '<p class="tagline">' + indep.length + " " + esc(indep.length === 1
           ? COPY.independentsNote.replace(/^candidates (are|have)\b/, function (m, v) { return "candidate " + (v === "are" ? "is" : "has"); })
           : COPY.independentsNote) + "</p>" +
@@ -883,8 +953,10 @@
         (indepNotable.length ? '<dl class="kv"><div><dt>Notable</dt><dd>' + indepNotable.map(function (c) {
           return candLink(c) + ' <span class="muted small">(' + incumbentText(c) + ")</span>";
         }).join("<br>") + "</dd></div></dl>" : "") +
-        '<div class="indep-roster">' + rosterBlock(indep) + "</div>" +
-      "</article></div>";
+        (scope() ? "" : '<div class="indep-roster">' + rosterBlock(indep) + "</div>") +
+      "</article>" : "") + "</div>";
+    var wrap = $("#view-parties .compare-wrap");
+    if (wrap) watchScroll($(".compare-scroll", wrap), wrap, "x");
   }
 
   // ------------------------------------------------------------------ ISSUES
@@ -894,17 +966,19 @@
     }).join("") + "</nav>";
 
     $("#view-issues").innerHTML =
-      intro("Issues", "The big debates in this election. Each starts with sourced background facts, then where every party stands (the same positions as the comparison on the Parties page), then examples of individual candidates who have spoken to it.") +
+      intro("Issues", "The big debates in this election. Each starts with sourced background facts, then where every party stands (the same positions as the comparison on the Parties page), then examples of individual candidates who have spoken to it." +
+        (scope() ? " <strong>Showing the parties and candidates in " + esc(OFFICES[scope()].label) + ".</strong> Tap <strong>Show all</strong> at the top for everyone." : "")) +
       jump +
       G.issues.map(function (iss, i) {
         var topic = G.compareTopics.filter(function (t) { return t.issue === iss.id; })[0];
-        var parties = Object.keys(G.orgs).map(function (k) {
+        var parties = orgsInScope().map(function (k) {
           var st = topic && (G.orgs[k].stances || {})[topic.id];
           return '<div class="stance' + pc(k) + (st ? "" : " empty") + '">' +
             '<a class="stance-name party-link' + pc(k) + '" href="#parties/' + k + '"><span class="party-dot"></span>' + esc(G.orgs[k].short) + "</a>" +
             (st ? "<p>" + esc(st.text) + srcChips(st.src) + "</p>" : '<p class="na">Not in their platform</p>') + "</div>";
         }).join("");
-        var voices = (iss.candidates || []).map(function (v) {
+        var shown = (iss.candidates || []).filter(function (v) { return inScope(BY_ID[v.id]); });
+        var voices = shown.map(function (v) {
           var c = BY_ID[v.id];
           return '<li class="' + pc(c.org).trim() + '"><a class="party-link' + pc(c.org) + '" href="#candidates/' + c.office + "/" + c.id + '"><span class="party-dot"></span>' + esc(plainName(c)) + "</a>" +
             '<span class="voice-meta">' + esc(OFFICES[c.office].label) + " · " + esc(orgShort(c)) + "</span>" +
@@ -917,7 +991,7 @@
             '<div class="issue-facts"><p class="label">' + icon("file") + 'The facts</p><ul>' + iss.facts.map(function (f) { return "<li>" + esc(f.text) + srcChips(f.src) + "</li>"; }).join("") + "</ul></div>" +
             '<div class="issue-parties"><p class="label">' + icon("landmark") + 'Where the parties stand <span class="muted">(from their platforms)</span></p><div class="stances">' + parties + "</div></div>" +
           "</div>" +
-          (voices ? more("Candidates who've spoken to this (" + iss.candidates.length + ")", '<p class="small muted">Examples from candidates\' own statements and news coverage, not a complete list.</p><ul class="voices">' + voices + "</ul>") : "") +
+          (voices ? more("Candidates who've spoken to this (" + shown.length + ")", '<p class="small muted">Examples from candidates\' own statements and news coverage, not a complete list.</p><ul class="voices">' + voices + "</ul>") : "") +
           (iss.further ? more("Further reading", "<ul>" + iss.further.map(function (id) {
             var s = G.sources[id];
             return "<li>" + ext(s.url, s.title) + ' <span class="muted small">(' + esc(s.publisher) + ". Note the publisher's interest in the topic.)</span></li>";
@@ -938,7 +1012,7 @@
 
   function resultsSummary() {
     return '<div class="card"><h2 class="h-ico">' + icon("check") + "Who was elected</h2>" +
-      '<div class="elected-grid">' + Object.keys(OFFICES).map(function (o) {
+      '<div class="elected-grid">' + scopedOffices().map(function (o) {
         var won = raceRows(o).filter(function (r) { return r.elected && BY_ID[r.id]; });
         return '<div><p class="label">' + esc(OFFICES[o].plural) + '</p><ul class="elected-list">' + won.map(function (r) {
           var c = BY_ID[r.id];
@@ -954,7 +1028,7 @@
         : "Results will appear here after voting day, once they are officially declared.");
       return;
     }
-    var races = Object.keys(OFFICES).map(function (o) {
+    var races = scopedOffices().map(function (o) {
       var rows = raceRows(o);
       var max = Math.max.apply(null, rows.map(function (r) { return r.votes; }).concat([1]));
       return '<div class="card"><div class="race-bar"><h2 class="h-ico">' + icon(OFFICES[o].icon) + esc(OFFICES[o].plural) + '</h2><span class="count">' + OFFICES[o].seats + (OFFICES[o].seats === 1 ? " seat" : " seats") + "</span></div>" +
@@ -1113,8 +1187,14 @@
     var activeTab = $('.tabs a[data-tab="' + view + '"]');
     if (activeTab && activeTab.scrollIntoView) activeTab.scrollIntoView({ block: "nearest", inline: "nearest" });
 
+    renderScopeBar();
     var keepScroll = false;
     if (view === "candidates") {
+      if (scope() && parts[1] && OFFICES[parts[1]] && parts[1] !== scope()) {
+        scopeAll = true; store.set(SCOPE_KEY, true);
+        rendered.candidates = rendered.parties = rendered.issues = rendered.results = false;
+        renderScopeBar();
+      }
       if (!rendered.candidates) { renderCandidatesShell(); rendered.candidates = true; }
       var officeChanged = (parts[1] || state.office) !== state.office;
       showCandidates(parts[1] || state.office);
@@ -1129,6 +1209,13 @@
     if (view === "start") renderStart();
     if (view === "parties") {
       if (!rendered.parties) { renderParties(); rendered.parties = true; }
+      // A link to a party with no candidate in your riding: show all ridings.
+      if (scope() && parts[1] && (G.orgs[parts[1]] || parts[1] === "independent") && !document.getElementById("org-" + parts[1])) {
+        scopeAll = true; store.set(SCOPE_KEY, true);
+        rendered.candidates = rendered.issues = rendered.results = false;
+        renderScopeBar();
+        renderParties();
+      }
       var target = parts[1] && document.getElementById("org-" + parts[1]);
       if (target) { target.scrollIntoView({ block: "start" }); keepScroll = true; }
     }

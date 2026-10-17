@@ -159,6 +159,22 @@ button, input, select { font: inherit; color: inherit; }
 }
 .tabs a:hover { color: var(--bar-text); background: var(--bar-raised); }
 .tabs a[aria-current="page"] { background: var(--bar-text); color: var(--bar); }
+/* Riding switcher (elections where each voter is in one riding) */
+.scope-bar { max-width: 1120px; margin: 0 auto; padding: 0 var(--gutter) 10px; display: flex; align-items: center; gap: 8px; }
+.scope-bar[hidden] { display: none; }
+.scope-label { display: inline-flex; align-items: center; gap: 5px; color: var(--bar-muted); font-size: .8rem; font-weight: 700; flex: none; }
+.scope-label .i { width: 15px; height: 15px; }
+@media (max-width: 420px) { .scope-word { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+.scope-bar select {
+  flex: 0 1 300px; min-width: 0; height: 34px; padding: 0 8px; border-radius: 8px; font-size: .85rem; font-weight: 600;
+  background: var(--bar-raised); color: var(--bar-text); border: 1px solid var(--bar-line);
+}
+.scope-toggle {
+  flex: none; height: 34px; padding: 0 12px; border-radius: 8px; cursor: pointer; font-size: .8rem; font-weight: 700;
+  background: transparent; color: var(--bar-text); border: 1px solid var(--bar-line);
+}
+.scope-toggle:hover { background: var(--bar-raised); }
+html.has-scope { scroll-padding-top: 176px; }
 .pill { display: inline-block; min-width: 1.35em; padding: 0 .4em; border-radius: 999px; background: var(--pick); color: #2b2100; font-size: .72rem; font-weight: 800; text-align: center; line-height: 1.5; }
 
 @media (min-width: 900px) {
@@ -541,25 +557,28 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
 
 /* Comparison table: real table on wide screens, one card per topic on phones. */
 .compare-card h2 { margin-bottom: .3rem; }
-.compare-scroll { margin-top: 12px; }
-.compare { width: 100%; border-collapse: collapse; font-size: .8rem; line-height: 1.45; }
+/* Sideways scroll when the parties don't fit; the topic column stays put. */
+.compare-wrap { position: relative; margin-top: 12px; }
+.compare-scroll { overflow-x: auto; overscroll-behavior-x: contain; }
+.compare-wrap::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 48px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--surface)); opacity: 0; transition: opacity .2s;
+}
+.compare-wrap.more::after { opacity: 1; }
+.cue-side { right: 4px; top: 40px; background: var(--surface); color: var(--text); border: 1px solid var(--line-strong); box-shadow: 0 2px 8px rgba(15, 23, 42, .15); }
+.compare { --first: 7.5rem; --col: 13rem; width: 100%; min-width: calc(var(--first) + var(--cols, 5) * var(--col)); table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: .8rem; line-height: 1.45; }
+@media (min-width: 900px) { .compare { --first: 8rem; --col: 9.5rem; } }
+.compare .src { margin-left: 0; max-width: 100%; }
+.compare .src a { max-width: 100%; white-space: normal; overflow-wrap: anywhere; border-radius: 8px; }
+.compare thead th:first-child, .compare tbody th { position: sticky; left: 0; z-index: 1; width: var(--first); background: var(--surface); box-shadow: 1px 0 0 var(--line); }
 .compare th, .compare td { text-align: left; vertical-align: top; padding: 10px; border-top: 1px solid var(--line); }
 .compare thead th { border-top: 0; font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
 .compare thead a, .compare tbody th a { color: var(--text); font-weight: 800; text-decoration: none; }
-.compare tbody th { width: 12%; font-size: .82rem; }
+.compare tbody th { font-size: .82rem; }
 .compare tbody th a:hover, .compare thead a:hover { text-decoration: underline; }
-.compare td { width: 17.6%; color: var(--text-2); }
+.compare td { color: var(--text-2); }
 .compare .na { color: var(--muted); font-style: italic; }
 .compare tbody tr:nth-child(odd) td, .compare tbody tr:nth-child(odd) th { background: var(--surface-2); }
-@media (max-width: 899px) {
-  .compare, .compare tbody, .compare tr, .compare td, .compare tbody th { display: block; width: auto; }
-  .compare thead { display: none; }
-  .compare tbody tr { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
-  .compare tbody tr:nth-child(odd) td, .compare tbody tr:nth-child(odd) th { background: none; }
-  .compare tbody th { background: var(--surface-2) !important; border-top: 0; font-size: .9rem; }
-  .compare td { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 10px; }
-  .compare td::before { content: attr(data-label); font-weight: 800; color: var(--text); }
-}
 .kv dd .muted { font-weight: 500; }
 
 /* ---------- Party colours (vars injected from data: --pc brand, --pc-ink text) ---------- */
@@ -579,10 +598,6 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
 .compare thead th:first-child { border-bottom-color: var(--line); }
 .ballot li .party-dot { background: var(--pc); }
 .positions .who.party-text { display: flex; align-items: center; }
-@media (max-width: 899px) {
-  .compare td { border-left: 4px solid var(--pc); }
-  .compare td::before { color: var(--pc-ink); }
-}
 /* Party-coloured names that link to the party or the candidate. */
 .party-link { color: var(--pc-ink); font-weight: 700; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--pc) 45%, transparent); text-underline-offset: 3px; }
 .party-link:hover { text-decoration-color: var(--pc); }
