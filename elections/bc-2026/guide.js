@@ -13,7 +13,7 @@
 // since the printed guide isn't online.
 
 window.GUIDE = {
-  lastUpdated: "2026-10-14",
+  lastUpdated: "2026-10-19",
 
   // Everything election-specific the app shows. Text marked `html` is trusted
   // author content (may contain <strong>/<a>); everything else is escaped.
@@ -85,8 +85,9 @@ window.GUIDE = {
 
     // Extra "Good to know" items (candidates on both ballots are added automatically).
     alerts: [
-      { html: "The <strong>Burnaby and Richmond local elections on October 17</strong> were a separate vote, one week earlier. Some Burnaby candidates were on both ballots.", src: ["ebc-candidates", "city-elections", "richmond-declaration"] },
-      { html: "<strong>Vote-by-mail:</strong> the last day to request a package online or by phone is <strong>Sunday, October 18</strong>. Elections BC must receive your completed package by 8 pm on October 24.", src: ["ebc-ways"] },
+      { html: "<strong>Advance voting is open until Wednesday, October 21</strong>, 8 am to 8 pm, at any advance voting place. Not all of them are open every day, so check <a href=\"https://wheretovote.elections.bc.ca/\" target=\"_blank\" rel=\"noopener\">Where to Vote</a> first.", src: ["ebc-ways", "ebc-where"] },
+      { html: "The <strong>Burnaby and Richmond local elections on October 17</strong> were a separate vote, one week earlier. Some Burnaby and Richmond candidates were on both ballots.", src: ["ebc-candidates", "city-elections", "richmond-declaration"] },
+      { html: "<strong>Vote-by-mail:</strong> requests closed on October 18. If you have a package, Elections BC must receive it by 8 pm on October 24.", src: ["ebc-ways"] },
     ],
 
     beforeYouGo: [
@@ -136,8 +137,11 @@ window.GUIDE = {
     "ebc-candidates": { title: "2026 Provincial General Election - candidate list", publisher: "Elections BC", url: "https://elections.bc.ca/2026-provincial-election/candidate-list/", type: "official" },
     "ebc-yamagata": { title: "2026 Provincial General Election candidates update", publisher: "Elections BC", url: "https://elections.bc.ca/news/2026-provincial-general-election-candidates-update/", type: "official" },
     "ebc-depaco": { title: "2026 Provincial General Election candidates update (Greg DePaco withdrawal)", publisher: "Elections BC", date: "2026-10-10", url: "https://elections.bc.ca/news/2026-provincial-general-election-candidates-update-3/", type: "official" },
+    "ebc-withdrawals": { title: "2026 Provincial General Election Candidates (withdrawals before the October 14 deadline)", publisher: "Elections BC", date: "2026-10-14", url: "https://elections.bc.ca/news/2026-provincial-general-election-candidates/", type: "official" },
     "ebc-parties": { title: "Registered political parties", publisher: "Elections BC", url: "https://elections.bc.ca/docs/fin/Registered-Political-Parties-Information.pdf", type: "official" },
     "richmond-declaration": { title: "General Local and School Election, October 17, 2026: Declaration of Election by Voting", publisher: "City of Richmond", date: "2026-09-21", url: "https://www.richmond.ca/__shared/assets/Declaration_of_Election_by_Voting_-_September_21__202679778.pdf", type: "official" },
+    "richmond-results": { title: "2026 General Local and School Election: unofficial results", publisher: "City of Richmond", url: "https://richmond.ca/electionservices/electionresults/Results.aspx", type: "official" },
+    "burnaby-results": { title: "Preliminary Election Results", publisher: "City of Burnaby", date: "2026-10-17", url: "https://www.burnaby.ca/our-city/news/2026-10-17/preliminary-election-results", type: "official" },
     "city-elections": { title: "General Local Election", publisher: "City of Burnaby", url: "https://www.burnaby.ca/elections", type: "official" },
     "city-profiles-council": { title: "Office of Councillor - candidate profiles", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates/office-of-councillor-candidate-profiles", type: "official" },
     "city-profiles-trustee": { title: "Office of School Trustee - candidate profiles", publisher: "City of Burnaby", url: "https://www.burnaby.ca/our-city/mayor-and-council/elections/candidates/office-of-school-trustees-candidate-profiles", type: "official" },
@@ -158,6 +162,7 @@ window.GUIDE = {
     "party-ndp-plan": { title: "Build BC Strong (platform)", publisher: "BC NDP", url: "https://www.bcndp.ca/plan", type: "party" },
     "party-ndp-costing": { title: "BC Strong Fiscal & Costing Plan", publisher: "BC NDP", date: "2026-10-14", url: "https://www.bcndp.ca/sites/default/files/bc_strong_fiscal_and_costing_plan.pdf", type: "party" },
     "party-ndp-team": { title: "Our Team (candidate bios)", publisher: "BC NDP", url: "https://www.bcndp.ca/team", type: "candidate" },
+    "party-conservative-platform": { title: "Lorne Doerkson's Plan for a Stronger BC (costed platform, PDF)", publisher: "Conservative Party of BC", date: "2026-10-18", url: "https://conservativebc.ca/wp-content/uploads/2026/10/20261016_BCC_Platform2026_8-5x11-Draft-18_compressed.pdf", type: "party" },
     "party-conservative-plan": { title: "Our Plan", publisher: "Conservative Party of BC", url: "https://conservativebc.ca/plan/", type: "party" },
     "party-conservative-tax": { title: "$1000 Tax Cut", publisher: "Conservative Party of BC", date: "2026-10-08", url: "https://conservativebc.ca/plan/conservatives-will-cut-your-taxes-by-1000/", type: "party" },
     "party-conservative-safety": { title: "Safe Streets for BC", publisher: "Conservative Party of BC", date: "2026-10-06", url: "https://conservativebc.ca/plan/safe-streets-for-bc/", type: "party" },
@@ -165,6 +170,8 @@ window.GUIDE = {
     "party-green-plan": { title: "Believe in Better: 2026 platform (PDF)", publisher: "BC Green Party", date: "2026-10", url: "https://bcgreens.ca/wp-content/uploads/2026/10/BCG_Platform.pdf", type: "party" },
     "party-green-summary": { title: "Economic vision: executive summary (PDF)", publisher: "BC Green Party", date: "2026-10", url: "https://bcgreens.ca/wp-content/uploads/2026/10/BCG_Executive-Summary.pdf", type: "party" },
     "party-centrebc-plan": { title: "2026 Platform", publisher: "CentreBC", url: "https://www.centrebc.ca/platform/", type: "party" },
+    "party-canwest-home": { title: "CanWest Party home page", publisher: "CanWest Party", url: "http://canwestparty.ca/", type: "party" },
+    "party-centrebc-wosk": { title: "Barry Wosk (candidate bio)", publisher: "CentreBC", url: "https://www.centrebc.ca/candidates/barry-wosk/", type: "candidate" },
     "party-onebc-home": { title: "OneBC home page", publisher: "OneBC", url: "https://1bc.ca/", type: "party" },
     "party-onebc-plan": { title: "Our Priorities", publisher: "OneBC", url: "https://1bc.ca/priorities", type: "party" },
 
@@ -198,6 +205,13 @@ window.GUIDE = {
     "cp-debate": { title: "Key quotes from the British Columbia leaders' debate ahead of Oct. 24 election", publisher: "The Canadian Press (via CFJC Today)", date: "2026-10-14", url: "https://cfjctoday.com/2026/10/14/key-quotes-from-the-british-columbia-leaders-debate-ahead-of-oct-24-election/", type: "news" },
     "tyee-debate": { title: "Leaders Battle over BC's Future in TV Debate", publisher: "The Tyee (Andrew MacLeod)", date: "2026-10-15", url: "https://thetyee.ca/News/2026/10/15/Leaders-Battle-BC-Future-TV-Debate/", type: "news" },
     "global-debate": { title: "B.C. provincial election debate: Leadership, spending, ICBC and DRIPA", publisher: "Global News (Amy Judd)", date: "2026-10-14", url: "https://globalnews.ca/news/12101213/watch-bc-election-provincial-leaders-debate-live/", type: "news" },
+    "rn-evans": { title: "B.C. Votes: Steveston candidate plans to withdraw from provincial race", publisher: "Richmond News (Maria Rantanen)", date: "2026-10-09", url: "https://www.richmond-news.com/2026-bc-votes/steveston-bc-candidate-plans-to-withdraw-from-provincial-race-12879821", type: "news" },
+    "rn-parties": { title: "Five parties vie for Richmond votes in provincial election", publisher: "Richmond News", url: "https://www.richmond-news.com/2026-bc-votes/bc-votes-parties-richmond-bc-votes-oct-24-2026-provincial-election-12855611", type: "news" },
+    "rn-chen": { title: "B.C. Votes: Richmond Centre CanWest Party candidate Lawrence Chen (questionnaire)", publisher: "Richmond News", date: "2026-10-12", url: "https://www.richmond-news.com/2026-bc-votes/bc-votes-richmond-centre-canwest-party-candidate-lawrence-chen-12883894", type: "candidate" },
+    "rn-yang": { title: "B.C. Votes: Richmond-Steveston CanWest Party candidate Keenan Yang (questionnaire)", publisher: "Richmond News", date: "2026-10-16", url: "https://www.richmond-news.com/2026-bc-votes/bc-votes-richmond-steveston-canwest-party-candidate-keenan-yang-12901435", type: "candidate" },
+    "rn-dang-trustee": { title: "Richmond Votes: School trustee candidate Calvin Dang", publisher: "Richmond News", date: "2026-09-29", url: "https://www.richmond-news.com/2026-civic-election/richmond-bc-votes-school-trustee-candidate-calvin-dang-12832198", type: "news" },
+    "dang-site-trustee": { title: "Calvin Dang for Richmond School Trustee (campaign site, archived October 8)", publisher: "Calvin Dang campaign (via Internet Archive)", date: "2026-10-08", url: "https://web.archive.org/web/20261008133558/https://calvindang.ca/en", type: "candidate" },
+    "dang-site": { title: "Calvin Dang, BC Greens Candidate for MLA (campaign site)", publisher: "Calvin Dang campaign", url: "https://calvindang.ca/en", type: "candidate" },
     "dailyhive-xie": { title: "David Xie says he is no longer pursuing a seat on Burnaby City Council", publisher: "Daily Hive", date: "2026-10-02", url: "https://dailyhive.com/vancouver/david-xie-bc-conservative-burnaby-south-metrotown", type: "news" },
   },
 
@@ -214,13 +228,13 @@ window.GUIDE = {
       lean: [{ label: "Centre-right to right-wing", src: ["wiki-conservative"] }],
       role: "Challenger",
       website: "https://conservativebc.ca/",
-      platform: "party-conservative-plan",
+      platform: "party-conservative-platform",
       context: [
         { text: "Running candidates in all 93 ridings.", src: ["ebc-candidates"] },
       ],
       stances: {
         costs: { text: "“Cut provincial income taxes by $1,000 a year” by raising the basic personal exemption to $32,000; “we will not raise taxes”", src: ["party-conservative-tax", "party-conservative-plan"] },
-        housing: null,
+        housing: { text: "“Cut construction taxes and charges”; “approve homes in months, not years”; density decided by local governments through their Official Community Plans; overhaul the step code", src: ["party-conservative-platform"] },
         health: { text: "“Keep emergency rooms open”; protect current health funding; an expert commission in the first 100 days to cut wait times", src: ["party-conservative-health"] },
         safety: { text: "Hire 250 more police officers and 500 RCMP officers; “compassionate intervention” into care; end “safe supply”", src: ["party-conservative-safety"] },
       },
@@ -230,8 +244,10 @@ window.GUIDE = {
         "Hire 250 more police officers, add 500 RCMP officers, and 50 new Crown prosecutors",
         "“Double BC's LNG production by 2032 and triple it by 2035”",
       ],
-      moreSrc: ["party-conservative-plan", "party-conservative-tax", "party-conservative-health", "party-conservative-safety"],
+      moreSrc: ["party-conservative-platform", "party-conservative-plan", "party-conservative-tax", "party-conservative-health", "party-conservative-safety"],
       more: [
+        "Costed platform: a deficit of $13.7 billion this year, falling to $10.8 billion in 2029/30",
+        "“Give local governments a say in deciding where density goes”, through locally developed Official Community Plans",
         "“Introduce compassionate intervention” so people with severe addiction, mental illness or brain injury are taken into care",
         "“End the NDP's failed ‘safe supply’ experiment and expand access to naloxone”",
         "“Repeal SOGI, while providing a safe place for our kids to go to school”",
@@ -300,6 +316,7 @@ window.GUIDE = {
       ],
       moreSrc: ["party-ndp-plan", "party-ndp-costing"],
       more: [
+        "Costed plan: a deficit of $13.8 billion this year, falling to $12.0 billion in 2028/29",
         "$1.31 billion over five years toward Burnaby Hospital Phase 2, a $1.8 billion project",
         "Fund health care by “asking top income earners to contribute a little more”",
         "Coordinated regional surgery waitlists and more MRI and CT capacity",
@@ -316,12 +333,15 @@ window.GUIDE = {
       short: "CanWest",
       lean: null,
       role: "Challenger",
-      website: null,
+      website: "http://canwestparty.ca/",
       context: [
-        { text: "A registered BC party based in Richmond; its registered leader is Wei Ping Chen. We found no party website or published platform.", src: ["ebc-parties"] },
+        { text: "A registered BC party based in Richmond; its registered leader is Wei Ping Chen. Its website gives a one-line platform and no detailed policies.", src: ["ebc-parties", "party-canwest-home"] },
         { text: "Running candidates in 2 of 93 ridings.", src: ["ebc-candidates"] },
       ],
-      stances: { costs: null, housing: null, health: null, safety: null },
+      stances: { costs: { text: "“Low tax”", src: ["party-canwest-home"] }, housing: null, health: null, safety: { text: "“Promote community safety”", src: ["party-canwest-home"] } },
+      says: [
+        "“Developing the economy, promote community safety, foster harmonious neighborly relations, ensure equality among all races, low tax and create a better environment”",
+      ],
     },
     "centrebc": {
       color: { brand: "#ee2d30", ink: "#c0181b", inkDark: "#f88183", src: "party-centrebc-home" },
@@ -441,7 +461,7 @@ window.GUIDE = {
     "burnaby-north-jenny-yamagata": {
       flags: ["local"],
       points: ["Make Burnaby Hospital Phase 2 “a top priority”", "Mental well-being of youth and teachers; equitable access to education", "Responsible public spending and holding officials accountable", "Founder of a maternal wellness non-profit (WOMB)"],
-      notes: [{ text: "Is also an independent candidate for Burnaby school trustee in the October 17 local election.", src: ["city-profiles-trustee", "ebc-yamagata"] }],
+      notes: [{ text: "Was also an independent candidate for Burnaby school trustee in the October 17 local election. She received 10,541 votes and was not elected (preliminary results).", src: ["city-profiles-trustee", "ebc-yamagata", "burnaby-results"] }],
     },
 
     // Burnaby South-Metrotown
@@ -455,7 +475,7 @@ window.GUIDE = {
     "burnaby-south-metrotown-david-xie": {
       flags: ["local"],
       points: ["More than a decade in recruitment and talent acquisition", "Make sure residents' concerns are “heard”", "Raised by immigrant parents; UBC graduate"],
-      notes: [{ text: "His name is also on the October 17 Burnaby local ballot for City Council. He said on October 2 that he is no longer seeking that seat.", src: ["city-profiles-council", "dailyhive-xie"] }],
+      notes: [{ text: "His name was also on the October 17 Burnaby local ballot for City Council, though he said on October 2 that he was no longer seeking that seat. He received 5,598 votes and was not elected (preliminary results).", src: ["city-profiles-council", "dailyhive-xie", "burnaby-results"] }],
     },
 
     // Burnaby-New Westminster
@@ -477,7 +497,18 @@ window.GUIDE = {
     },
 
     // Richmond Centre
-    "richmond-centre-calvin-dang": { points: ["Has run Richmond seafood and meat processing businesses since 2014", "Helps lead an Asian Canadian youth basketball non-profit with about 1,000 members", "“Good representation starts with listening”"] },
+    "richmond-centre-lawrence-chen": {
+      flags: ["local"],
+      notes: [
+        { text: "Has no party bio. His answers to the Richmond News candidate questionnaire cover housing, health care, public safety, taxes, transit and other local issues.", src: ["rn-chen"] },
+        { text: "Was also a candidate for Richmond school trustee in the October 17 local election, and was reported to be running for trustee in Sechelt too. He received 4,127 votes in Richmond and was not elected (unofficial results).", src: ["rn-parties", "richmond-declaration", "richmond-results"] },
+      ],
+    },
+    "richmond-centre-calvin-dang": {
+      flags: ["local"],
+      points: ["Has run Richmond seafood and meat processing businesses since 2014", "Helps lead an Asian Canadian youth basketball non-profit with about 1,000 members", "“Good representation starts with listening”"],
+      notes: [{ text: "Was also a candidate for Richmond school trustee in the October 17 local election. His campaign website was for that race until it switched to this one. He received 2,929 votes and was not elected (unofficial results).", src: ["rn-dang-trustee", "richmond-declaration", "dang-site-trustee", "dang-site", "richmond-results"] }],
+    },
     "richmond-centre-sacha-peter": { points: ["Chartered Professional Accountant specializing in corporate taxation", "Born and raised in Richmond; UBC physics graduate", "Six years on the Cultus Lake Park Board, three as Chair", "Scrutinize the provincial budget and expose waste"] },
     "richmond-centre-henry-yao": {
       points: ["MLA for Richmond South Centre from 2020 to 2024", "Moved to Richmond from Taiwan when young; fluent in English and Mandarin", "Protect services, create good jobs and strengthen healthcare"],
@@ -494,6 +525,12 @@ window.GUIDE = {
     },
 
     // Richmond-Steveston
+    "richmond-steveston-robert-evans": {
+      notes: [{ text: "Told the Richmond News on October 9 that he planned to withdraw and support CentreBC's Barry Wosk. He was not among the withdrawals Elections BC announced before the October 14 deadline, so he is still a candidate and his name is on the ballot.", src: ["rn-evans", "ebc-withdrawals", "ebc-candidates"] }],
+    },
+    "richmond-steveston-keenan-yang": {
+      notes: [{ text: "Has no party bio. In the Richmond News candidate questionnaire he describes himself as a UBC graduate and environmental scientist, and says he is running “to listen, represent our community’s priorities and deliver practical results”.", src: ["rn-yang"] }],
+    },
     "richmond-steveston-bruce-kong": { points: ["Owns an auto body shop in Richmond", "Father of two who also helps care for his aging parents", "Reliable health care; help families and local businesses get ahead"] },
     "richmond-steveston-barry-wosk": { points: ["Lifelong Richmond resident; Steveston High School graduate", "Three decades running a Richmond-based small business; UBC Commerce graduate", "Former Director of the Richmond Chamber of Commerce", "Economy, healthcare access, safer communities and housing affordability"] },
     "richmond-steveston-gordon-zhang": { points: ["Has taught business at Kwantlen Polytechnic University's Richmond campus for more than 17 years", "Helped set up one of Canada's first domestic N95 respirator production lines, in Richmond", "Domestic manufacturing and secure supply chains"] },
@@ -554,6 +591,9 @@ window.GUIDE = {
         { id: "burnaby-new-westminster-raj-chouhan", text: "Wants to bring down “the costs people face” and support workers and businesses facing tariffs.", src: ["party-ndp-team"] },
         { id: "burnaby-north-simon-chandler", text: "An accountant who says he will advocate for “common-sense tax policy”.", src: ["party-conservative-candidates"] },
         { id: "burnaby-south-metrotown-bryan-fockler", text: "Says delivery work gives him “a firsthand understanding of the cost-of-living crisis”.", src: ["party-green-candidates"] },
+        { id: "richmond-bridgeport-linda-li", text: "Says she will fight to “bring down costs”.", src: ["party-ndp-team"] },
+        { id: "richmond-queensborough-luc-burns", text: "Wants to help shape policy “that makes everyday life more affordable” for the riding.", src: ["party-green-candidates"] },
+        { id: "richmond-centre-sacha-peter", text: "An accountant who says he will scrutinize the provincial budget and expose “waste wherever he finds it”.", src: ["party-conservative-candidates"] },
       ],
     },
     {
@@ -570,6 +610,7 @@ window.GUIDE = {
         { id: "burnaby-north-maddy-kennedy-parrott", text: "A renter raising two children who says she knows “the pressures families face around housing”.", src: ["party-green-candidates"] },
         { id: "burnaby-east-javad-shushtarian", text: "Running to advocate for affordable housing.", src: ["party-green-candidates"] },
         { id: "burnaby-centre-shila-taheri", text: "Lists affordability and housing among her priorities.", src: ["party-green-candidates"] },
+        { id: "richmond-steveston-barry-wosk", text: "Lists “addressing housing affordability” among his commitments.", src: ["party-centrebc-wosk"] },
       ],
     },
     {
@@ -586,6 +627,8 @@ window.GUIDE = {
         { id: "burnaby-east-javad-shushtarian", text: "A nursing graduate who cites primary care shortages and long ER waits.", src: ["party-green-candidates"] },
         { id: "burnaby-new-westminster-raj-chouhan", text: "Wants to hire more health care workers.", src: ["party-ndp-team"] },
         { id: "burnaby-centre-anne-kang", text: "Says she has worked to strengthen public health care.", src: ["party-ndp-team"] },
+        { id: "richmond-steveston-bruce-kong", text: "Says families “need access to reliable health care”.", src: ["party-ndp-team"] },
+        { id: "richmond-steveston-barry-wosk", text: "Committed to “improving access to healthcare”.", src: ["party-centrebc-wosk"] },
       ],
     },
     {
@@ -601,6 +644,7 @@ window.GUIDE = {
       candidates: [
         { id: "burnaby-north-simon-chandler", text: "A former Community Police Volunteer who says police “need the right tools to tackle crime”.", src: ["party-conservative-candidates"] },
         { id: "burnaby-centre-shila-taheri", text: "Lists safe communities among her priorities.", src: ["party-green-candidates"] },
+        { id: "richmond-steveston-barry-wosk", text: "Committed to “building safer communities”.", src: ["party-centrebc-wosk"] },
       ],
     },
   ],

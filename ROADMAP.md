@@ -8,20 +8,19 @@ The guide covers the nine ridings that include Burnaby or Richmond (`?election=b
 
 Before voting day:
 
-- [ ] Re-check the party platforms for new announcements. October 17: added the NDP costed plan's Burnaby Hospital Phase 2 funding. The Conservatives' plan still has no housing commitment, and their costed platform is described as imminent.
-- [ ] Re-run `scripts/bc-2026/fetch_candidates.py` once more before Final Voting Day, now that it covers the Richmond ridings, and check the Richmond focus points against any bio changes.
+- [ ] Re-check the party platforms for new announcements. October 17: added the NDP costed plan's Burnaby Hospital Phase 2 funding. October 19: added the Conservatives' costed platform (released October 18), including their housing plan, and each party's own deficit projection.
 - [ ] Ask a few people of different political views to review the BC guide for fairness before sharing it widely.
 - [ ] Ask someone to try "Find my riding" and the riding switcher on a phone with a few real addresses, including one near a riding boundary.
 
 Richmond gaps:
 
-- [ ] Find bios for the candidates who have none: Lawrence Chen and Keenan Yang (CanWest Party) and Robert Evans (independent, Richmond-Steveston). If one turns up, add it to `BIOS` in the fetch script. Also look for a CanWest Party website or platform.
-- [ ] Check whether Lawrence Chen and Calvin Dang, both Richmond MLA candidates, are the same people as the school trustee candidates of those names on Richmond's October 17 ballot (City of Richmond declaration). If confirmed, add a sourced note and the `local` flag, as for Jenny Yamagata.
-- [ ] Add Richmond candidates to the Issues pages (`issues[].candidates`), where their own bios speak to an issue. Today these pages quote only Burnaby candidates.
+- [ ] Robert Evans (independent, Richmond-Steveston) still has no bio or questionnaire. He told the Richmond News on October 9 that he planned to withdraw, but didn't before the deadline. Check for a follow-up story before voting day.
+- [ ] Consider linking every Richmond candidate's Richmond News questionnaire (published October 12 to 17), not just the two CanWest candidates who have no party bio.
 
 ## Next: results
 
-- [ ] Add Burnaby 2026 results (`elections/burnaby-2026/results.js`) once the City declares them (by October 21), then set `results: true`.
+- [ ] After the October 21 official declarations in Burnaby and Richmond, update the local-ballot vote counts quoted in BC candidate notes (Jenny Yamagata, David Xie, Lawrence Chen, Calvin Dang) if they changed.
+- [ ] Burnaby 2026: replace the unofficial results with the City's official declaration (due October 21 at 4 pm): update the counts and source, set `status: "official"` and `declared`, and drop `published`.
 - [ ] Add BC 2026 results for the Burnaby and Richmond ridings after final count (planned November 6 to 10), then set `results: true`.
 
 ## After the elections
@@ -68,6 +67,11 @@ Three options, from least to most risky:
 
 ## Done
 
+- [x] BC 2026: re-ran `scripts/bc-2026/fetch_candidates.py` (October 19: same 33 candidates; Barry Wosk's bio now ends with his website)
+- [x] BC 2026: found the CanWest Party website and its one-line platform; added notes for Lawrence Chen and Keenan Yang linking their Richmond News questionnaires, and for Robert Evans's announced but unfiled withdrawal (October 19)
+- [x] BC 2026: confirmed Lawrence Chen and Calvin Dang also ran for Richmond school trustee; added sourced notes, the `local` flag and their local results (October 19)
+- [x] BC 2026: added Richmond candidates to the Issues pages from their own bios; replaced the expired vote-by-mail alert with an advance voting alert (October 19)
+- [x] Burnaby 2026: unofficial results from the City's preliminary count (October 17), shown as unofficial until declared (October 19)
 - [x] Guide built from official candidate profiles, all 64 Burnaby candidates (October 2026)
 - [x] Party platforms, issue explainers, attributed opinions, Leger poll with caveats
 - [x] Party colours from each party's own branding; neutral line icons
