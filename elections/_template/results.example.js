@@ -9,6 +9,7 @@
 window.RESULTS = {
   status: "official",            // "unofficial" on election night, "official" once declared
   declared: "2026-10-21",        // date the official results were declared
+  // published: "2026-10-17",    // instead of `declared`, for unofficial results
   src: ["official-results"],
   sources: {
     "official-results": { title: "Official election results", publisher: "City of ...", url: "https://...", type: "official" },

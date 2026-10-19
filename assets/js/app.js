@@ -549,7 +549,7 @@
         '<span class="eyebrow">' + esc(e.kind) + " · " + esc(e.day) + "</span>" +
         "<h1>" + esc(e.place) + (PAST ? " voted on " : / and /.test(e.place) ? " vote on " : " votes on ") + esc(e.dayShort) + "</h1>" +
         '<p><span class="countdown">' + esc(countdownText()) + "</span> " +
-          (PAST ? (RES ? "See who won, with official vote counts, on the Results tab. " : "") + "The candidates, parties and issues are kept here as they stood during the campaign."
+          (PAST ? (RES ? "See who won, with " + (OFFICIAL ? "official" : "unofficial") + " vote counts, on the Results tab. " : "") + "The candidates, parties and issues are kept here as they stood during the campaign."
                 : esc(e.termNote) + " Every candidate is here in their own words, with sources for everything else.") + "</p>" +
         (PAST && RES ? '<p><a class="btn hero-btn" href="#results">' + icon("chart") + "See the results</a></p>" : "") +
       "</div>" +
@@ -1010,8 +1010,13 @@
     return rows;
   }
 
+  var OFFICIAL = !RES || RES.status === "official";
+  function longDate(iso) {
+    return new Date(iso + "T12:00:00").toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" });
+  }
+
   function resultsSummary() {
-    return '<div class="card"><h2 class="h-ico">' + icon("check") + "Who was elected</h2>" +
+    return '<div class="card"><h2 class="h-ico">' + icon("check") + "Who was elected" + (OFFICIAL ? "" : ' <span class="badge">Unofficial</span>') + "</h2>" +
       '<div class="elected-grid">' + scopedOffices().map(function (o) {
         var won = raceRows(o).filter(function (r) { return r.elected && BY_ID[r.id]; });
         return '<div><p class="label">' + esc(OFFICES[o].plural) + '</p><ul class="elected-list">' + won.map(function (r) {
@@ -1041,7 +1046,10 @@
         }).join("") + "</ol></div>";
     }).join("");
     $("#view-results").innerHTML =
-      intro("Results", esc(RES.status === "official" ? "Official results" : "Unofficial results") + (RES.declared ? ", declared " + esc(RES.declared) : "") + ". Vote counts as published by the " + esc(E.authority) + "." + srcChips(RES.src)) +
+      intro("Results", (OFFICIAL
+        ? "Official results" + (RES.declared ? ", declared " + esc(longDate(RES.declared)) : "") + "."
+        : "Unofficial results" + (RES.published ? ", published " + esc(longDate(RES.published)) : "") + ". " + esc(E.resultsNote || "They may change once official results are declared.")) +
+        " Vote counts as published by the " + esc(E.authority) + "." + srcChips(RES.src)) +
       (RES.turnout ? '<div class="card"><p class="label">Turnout</p><p><strong>' + esc(RES.turnout.pct) + "</strong>" + (RES.turnout.ballots ? " · " + Number(RES.turnout.ballots).toLocaleString("en-CA") + " ballots" : "") + "</p></div>" : "") +
       races;
   }

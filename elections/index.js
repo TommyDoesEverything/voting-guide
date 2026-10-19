@@ -6,7 +6,7 @@
 //   date     voting day (YYYY-MM-DD, local time)
 //   close    when polls close on voting day (HH:MM); the election is shown as
 //            "past" after this, with results if results.js exists
-//   results  true once elections/<id>/results.js has official results
+//   results  true once elections/<id>/results.js exists (unofficial or official)
 //
 // The site opens on the earliest election whose voting day hasn't ended yet
 // (switching at midnight after voting day), or the most recent one once all
@@ -21,7 +21,7 @@ window.ELECTIONS = {
       type: "Municipal",
       date: "2026-10-17",
       close: "20:00",
-      results: false,
+      results: true,
     },
     {
       id: "bc-2026",
