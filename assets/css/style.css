@@ -160,21 +160,25 @@ button, input, select { font: inherit; color: inherit; }
 .tabs a:hover { color: var(--bar-text); background: var(--bar-raised); }
 .tabs a[aria-current="page"] { background: var(--bar-text); color: var(--bar); }
 /* Riding switcher (elections where each voter is in one riding) */
-.scope-bar { max-width: 1120px; margin: 0 auto; padding: 0 var(--gutter) 10px; display: flex; align-items: center; gap: 8px; }
-.scope-bar[hidden] { display: none; }
-.scope-label { display: inline-flex; align-items: center; gap: 5px; color: var(--bar-muted); font-size: .8rem; font-weight: 700; flex: none; }
-.scope-label .i { width: 15px; height: 15px; }
-@media (max-width: 420px) { .scope-word { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
-.scope-bar select {
-  flex: 0 1 300px; min-width: 0; height: 34px; padding: 0 8px; border-radius: 8px; font-size: .85rem; font-weight: 600;
-  background: var(--bar-raised); color: var(--bar-text); border: 1px solid var(--bar-line);
+/* Riding button: a header button like the others; opens the riding popup. */
+.scope-btn[hidden] { display: none; }
+.scope-btn .lbl { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.scope-ico { position: relative; display: inline-flex; }
+.scope-dot { position: absolute; top: -3px; right: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--pick); box-shadow: 0 0 0 2px var(--bar-raised); }
+dialog.scope-dlg { width: min(480px, 100%); }
+.scope-dlg h2 { margin: 6px 0 0; font-size: 1.1rem; }
+.scope-list { list-style: none; margin: 12px 0 16px; padding: 0; display: grid; gap: 6px; }
+.scope-opt {
+  width: 100%; min-height: var(--tap); padding: 8px 12px; border-radius: 12px; cursor: pointer; text-align: left;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--surface); color: var(--text); border: 1px solid var(--line); font: inherit;
 }
-.scope-toggle {
-  flex: none; height: 34px; padding: 0 12px; border-radius: 8px; cursor: pointer; font-size: .8rem; font-weight: 700;
-  background: transparent; color: var(--bar-text); border: 1px solid var(--bar-line);
-}
-.scope-toggle:hover { background: var(--bar-raised); }
-html.has-scope { scroll-padding-top: 176px; }
+.scope-opt:hover { border-color: var(--line-strong); background: var(--surface-2); }
+.scope-opt strong { display: block; font-size: .93rem; }
+.scope-opt small { display: block; font-size: .76rem; color: var(--muted); }
+.scope-opt[aria-pressed="true"] { border-color: var(--text); box-shadow: inset 0 0 0 1px var(--text); }
+.scope-opt .i { width: 18px; height: 18px; flex: none; }
+.scope-finder { margin-bottom: 12px; }
 .pill { display: inline-block; min-width: 1.35em; padding: 0 .4em; border-radius: 999px; background: var(--pick); color: #2b2100; font-size: .72rem; font-weight: 800; text-align: center; line-height: 1.5; }
 
 @media (min-width: 900px) {
@@ -307,6 +311,8 @@ details.more > .more-body { padding: 2px 0 8px; font-size: .92rem; }
 .bar-row.other .bar-fill { background: repeating-linear-gradient(45deg, var(--chart-soft), var(--chart-soft) 4px, transparent 4px, transparent 8px); border: 1px solid var(--chart-soft); }
 .bar-row.other .nm { color: var(--muted); font-style: italic; }
 .bar-row .pct { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
+.poll-card .poll-sub { margin: 14px 0 0; font-size: .78rem; font-weight: 700; color: var(--text-2); }
+.poll-card .bar-row { grid-template-columns: minmax(0, 8em) 1fr 3em; }
 .caveat { font-size: .8rem; color: var(--muted); background: var(--surface-2); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 12px; }
 .snap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .snap div { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; }

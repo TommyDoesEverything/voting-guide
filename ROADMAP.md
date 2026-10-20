@@ -9,6 +9,7 @@ The guide covers the nine ridings that include Burnaby or Richmond (`?election=b
 Before voting day:
 
 - [ ] Re-check the party platforms for new announcements. October 17: added the NDP costed plan's Burnaby Hospital Phase 2 funding. October 19: added the Conservatives' costed platform (released October 18), including their housing plan, and each party's own deficit projection.
+- [ ] Polls: check for final-week releases (Leger, Research Co., Angus Reid, others) and replace each firm's entry in `elections/bc-2026/polls.js` with its latest. Angus Reid's own methodology paragraph couldn't be read (its page blocks scripts); its sample and margin of error come from Indo-Canadian Voice coverage. Confirm them against Angus Reid if possible.
 - [ ] Ask a few people of different political views to review the BC guide for fairness before sharing it widely.
 - [ ] Ask someone to try "Find my riding" and the riding switcher on a phone with a few real addresses, including one near a riding boundary.
 
@@ -67,6 +68,7 @@ Three options, from least to most risky:
 
 ## Done
 
+- [x] BC 2026: added province-wide polls (Angus Reid October 15-19, Leger October 9-12, Research Co. October 9-11) with BC-wide and Metro Vancouver vote intention; checked CTV's platform tracker against party platforms and added the missing promises to each party's list (October 19)
 - [x] BC 2026: re-ran `scripts/bc-2026/fetch_candidates.py` (October 19: same 33 candidates; Barry Wosk's bio now ends with his website)
 - [x] BC 2026: found the CanWest Party website and its one-line platform; added notes for Lawrence Chen and Keenan Yang linking their Richmond News questionnaires, and for Robert Evans's announced but unfiled withdrawal (October 19)
 - [x] BC 2026: confirmed Lawrence Chen and Calvin Dang also ran for Richmond school trustee; added sourced notes, the `local` flag and their local results (October 19)

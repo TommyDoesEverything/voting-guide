@@ -182,8 +182,8 @@
   }
   function ballotOffices() { return CHOOSE ? (myOffice ? [myOffice] : []) : Object.keys(OFFICES); }
 
-  // What the other pages show: just your riding, or all of them. "Show all"
-  // keeps your riding (and ballot); it only widens what's listed.
+  // What the other pages show: just your riding, or all of them. Choosing
+  // "All ridings" keeps your riding (and ballot); it only widens what's listed.
   var SCOPE_KEY = "vg-scope-all:" + META.id;
   var scopeAll = CHOOSE ? store.get(SCOPE_KEY, false) === true : true;
   function scope() { return CHOOSE && myOffice && !scopeAll ? myOffice : null; }
@@ -211,27 +211,68 @@
     if (route.view === "picks") renderPicks();
   }
   var SCOPED_VIEWS = ["start", "candidates", "parties", "issues", "results"];
+  // Riding button in the header, styled like the other header buttons (icon
+  // only on phones, with a dot when one riding is shown). It opens a popup
+  // listing every riding, plus "Find my riding" where the guide has a finder.
+  // Shown only on pages the scope filters.
+  function scopeAllLabel() { return "All " + Object.keys(OFFICES).length + " " + CHOOSE.noun + "s"; }
   function renderScopeBar() {
-    var bar = $("#scope-bar");
+    var btn = $("#scope-btn");
     if (!CHOOSE) return;
-    var all = Object.keys(OFFICES);
-    bar.innerHTML = '<label class="scope-label" for="scope-pick">' + icon("pin") + '<span class="scope-word">' + esc(CHOOSE.noun.charAt(0).toUpperCase() + CHOOSE.noun.slice(1)) + "</span></label>" +
-      '<select id="scope-pick"><option value="all"' + (scope() ? "" : " selected") + ">All " + all.length + " " + esc(CHOOSE.noun) + "s</option>" +
-      all.map(function (o) {
-        return '<option value="' + o + '"' + (o === scope() ? " selected" : "") + ">" + esc(OFFICES[o].label) + (o === myOffice ? " (yours)" : "") + "</option>";
-      }).join("") + "</select>" +
-      (myOffice ? '<button type="button" class="scope-toggle" id="scope-toggle">' + (scope() ? "Show all" : "Just mine") + "</button>" : "");
-    var show = SCOPED_VIEWS.indexOf(route.view || "start") > -1;
-    bar.hidden = !show;
-    document.documentElement.classList.toggle("has-scope", show);
+    var label = scope() ? OFFICES[scope()].label : scopeAllLabel();
+    btn.innerHTML = '<span class="scope-ico">' + icon("pin") + (scope() ? '<span class="scope-dot" aria-hidden="true"></span>' : "") + "</span>" +
+      '<span class="lbl">' + esc(label) + "</span>";
+    btn.setAttribute("aria-label", CHOOSE.noun.charAt(0).toUpperCase() + CHOOSE.noun.slice(1) + ": " + label + ". Change");
+    btn.hidden = SCOPED_VIEWS.indexOf(route.view || "start") < 0;
+    var dlg = $("#scope-dlg");
+    if (dlg && dlg.open) renderScopeList();
+  }
+  function renderScopeList() {
+    var list = $("#scope-dlg .scope-list");
+    if (!list) return;
+    var rows = [{ id: "all", label: scopeAllLabel(), sub: "Every candidate and party in this guide" }].concat(Object.keys(OFFICES).map(function (o) {
+      var n = CANDS.filter(function (c) { return c.office === o; }).length;
+      return { id: o, label: OFFICES[o].label, sub: n + " candidates" + (o === myOffice ? " · your " + CHOOSE.noun : "") };
+    }));
+    var cur = scope() || "all";
+    list.innerHTML = rows.map(function (r) {
+      return '<li><button type="button" class="scope-opt" data-scope="' + r.id + '" aria-pressed="' + (r.id === cur) + '">' +
+        '<span><strong>' + esc(r.label) + "</strong><small>" + esc(r.sub) + "</small></span>" + (r.id === cur ? icon("check") : "") + "</button></li>";
+    }).join("");
+  }
+  function openScopeDialog() {
+    var dlg = $("#scope-dlg");
+    var finder = FINDER && !PAST
+      ? '<form class="finder scope-finder" novalidate><label class="label" for="scope-dlg-addr">' + esc(FINDER.label) + "</label>" +
+        '<div class="finder-row"><input type="text" id="scope-dlg-addr" name="addr" autocomplete="street-address" placeholder="' + esc(FINDER.placeholder) + '" value="' + esc(finderAddr) + '">' +
+        '<button class="btn" type="submit">' + icon("search") + "Find</button></div>" +
+        ("geolocation" in navigator ? '<button class="btn ghost sm finder-locate" type="button">' + icon("target") + "Use my location</button>" : "") +
+        '<p class="finder-out small" role="status" aria-live="polite">' + finderMsg + "</p>" +
+        '<p class="small muted">' + esc(FINDER.privacy) + "</p></form>"
+      : "";
+    dlg.innerHTML = '<div class="pf">' +
+      '<div class="pf-head"><h2 id="scope-dlg-title">' + esc(CHOOSE.question) + '</h2><button type="button" class="x-btn" data-close aria-label="Close">✕</button></div>' +
+      '<div class="pf-body">' +
+        '<p class="small muted">Changes which ' + esc(CHOOSE.noun) + " the Overview, Candidates, Parties and Issues pages show. Your ballot keeps the " + esc(CHOOSE.noun) + " you choose.</p>" +
+        '<ul class="scope-list"></ul>' + finder +
+        '<p class="small"><a href="' + esc(CHOOSE.lookupUrl) + '" target="_blank" rel="noopener">' + esc(CHOOSE.lookupText) + "</a></p>" +
+      "</div></div>";
+    renderScopeList();
+    dlg.showModal();
+    var cur = $('.scope-opt[aria-pressed="true"]', dlg);
+    if (cur) { cur.focus({ preventScroll: true }); cur.scrollIntoView({ block: "nearest" }); }
   }
   if (CHOOSE) {
-    document.addEventListener("change", function (ev) {
-      if (ev.target.id !== "scope-pick") return;
-      if (ev.target.value === "all") setScopeAll(true); else setMyOffice(ev.target.value);
-    });
     document.addEventListener("click", function (ev) {
-      if (ev.target.id === "scope-toggle") setScopeAll(!!scope());
+      if (ev.target.closest("#scope-btn")) { openScopeDialog(); return; }
+      var dlg = $("#scope-dlg");
+      if (!dlg.open) return;
+      if (ev.target === dlg || ev.target.closest("[data-close]")) { dlg.close(); return; }
+      var opt = ev.target.closest(".scope-opt");
+      if (!opt) return;
+      var v = opt.getAttribute("data-scope");
+      dlg.close();
+      if (v === "all") setScopeAll(true); else setMyOffice(v);
     });
   }
   function officePicker(id) {
@@ -482,21 +523,43 @@
     return days + " days until " + COPY.votingDay + ".";
   }
 
-  function barRows(rows, linkOffice) {
-    var max = Math.max.apply(null, rows.map(function (r) { return r.pct; }));
+  // `scale` fixes the full-width value so bars compare across side-by-side charts.
+  function barRows(rows, linkOffice, scale) {
+    var max = Math.max.apply(null, rows.map(function (r) { return r.pct; }).concat(scale || 0));
     return rows.map(function (r) {
       var name = r.name || r.label;
       var nm = r.id ? '<a class="nm" href="#candidates/' + linkOffice + "/" + r.id + '">' + esc(name) + "</a>" : '<span class="nm">' + esc(name) + "</span>";
-      var cls = r.id && BY_ID[r.id] ? pc(BY_ID[r.id].org) + " party-bar" : "";
+      var org = r.org || (r.id && BY_ID[r.id] ? BY_ID[r.id].org : null);
+      var cls = org ? pc(org) + " party-bar" : "";
       return '<div class="bar-row' + (r.other ? " other" : "") + cls + '">' + nm +
         '<div class="bar-track" aria-hidden="true"><div class="bar-fill" style="width:' + (r.pct / max * 100) + '%"></div></div>' +
         '<span class="pct">' + r.pct + "%</span></div>";
     }).join("");
   }
 
+  // Province-wide polls (polls.js entries with `bc`): one card per poll, newest
+  // first, each with its own sample, undecided share and margin of error.
+  function partyPollSection() {
+    var cards = POLLS.map(function (p) {
+      return '<div class="card poll-card"><p class="label">' + esc(p.pollster) + "</p>" +
+        '<p class="small muted">Fieldwork ' + esc(p.fieldDates) + " · " + esc(p.sample) + srcChips(p.src) + "</p>" +
+        '<p class="poll-sub">BC-wide · ' + esc(p.bc.label.toLowerCase()) + '</p><div class="bars">' + barRows(p.bc.results, null, 50) + "</div>" +
+        '<p class="poll-sub">Metro Vancouver</p><div class="bars">' + barRows(p.metro.results, null, 50) + "</div>" +
+        (p.metro.note ? '<p class="small muted">' + esc(p.metro.note) + "</p>" : "") +
+        '<p class="small muted">' + esc(p.method) + " " + esc(p.undecided) + " " + esc(p.moeNote) + "</p>" +
+        (p.findings && p.findings.length ? more("Also in this poll", "<ul>" + p.findings.map(function (f) { return "<li>" + esc(f) + "</li>"; }).join("") + "</ul>") : "") +
+      "</div>";
+    }).join("");
+    return '<div><h2 class="h-ico">' + icon("chart") + "What BC voters told pollsters</h2>" +
+      '<p class="small muted">The latest poll from each firm that published BC vote intention in October, newest fieldwork first. Numbers are copied from each pollster without rounding or averaging.</p></div>' +
+      '<div class="grid-3">' + cards + "</div>" +
+      '<div class="caveat"><strong>Read with care:</strong> these polls measure support across BC and in Metro Vancouver as a whole. None reports results for Burnaby or Richmond, or for any single riding, and you vote for a candidate in your riding, not for a party province-wide. In every poll the two largest parties are 3 points or less apart, and the pollsters used different methods and questions. A poll is a snapshot, not a prediction.</div>';
+  }
+
   function pollSection() {
     var p = POLLS[0];
     if (!p) return "";
+    if (p.bc) return partyPollSection();
     var snap = p.snapshot.map(function (s) {
       return "<div><b>" + esc(s.value) + "</b><span>" + esc(s.label) + "</span><small>" + esc(s.detail) + (s.src ? srcChips(s.src) : "") + "</small></div>";
     }).join("");
@@ -602,7 +665,7 @@
           ? "The " + CANDS.filter(inScope).length + " candidates in " + esc(OFFICES[scope()].label) + ", your " + esc(CHOOSE.noun) + ","
           : "All " + CANDS.length + " candidates,") +
         " listed alphabetically by surname " + esc(COPY.listedAs) + ". Each card's focus comes only from the candidate's own statement. Tap <strong>View full profile</strong> for their full statement, sourced context, and arguments for and against." +
-        (scope() ? " To see other " + esc(CHOOSE.noun) + "s, tap <strong>Show all</strong> at the top." : "")) +
+        (scope() ? " To see other " + esc(CHOOSE.noun) + "s, tap the " + esc(CHOOSE.noun) + " button at the top and choose <strong>" + esc(scopeAllLabel()) + "</strong>." : "")) +
       '<div class="card filters-card">' +
         (offs.length > 1 ? '<div class="seg' + (offs.length > 6 ? " many" : "") + '" role="group" aria-label="Choose a race">' + seg + "</div>" : "") +
         '<div class="filter-row">' +
@@ -941,7 +1004,7 @@
     var indepNotable = scope() ? [] : indep.filter(function (c) { return c.flags.indexOf("incumbent") > -1; });
     $("#view-parties").innerHTML =
       intro("Parties", esc(COPY.partiesIntro) + (scope()
-        ? " <strong>Showing the " + keys.length + (keys.length === 1 ? " party" : " parties") + (indep.length ? " and independents" : "") + " running in " + esc(OFFICES[scope()].label) + ".</strong> Tap <strong>Show all</strong> at the top for every party in this guide."
+        ? " <strong>Showing the " + keys.length + (keys.length === 1 ? " party" : " parties") + (indep.length ? " and independents" : "") + " running in " + esc(OFFICES[scope()].label) + ".</strong> Tap the " + esc(CHOOSE.noun) + " button at the top and choose <strong>" + esc(scopeAllLabel()) + "</strong> for every party in this guide."
         : "")) +
       compareTable(keys) +
       '<div class="grid-2 party-grid">' + cards +
@@ -967,7 +1030,7 @@
 
     $("#view-issues").innerHTML =
       intro("Issues", "The big debates in this election. Each starts with sourced background facts, then where every party stands (the same positions as the comparison on the Parties page), then examples of individual candidates who have spoken to it." +
-        (scope() ? " <strong>Showing the parties and candidates in " + esc(OFFICES[scope()].label) + ".</strong> Tap <strong>Show all</strong> at the top for everyone." : "")) +
+        (scope() ? " <strong>Showing the parties and candidates in " + esc(OFFICES[scope()].label) + ".</strong> Tap the " + esc(CHOOSE.noun) + " button at the top and choose <strong>" + esc(scopeAllLabel()) + "</strong> for everyone." : "")) +
       jump +
       G.issues.map(function (iss, i) {
         var topic = G.compareTopics.filter(function (t) { return t.issue === iss.id; })[0];

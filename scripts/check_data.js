@@ -84,6 +84,8 @@ for (const [k, list] of Object.entries(ops)) {
 polls.forEach((pl, i) => {
   checkSources(pl.src, `polls[${i}]`);
   (pl.mayor ? pl.mayor.results : []).forEach((r) => r.id && !ids.has(r.id) && problems.push(`polls[${i}]: unknown candidate "${r.id}"`));
+  [pl.bc, pl.metro].forEach((grp) => (grp ? grp.results : []).forEach((r) => r.org && !g.orgs[r.org] && problems.push(`polls[${i}]: unknown party "${r.org}"`)));
+  if (pl.bc && !(pl.sample && pl.undecided && pl.moeNote)) problems.push(`polls[${i}]: needs sample, undecided and moeNote`);
 });
 
 if (res) {
