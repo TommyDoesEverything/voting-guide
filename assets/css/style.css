@@ -574,6 +574,15 @@ dialog.profile::backdrop { background: rgba(2, 6, 23, .6); backdrop-filter: blur
 .cue-side { right: 4px; top: 40px; background: var(--surface); color: var(--text); border: 1px solid var(--line-strong); box-shadow: 0 2px 8px rgba(15, 23, 42, .15); }
 .compare { --first: 7.5rem; --col: 13rem; width: 100%; min-width: calc(var(--first) + var(--cols, 5) * var(--col)); table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: .8rem; line-height: 1.45; }
 @media (min-width: 900px) { .compare { --first: 8rem; --col: 9.5rem; } }
+/* Phones: the card spans the screen and the table runs edge to edge, with a
+   narrow topic column whose text lines up with the page gutter. */
+@media (max-width: 759px) {
+  .compare-card { margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); border-radius: 0; border-inline: 0; }
+  .compare-wrap { margin-inline: calc(-1 * var(--gutter)); }
+  .compare { --first: calc(4rem + var(--gutter)); }
+  .compare thead th:first-child, .compare tbody th { padding: 10px 4px 10px var(--gutter); }
+  .compare tbody th { font-size: .74rem; line-height: 1.3; hyphens: auto; overflow-wrap: break-word; }
+}
 .compare .src { margin-left: 0; max-width: 100%; }
 .compare .src a { max-width: 100%; white-space: normal; overflow-wrap: anywhere; border-radius: 8px; }
 .compare thead th:first-child, .compare tbody th { position: sticky; left: 0; z-index: 1; width: var(--first); background: var(--surface); box-shadow: 1px 0 0 var(--line); }
