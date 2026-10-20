@@ -218,7 +218,7 @@
   function scopeAllLabel() { return "All " + Object.keys(OFFICES).length + " " + CHOOSE.noun + "s"; }
   function renderScopeBar() {
     var btn = $("#scope-btn");
-    if (!CHOOSE) return;
+    if (!CHOOSE || !btn) return;
     var label = scope() ? OFFICES[scope()].label : scopeAllLabel();
     btn.innerHTML = '<span class="scope-ico">' + icon("pin") + (scope() ? '<span class="scope-dot" aria-hidden="true"></span>' : "") + "</span>" +
       '<span class="lbl">' + esc(label) + "</span>";
@@ -266,7 +266,7 @@
     document.addEventListener("click", function (ev) {
       if (ev.target.closest("#scope-btn")) { openScopeDialog(); return; }
       var dlg = $("#scope-dlg");
-      if (!dlg.open) return;
+      if (!dlg || !dlg.open) return;
       if (ev.target === dlg || ev.target.closest("[data-close]")) { dlg.close(); return; }
       var opt = ev.target.closest(".scope-opt");
       if (!opt) return;

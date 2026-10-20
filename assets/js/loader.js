@@ -26,6 +26,11 @@
   meta.isDefault = meta.id === reg.default;
   window.ELECTION = meta;
 
+  // The ?v= stamp on this script's own URL (set in index.html) goes on every
+  // file it loads, so a release never mixes new and cached old files.
+  var me = document.currentScript && document.currentScript.src || "";
+  var ver = me.indexOf("?") > -1 ? "?" + me.split("?")[1] : "";
+
   var base = "elections/" + meta.id + "/";
   var files = ["profiles.js", "guide.js", "opinions.js", "polls.js"];
   if (meta.results) files.push("results.js");
@@ -34,7 +39,7 @@
   (function next(i) {
     if (i >= files.length) return;
     var s = document.createElement("script");
-    s.src = base + files[i];
+    s.src = base + files[i] + ver;
     s.onload = function () { next(i + 1); };
     // Optional files (opinions, polls, results) may be missing; keep going.
     s.onerror = function () { next(i + 1); };

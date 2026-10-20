@@ -65,3 +65,5 @@ node scripts/check_data.js
 ```
 
 Then open the site at phone width (about 360px) and check that nothing scrolls sideways.
+
+When a change touches `index.html`, `assets/` or any election file, bump the `?v=` stamp on the three links in `index.html` (it's the same value in all three; use the date plus a letter, like `20261019b`). The loader passes the stamp on to every file it loads, so browsers fetch the whole release fresh instead of mixing new and cached old files.
